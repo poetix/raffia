@@ -152,7 +152,7 @@ public class JsonPathExamples {
 
         Path cheapBooks = Paths.create(
             Paths.toDeepScanObjectProperty("book"),
-            Paths.toArrayIndex("?[@.price < $..expensive]", IndexValuePredicates.valueMatches(isInexpensive))
+            Paths.toArrayIndex("?(@.price < $['expensive'])", IndexValuePredicates.valueMatches(isInexpensive))
         );
 
         return Paths.projectWith(cheapBooks, Projections.listOf(Visitors.copy));
