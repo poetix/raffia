@@ -1,11 +1,8 @@
 package com.codepoetics.raffia.paths;
 
-import com.codepoetics.raffia.api.*;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.codepoetics.raffia.api.Path;
+import com.codepoetics.raffia.api.PathSegment;
+import org.pcollections.PVector;
 
 public final class Paths {
 
@@ -18,71 +15,12 @@ public final class Paths {
     return EMPTY;
   }
 
-  public static Path create(PathSegment...segments) {
+  public static Path create(PVector<PathSegment> segments) {
     Path result = empty();
-    for (int i = segments.length - 1; i >=0; i--) {
-      result = result.prepend(segments[i]);
+    for (int i = segments.size() - 1; i >=0; i--) {
+      result = result.prepend(segments.get(i));
     }
     return result;
-  }
-
-  public static PathSegment toArrayIndex(int index) {
-    return new ArrayIndexPathSegment(index);
-  }
-
-  public static PathSegment toArrayIndex(String predicateDescription, IndexValuePredicate predicate) {
-    return new ItemPredicatePathSegment(predicateDescription, predicate);
-  }
-
-  public static PathSegment toDeepScanObjectProperty(String key) {
-    return new DeepScanToObjectKeyPathSegment(key);
-  }
-
-  public static PathSegment toArrayWildcard() {
-    return ItemPredicatePathSegment.ANY;
-  }
-
-  public static PathSegment toObjectProperty(String key) {
-    return new ObjectKeyPathSegment(key);
-  }
-
-  public static Visitor<Basket> updateWith(Path path, Visitor<Basket> updater) {
-    return path.isEmpty()
-        ? updater
-        : path.head().createUpdater(path.tail(), updater);
-  }
-
-  public static <T> Visitor<List<T>> projectWith(Path path, Visitor<List<T>> projector) {
-    return path.isEmpty()
-        ? projector
-        : path.head().createProjector(path, projector);
-  }
-
-  public static PathSegment toObjectWildcard() {
-    return ObjectPredicatePathSegment.all;
-  }
-
-  public static PathSegment toArrayIndices(int...indices) {
-    StringBuilder representation = new StringBuilder();
-    final Set<Integer> indexSet = new HashSet<>();
-    boolean first = true;
-
-    for (int index : indices) {
-      if (first) {
-        first = false;
-      } else {
-        representation.append(",");
-      }
-      representation.append(index);
-      indexSet.add(index);
-    }
-
-    return toArrayIndex(representation.toString(), new IndexValuePredicate() {
-      @Override
-      public boolean test(int index, Basket value) {
-        return indexSet.contains(index);
-      }
-    });
   }
 
   private static final class EmptyPath implements Path {

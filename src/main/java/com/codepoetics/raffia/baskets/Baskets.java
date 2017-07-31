@@ -3,13 +3,13 @@ package com.codepoetics.raffia.baskets;
 import com.codepoetics.raffia.api.Basket;
 import com.codepoetics.raffia.api.ObjectEntry;
 import com.codepoetics.raffia.api.PropertySet;
-import org.pcollections.HashTreePMap;
-import org.pcollections.PMap;
 import org.pcollections.PVector;
 import org.pcollections.TreePVector;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
 
 public final class Baskets {
 

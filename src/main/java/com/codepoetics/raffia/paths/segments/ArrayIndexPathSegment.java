@@ -1,6 +1,8 @@
-package com.codepoetics.raffia.paths;
+package com.codepoetics.raffia.paths.segments;
 
-import com.codepoetics.raffia.api.*;
+import com.codepoetics.raffia.api.Basket;
+import com.codepoetics.raffia.api.Mapper;
+import com.codepoetics.raffia.api.Visitor;
 import com.codepoetics.raffia.baskets.Baskets;
 import com.codepoetics.raffia.predicates.Predicates;
 import com.codepoetics.raffia.projections.Projections;
@@ -20,19 +22,19 @@ final class ArrayIndexPathSegment extends BasePathSegment {
 
 
   @Override
-  protected Visitor<Basket> createUpdater(Visitor<Basket> subUpdater) {
+  protected Visitor<Basket> createUpdater(Visitor<Basket> continuation) {
     return Projections.branch(
         Predicates.isArray,
-        Projections.map(Projections.asArray, getUpdateMapper(subUpdater)),
+        Projections.map(Projections.asArray, getUpdateMapper(continuation)),
         Visitors.copy
     );
   }
 
   @Override
-  protected <T> Visitor<List<T>> createProjector(Visitor<List<T>> subProjector) {
+  protected <T> Visitor<List<T>> createProjector(Visitor<List<T>> continuation) {
     return Projections.branch(
         Predicates.isArray,
-        Projections.map(Projections.asArray, getProjectionMapper(subProjector)),
+        Projections.map(Projections.asArray, getProjectionMapper(continuation)),
         Projections.constant(Collections.<T>emptyList())
     );
   }

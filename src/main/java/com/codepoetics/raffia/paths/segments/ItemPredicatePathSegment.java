@@ -1,4 +1,4 @@
-package com.codepoetics.raffia.paths;
+package com.codepoetics.raffia.paths.segments;
 
 import com.codepoetics.raffia.api.*;
 import com.codepoetics.raffia.baskets.Baskets;
@@ -13,7 +13,7 @@ import java.util.List;
 
 final class ItemPredicatePathSegment extends BasePathSegment {
 
-  static final PathSegment ANY = new ItemPredicatePathSegment("*", new IndexValuePredicate() {
+  static final PathSegment all = new ItemPredicatePathSegment("*", new IndexValuePredicate() {
     @Override
     public boolean test(int index, Basket value) {
       return true;
@@ -29,19 +29,19 @@ final class ItemPredicatePathSegment extends BasePathSegment {
   }
 
   @Override
-  protected Visitor<Basket> createUpdater(Visitor<Basket> subUpdater) {
+  protected Visitor<Basket> createUpdater(Visitor<Basket> continuation) {
     return Projections.branch(
         Predicates.isArray,
-        Projections.map(Projections.asArray, getUpdateMapper(subUpdater)),
+        Projections.map(Projections.asArray, getUpdateMapper(continuation)),
         Visitors.copy
     );
   }
 
   @Override
-  protected <T> Visitor<List<T>> createProjector(Visitor<List<T>> subProjector) {
+  protected <T> Visitor<List<T>> createProjector(Visitor<List<T>> continuation) {
     return Projections.branch(
         Predicates.isArray,
-        Projections.map(Projections.asArray, getProjectionMapper(subProjector)),
+        Projections.map(Projections.asArray, getProjectionMapper(continuation)),
         Projections.constant(Collections.<T>emptyList())
     );
   }

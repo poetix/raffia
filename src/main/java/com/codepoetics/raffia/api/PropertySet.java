@@ -10,6 +10,10 @@ import java.util.*;
 public class PropertySet implements Iterable<ObjectEntry> {
 
   public static PropertySet of(ObjectEntry...entries) {
+    return of(Arrays.asList(entries));
+  }
+
+  public static PropertySet of(Collection<ObjectEntry> entries) {
     Map<String, Basket> properties = new LinkedHashMap<>();
     for (ObjectEntry entry : entries) {
       properties.put(entry.getKey(), entry.getValue());
@@ -62,7 +66,7 @@ public class PropertySet implements Iterable<ObjectEntry> {
 
   @Override
   public String toString() {
-    return properties.toString();
+    return toMap().toString();
   }
 
   @Override

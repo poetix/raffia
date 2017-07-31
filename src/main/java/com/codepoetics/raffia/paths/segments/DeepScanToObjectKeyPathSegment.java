@@ -1,4 +1,4 @@
-package com.codepoetics.raffia.paths;
+package com.codepoetics.raffia.paths.segments;
 
 import com.codepoetics.raffia.api.*;
 import com.codepoetics.raffia.baskets.Baskets;
@@ -19,11 +19,11 @@ final class DeepScanToObjectKeyPathSegment extends BasePathSegment {
   }
 
   @Override
-  protected Visitor<Basket> createUpdater(Visitor<Basket> subUpdater) {
+  protected Visitor<Basket> createUpdater(Visitor<Basket> continuation) {
     final AtomicReference<Visitor<Basket>> self = new AtomicReference<>();
 
     Visitor<Basket> arrayVisitor = Projections.map(Projections.asArray, getArrayUpdateMapper(self));
-    Visitor<Basket> objectVisitor = Projections.map(Projections.asObject, getObjectUpdateMapper(subUpdater, self));
+    Visitor<Basket> objectVisitor = Projections.map(Projections.asObject, getObjectUpdateMapper(continuation, self));
 
     self.set(Projections.branch(
         Predicates.isArray,
@@ -39,11 +39,11 @@ final class DeepScanToObjectKeyPathSegment extends BasePathSegment {
   }
 
   @Override
-  protected <T> Visitor<List<T>> createProjector(Visitor<List<T>> subProjector) {
+  protected <T> Visitor<List<T>> createProjector(Visitor<List<T>> continuation) {
     final AtomicReference<Visitor<List<T>>> self = new AtomicReference<>();
 
     Visitor<List<T>> arrayVisitor = Projections.map(Projections.asArray, getArrayProjectionMapper(self));
-    Visitor<List<T>> objectVisitor = Projections.map(Projections.asObject, getObjectProjectionMapper(subProjector, self));
+    Visitor<List<T>> objectVisitor = Projections.map(Projections.asObject, getObjectProjectionMapper(continuation, self));
 
     self.set(Projections.branch(
         Predicates.isArray,

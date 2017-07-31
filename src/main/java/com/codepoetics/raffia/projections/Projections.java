@@ -4,7 +4,6 @@ import com.codepoetics.raffia.api.Basket;
 import com.codepoetics.raffia.api.Mapper;
 import com.codepoetics.raffia.api.PropertySet;
 import com.codepoetics.raffia.api.Visitor;
-import org.pcollections.PMap;
 import org.pcollections.PVector;
 
 import java.math.BigDecimal;
@@ -234,10 +233,12 @@ public final class Projections {
     };
   }
 
+  @SuppressWarnings("unchecked")
   public static <T> Visitor<List<T>> listOf(Visitor<T> projection) {
     return map(projection, toListMapper);
   }
 
+  @SuppressWarnings("unchecked")
   public static <T> Visitor<T> firstOf(Visitor<List<T>> projection) {
     return map(projection, (Mapper) toFirstItemMapper);
   }

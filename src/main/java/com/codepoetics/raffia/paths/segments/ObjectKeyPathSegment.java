@@ -1,11 +1,13 @@
-package com.codepoetics.raffia.paths;
+package com.codepoetics.raffia.paths.segments;
 
-import com.codepoetics.raffia.api.*;
+import com.codepoetics.raffia.api.Basket;
+import com.codepoetics.raffia.api.Mapper;
+import com.codepoetics.raffia.api.PropertySet;
+import com.codepoetics.raffia.api.Visitor;
 import com.codepoetics.raffia.baskets.Baskets;
 import com.codepoetics.raffia.predicates.Predicates;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.visitors.Visitors;
-import org.pcollections.PMap;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,19 +21,19 @@ final class ObjectKeyPathSegment extends BasePathSegment {
   }
 
   @Override
-  protected Visitor<Basket> createUpdater(Visitor<Basket> subUpdater) {
+  protected Visitor<Basket> createUpdater(Visitor<Basket> continuation) {
     return Projections.branch(
         Predicates.isObject,
-        Projections.map(Projections.asObject, getUpdateMapper(subUpdater)),
+        Projections.map(Projections.asObject, getUpdateMapper(continuation)),
         Visitors.copy
     );
   }
 
   @Override
-  protected <T> Visitor<List<T>> createProjector(Visitor<List<T>> subProjector) {
+  protected <T> Visitor<List<T>> createProjector(Visitor<List<T>> continuation) {
     return Projections.branch(
         Predicates.isObject,
-        Projections.map(Projections.asObject, getProjectionMapper(subProjector)),
+        Projections.map(Projections.asObject, getProjectionMapper(continuation)),
         Projections.constant(Collections.<T>emptyList())
     );
   }

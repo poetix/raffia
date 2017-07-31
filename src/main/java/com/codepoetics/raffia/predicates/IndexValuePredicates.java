@@ -1,6 +1,9 @@
 package com.codepoetics.raffia.predicates;
 
-import com.codepoetics.raffia.api.*;
+import com.codepoetics.raffia.api.Basket;
+import com.codepoetics.raffia.api.IndexPredicate;
+import com.codepoetics.raffia.api.IndexValuePredicate;
+import com.codepoetics.raffia.api.Visitor;
 
 public final class IndexValuePredicates {
 

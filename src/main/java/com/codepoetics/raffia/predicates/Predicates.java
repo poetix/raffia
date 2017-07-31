@@ -3,7 +3,6 @@ package com.codepoetics.raffia.predicates;
 import com.codepoetics.raffia.api.Basket;
 import com.codepoetics.raffia.api.PropertySet;
 import com.codepoetics.raffia.api.Visitor;
-import org.pcollections.PMap;
 import org.pcollections.PVector;
 
 import java.math.BigDecimal;

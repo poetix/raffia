@@ -4,12 +4,9 @@ import com.codepoetics.raffia.api.Basket;
 import com.codepoetics.raffia.api.PropertySet;
 import com.codepoetics.raffia.api.Visitor;
 import com.codepoetics.raffia.baskets.Baskets;
-import org.pcollections.PMap;
 import org.pcollections.PVector;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
 
 final class CopyVisitor implements Visitor<Basket> {
 

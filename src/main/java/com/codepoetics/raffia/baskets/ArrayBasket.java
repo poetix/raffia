@@ -4,8 +4,6 @@ import com.codepoetics.raffia.api.Basket;
 import com.codepoetics.raffia.api.Visitor;
 import org.pcollections.PVector;
 
-import java.util.List;
-
 
 final class ArrayBasket extends BaseBasket<PVector<Basket>> {
 

@@ -1,6 +1,5 @@
 package com.codepoetics.raffia.api;
 
-import org.pcollections.PMap;
 import org.pcollections.PVector;
 
 import java.math.BigDecimal;

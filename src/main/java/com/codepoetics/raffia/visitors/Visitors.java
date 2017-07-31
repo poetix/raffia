@@ -4,7 +4,6 @@ import com.codepoetics.raffia.api.*;
 import org.pcollections.PVector;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 public final class Visitors {
 
@@ -12,8 +11,11 @@ public final class Visitors {
   }
 
   public static final Visitor<Basket> copy = new CopyVisitor();
-
   public static final Visitor<Object> object = new ObjectVisitor();
+
+  public static <T extends BasketWriter<T>> Visitor<T> writingTo(T writer) {
+    return new WritingVisitor<T>(writer);
+  }
 
   public static <I, O> Visitor<O> chain(final Visitor<I> first, final Mapper<I, Visitor<O>> second) {
     return new Visitor<O>() {
