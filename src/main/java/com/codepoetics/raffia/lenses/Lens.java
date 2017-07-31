@@ -90,7 +90,11 @@ public class Lens {
     Path path = getPath();
     return path.isEmpty()
         ? updater
-        : path.head().createUpdater(path.tail(), updater);
+        : path.head().createUpdater(path, updater);
+  }
+
+  public Basket update(Visitor<Basket> updater, Basket target) {
+    return target.visit(updating(updater));
   }
 
   public <T> Visitor<List<T>> projecting(Visitor<List<T>> projector) {
