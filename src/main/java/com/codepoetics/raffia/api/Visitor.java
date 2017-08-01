@@ -1,7 +1,5 @@
 package com.codepoetics.raffia.api;
 
-import org.pcollections.PVector;
-
 import java.math.BigDecimal;
 
 public interface Visitor<T> {
@@ -14,7 +12,7 @@ public interface Visitor<T> {
 
   T visitNull();
 
-  T visitArray(PVector<Basket> items);
+  T visitArray(ArrayContents items);
 
   T visitObject(PropertySet properties);
 

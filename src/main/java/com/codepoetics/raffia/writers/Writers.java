@@ -1,9 +1,6 @@
 package com.codepoetics.raffia.writers;
 
-import com.codepoetics.raffia.api.Basket;
-import com.codepoetics.raffia.api.BasketWeavingWriter;
-import com.codepoetics.raffia.api.ObjectEntry;
-import com.codepoetics.raffia.api.PropertySet;
+import com.codepoetics.raffia.api.*;
 import com.codepoetics.raffia.baskets.Baskets;
 import org.pcollections.PVector;
 import org.pcollections.TreePVector;
@@ -28,23 +25,23 @@ public final class Writers {
     }
 
     @Override
-    public BasketWeavingWriter writeString(String value) {
-      return writeBasket(Baskets.ofString(value));
+    public BasketWeavingWriter add(String value) {
+      return add(Baskets.ofString(value));
     }
 
     @Override
-    public BasketWeavingWriter writeNumber(BigDecimal value) {
-      return writeBasket(Baskets.ofNumber(value));
+    public BasketWeavingWriter add(BigDecimal value) {
+      return add(Baskets.ofNumber(value));
     }
 
     @Override
-    public BasketWeavingWriter writeBoolean(boolean value) {
-      return writeBasket(Baskets.ofBoolean(value));
+    public BasketWeavingWriter add(boolean value) {
+      return add(Baskets.ofBoolean(value));
     }
 
     @Override
-    public BasketWeavingWriter writeNull() {
-      return writeBasket(Baskets.ofNull());
+    public BasketWeavingWriter addNull() {
+      return add(Baskets.ofNull());
     }
   }
 
@@ -58,9 +55,9 @@ public final class Writers {
     }
 
     @Override
-    public PersistentBasketWeavingWriter writeBasket(Basket basket) {
+    public PersistentBasketWeavingWriter add(Basket basket) {
       if (value != null) {
-        throw new IllegalStateException("accept called when writing value, but value already set");
+        throw new IllegalStateException("plus called when writing value, but value already set");
       }
       return new ValueBasketWeavingWriter(basket);
     }
@@ -74,42 +71,37 @@ public final class Writers {
     }
 
     @Override
-    public BasketWeavingWriter writeStartObject() {
+    public BasketWeavingWriter beginObject() {
       return new ObjectBasketWeavingWriter(this, null, TreePVector.<ObjectEntry>empty());
     }
 
     @Override
-    public BasketWeavingWriter writeEndObject() {
-      throw new IllegalStateException("writeEndObject called without corresponding writeStartObject");
+    public BasketWeavingWriter beginArray() {
+      return new ArrayBasketWeavingWriter(this, ArrayContents.empty());
     }
 
     @Override
-    public BasketWeavingWriter writeStartArray() {
-      return new ArrayBasketWeavingWriter(this, TreePVector.<Basket>empty());
+    public BasketWeavingWriter end() {
+      throw new IllegalStateException("end called without corresponding beginObject or beginArray");
     }
 
     @Override
-    public BasketWeavingWriter writeEndArray() {
-      throw new IllegalStateException("writeEndArray called without corresponding writeStartArray");
-    }
-
-    @Override
-    public BasketWeavingWriter writeKey(String key) {
-      throw new IllegalStateException("writeKey called, but not writing object");
+    public BasketWeavingWriter key(String key) {
+      throw new IllegalStateException("key called, but not writing beginObject");
     }
   }
 
   private static final class ArrayBasketWeavingWriter extends PersistentBasketWeavingWriter {
 
-    private final PVector<Basket> contents;
+    private final ArrayContents contents;
 
-    private ArrayBasketWeavingWriter(PersistentBasketWeavingWriter parent, PVector<Basket> contents) {
+    private ArrayBasketWeavingWriter(PersistentBasketWeavingWriter parent, ArrayContents contents) {
       super(parent);
       this.contents = contents;
     }
 
     @Override
-    public PersistentBasketWeavingWriter writeBasket(Basket basket) {
+    public PersistentBasketWeavingWriter add(Basket basket) {
       return new ArrayBasketWeavingWriter(parent, contents.plus(basket));
     }
 
@@ -119,28 +111,23 @@ public final class Writers {
     }
 
     @Override
-    public BasketWeavingWriter writeStartObject() {
+    public BasketWeavingWriter beginObject() {
       return new ObjectBasketWeavingWriter(this, null, TreePVector.<ObjectEntry>empty());
     }
 
     @Override
-    public BasketWeavingWriter writeEndObject() {
-      throw new IllegalStateException("writeEndObject called while writing array");
+    public BasketWeavingWriter end() {
+      return parent.add(weave());
     }
 
     @Override
-    public BasketWeavingWriter writeStartArray() {
-      return new ArrayBasketWeavingWriter(this, TreePVector.<Basket>empty());
+    public BasketWeavingWriter beginArray() {
+      return new ArrayBasketWeavingWriter(this, ArrayContents.empty());
     }
 
     @Override
-    public BasketWeavingWriter writeEndArray() {
-      return parent.writeBasket(weave());
-    }
-
-    @Override
-    public BasketWeavingWriter writeKey(String key) {
-      throw new IllegalStateException("writeKey called while writing array");
+    public BasketWeavingWriter key(String key) {
+      throw new IllegalStateException("key called while writing beginArray");
     }
   }
 
@@ -156,9 +143,9 @@ public final class Writers {
     }
 
     @Override
-    public PersistentBasketWeavingWriter writeBasket(Basket basket) {
+    public PersistentBasketWeavingWriter add(Basket basket) {
       if (key == null) {
-        throw new IllegalStateException("accept called while writing object, but key not given");
+        throw new IllegalStateException("plus called while writing beginObject, but key not given");
       }
       return new ObjectBasketWeavingWriter(parent, null, contents.plus(ObjectEntry.of(key, basket)));
     }
@@ -169,32 +156,27 @@ public final class Writers {
     }
 
     @Override
-    public BasketWeavingWriter writeStartObject() {
+    public BasketWeavingWriter beginObject() {
       return new ObjectBasketWeavingWriter(this, null, TreePVector.<ObjectEntry>empty());
     }
 
     @Override
-    public BasketWeavingWriter writeEndObject() {
-      return parent.writeBasket(weave());
+    public BasketWeavingWriter end() {
+      return parent.add(weave());
     }
 
     @Override
-    public BasketWeavingWriter writeStartArray() {
+    public BasketWeavingWriter beginArray() {
       if (key == null) {
-        throw new IllegalStateException("writeStartArray called while writing object, but key not given");
+        throw new IllegalStateException("beginArray called while writing beginObject, but key not given");
       }
-      return new ArrayBasketWeavingWriter(this, TreePVector.<Basket>empty());
+      return new ArrayBasketWeavingWriter(this, ArrayContents.empty());
     }
 
     @Override
-    public BasketWeavingWriter writeEndArray() {
-      throw new IllegalStateException("writeEndArray called while writing object");
-    }
-
-    @Override
-    public BasketWeavingWriter writeKey(String key) {
+    public BasketWeavingWriter key(String key) {
       if (this.key != null) {
-        throw new IllegalStateException("writeKey called, but key already set");
+        throw new IllegalStateException("key called, but key already set");
       }
       return new ObjectBasketWeavingWriter(parent, key, contents);
     }

@@ -3,13 +3,16 @@ package com.codepoetics.raffia.builders;
 import com.codepoetics.raffia.api.Basket;
 import com.codepoetics.raffia.api.BasketWeavingWriter;
 import com.codepoetics.raffia.api.BasketWriter;
-import com.codepoetics.raffia.api.Visitor;
-import com.codepoetics.raffia.visitors.Visitors;
+import com.codepoetics.raffia.api.Mapper;
+import com.codepoetics.raffia.injections.Injections;
+import com.codepoetics.raffia.mappers.Mappers;
 import com.codepoetics.raffia.writers.Writers;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public final class BasketBuilder implements BasketWriter<BasketBuilder> {
 
@@ -32,92 +35,127 @@ public final class BasketBuilder implements BasketWriter<BasketBuilder> {
   }
 
   @Override
-  public BasketBuilder writeStartObject() {
-    return with(writer.writeStartObject());
+  public BasketBuilder beginObject() {
+    return with(writer.beginObject());
   }
 
   @Override
-  public BasketBuilder writeEndObject() {
-    return with(writer.writeEndObject());
+  public BasketBuilder end() {
+    return with(writer.end());
   }
 
-
-  public BasketBuilder writeArray(Basket...items) {
-    return writeArray(Arrays.asList(items));
+  public BasketBuilder array() {
+    return array(Collections.<Basket>emptyList());
   }
 
-  public BasketBuilder writeArray(Collection<Basket> items) {
-    BasketBuilder state = writeStartArray();
-    for (Basket basket : items) {
-      state = state.writeBasket(basket);
+  public BasketBuilder array(Basket firstItem, Basket...subsequentItems) {
+    return array(asList(firstItem, subsequentItems, Mappers.<Basket>id()));
+  }
+
+  public BasketBuilder array(String firstItem, String...subsequentItems) {
+    return array(asList(firstItem, subsequentItems, Injections.fromString));
+  }
+
+  public BasketBuilder array(BigDecimal firstItem, BigDecimal...subsequentItems) {
+    return array(asList(firstItem, subsequentItems, Injections.fromNumber));
+  }
+
+  public BasketBuilder array(boolean firstItem, Boolean...subsequentItems) {
+    return array(asList(firstItem, subsequentItems, Injections.fromBoolean));
+  }
+
+  private <T> List<Basket> asList(T first, T[] subsequent, Mapper<T, Basket> mapper) {
+    List<Basket> result = new ArrayList<>(subsequent.length + 1);
+    result.add(mapper.map(first));
+    for (T item : subsequent) {
+      result.add(mapper.map(item));
     }
-    return state.writeEndArray();
+    return result;
   }
 
-  public BasketBuilder writeBasket(Basket basket) {
-    return with(writer.writeBasket(basket));
+  public BasketBuilder array(Collection<Basket> items) {
+    BasketBuilder state = beginArray();
+    for (Basket basket : items) {
+      state = state.add(basket);
+    }
+    return state.end();
   }
 
-  @Override
-  public BasketBuilder writeStartArray() {
-    return with(writer.writeStartArray());
-  }
-
-  @Override
-  public BasketBuilder writeEndArray() {
-    return with(writer.writeEndArray());
-  }
-
-  public BasketBuilder write(BasketBuilder builder) {
-    return writeBasket(builder.weave());
+  public BasketBuilder add(Basket basket) {
+    return with(writer.add(basket));
   }
 
   @Override
-  public BasketBuilder writeKey(String key) {
-    return with(writer.writeKey(key));
+  public BasketBuilder beginArray() {
+    return with(writer.beginArray());
   }
 
-  public BasketBuilder writeField(String key, String value) {
-    return writeKey(key).writeString(value);
-  }
-
-  public BasketBuilder writeField(String key, BigDecimal value) {
-    return writeKey(key).writeNumber(value);
-  }
-
-  public BasketBuilder writeField(String key, boolean value) {
-    return writeKey(key).writeBoolean(value);
-  }
-
-  public BasketBuilder writeField(String key, Basket value) {
-    return writeKey(key).writeBasket(value);
-  }
-
-  public BasketBuilder writeArrayField(String key, Basket...items) {
-    return writeKey(key).writeArray(items);
-  }
-
-  public BasketBuilder writeNullField(String key) {
-    return writeKey(key).writeNull();
+  public BasketBuilder add(BasketBuilder builder) {
+    return add(builder.weave());
   }
 
   @Override
-  public BasketBuilder writeString(String value) {
-    return with(writer.writeString(value));
+  public BasketBuilder key(String key) {
+    return with(writer.key(key));
+  }
+
+  public BasketBuilder add(String key, String value) {
+    return key(key).add(value);
+  }
+
+  public BasketBuilder add(String key, BigDecimal value) {
+    return key(key).add(value);
+  }
+
+  public BasketBuilder add(String key, boolean value) {
+    return key(key).add(value);
+  }
+
+  public BasketBuilder add(String key, Basket value) {
+    return key(key).add(value);
+  }
+
+  public BasketBuilder addArray(String key) {
+    return key(key).array();
+  }
+
+  public BasketBuilder addArray(String key, Basket firstItem, Basket...subsequent) {
+    return key(key).array(firstItem, subsequent);
+  }
+
+  public BasketBuilder addArray(String key, String firstItem, String...subsequent) {
+    return key(key).array(firstItem, subsequent);
+  }
+
+  public BasketBuilder addArray(String key, BigDecimal firstItem, BigDecimal...subsequent) {
+    return key(key).array(firstItem, subsequent);
+  }
+
+  public BasketBuilder addArray(String key, boolean firstItem, Boolean...subsequent) {
+    return key(key).array(firstItem, subsequent);
+  }
+
+  public BasketBuilder addNull(String key) {
+    return key(key).addNull();
   }
 
   @Override
-  public BasketBuilder writeNumber(BigDecimal value) {
-    return with(writer.writeNumber(value));
+  public BasketBuilder add(String value) {
+    return with(writer.add(value));
   }
 
   @Override
-  public BasketBuilder writeBoolean(boolean value) {
-    return with(writer.writeBoolean(value));
+  public BasketBuilder add(BigDecimal value) {
+    return with(writer.add(value));
   }
 
   @Override
-  public BasketBuilder writeNull() {
-    return with(writer.writeNull());
+  public BasketBuilder add(boolean value) {
+    return with(writer.add(value));
+  }
+
+  @Override
+  public BasketBuilder addNull() {
+    return with(writer.addNull());
   }
 }

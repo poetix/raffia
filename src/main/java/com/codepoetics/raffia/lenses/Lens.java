@@ -4,12 +4,15 @@ import com.codepoetics.raffia.api.*;
 import com.codepoetics.raffia.paths.Paths;
 import com.codepoetics.raffia.paths.segments.PathSegments;
 import com.codepoetics.raffia.predicates.IndexValuePredicates;
+import com.codepoetics.raffia.predicates.NumberPredicates;
 import com.codepoetics.raffia.predicates.Predicates;
+import com.codepoetics.raffia.predicates.StringPredicates;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.visitors.Visitors;
 import org.pcollections.PVector;
 import org.pcollections.TreePVector;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -66,12 +69,24 @@ public class Lens {
     return plus(PathSegments.ofAny(objectKey));
   }
 
+  public Lens toMatching(IndexValuePredicate predicate) {
+    return toMatching("?", predicate);
+  }
+
   public Lens toMatching(String representation, IndexValuePredicate predicate) {
     return plus(PathSegments.itemMatching(representation, predicate));
   }
 
+  public Lens toMatching(IndexPredicate predicate) {
+    return toMatching("?", predicate);
+  }
+
   public Lens toMatching(String representation, IndexPredicate predicate) {
     return toMatching(representation, IndexValuePredicates.indexMatches(predicate));
+  }
+
+  public Lens toMatching(Visitor<Boolean> valuePredicate) {
+    return toMatching("?", valuePredicate);
   }
 
   public Lens toMatching(String representation, Visitor<Boolean> valuePredicate) {
@@ -138,5 +153,21 @@ public class Lens {
 
   public List<Basket> getAll(Basket basket) {
     return basket.visit(gettingAll());
+  }
+
+  public Visitor<Boolean> matching(String value) {
+    return matchingString(StringPredicates.isEqualTo(value));
+  }
+
+  public Visitor<Boolean> matchingString(Mapper<String, Boolean> matcher) {
+    return gettingOne(Projections.map(Projections.asString, matcher));
+  }
+
+  public Visitor<Boolean> matching(BigDecimal value) {
+    return matchingNumber(NumberPredicates.isEqualTo(value));
+  }
+
+  public Visitor<Boolean> matchingNumber(Mapper<BigDecimal, Boolean> matcher) {
+    return gettingOne(Projections.map(Projections.asNumber, matcher));
   }
 }

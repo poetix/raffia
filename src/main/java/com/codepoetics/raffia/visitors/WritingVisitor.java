@@ -1,7 +1,6 @@
 package com.codepoetics.raffia.visitors;
 
 import com.codepoetics.raffia.api.*;
-import org.pcollections.PVector;
 
 import java.math.BigDecimal;
 
@@ -15,41 +14,41 @@ class WritingVisitor<T extends BasketWriter<T>> implements Visitor<T> {
 
   @Override
   public T visitString(String value) {
-    return writer.writeString(value);
+    return writer.add(value);
   }
 
   @Override
   public T visitBoolean(boolean value) {
-    return writer.writeBoolean(value);
+    return writer.add(value);
   }
 
   @Override
   public T visitNumber(BigDecimal value) {
-    return writer.writeNumber(value);
+    return writer.add(value);
   }
 
   @Override
   public T visitNull() {
-    return writer.writeNull();
+    return writer.addNull();
   }
 
   @Override
-  public T visitArray(PVector<Basket> items) {
-    T state = writer.writeStartArray();
+  public T visitArray(ArrayContents items) {
+    T state = writer.beginArray();
     for (Basket item : items) {
       state = item.visit(new WritingVisitor<>(state));
     }
-    return state.writeEndArray();
+    return state.end();
   }
 
   @Override
   public T visitObject(PropertySet properties) {
-    T state = writer.writeStartObject();
+    T state = writer.beginObject();
     for (ObjectEntry entry : properties) {
-      state = state.writeKey(entry.getKey());
+      state = state.key(entry.getKey());
       state = entry.getValue().visit(new WritingVisitor<>(state));
     }
-    return state.writeEndObject();
+    return state.end();
   }
 
 }

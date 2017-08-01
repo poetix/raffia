@@ -1,10 +1,9 @@
 package com.codepoetics.raffia.baskets;
 
+import com.codepoetics.raffia.api.ArrayContents;
 import com.codepoetics.raffia.api.Basket;
 import com.codepoetics.raffia.api.ObjectEntry;
 import com.codepoetics.raffia.api.PropertySet;
-import org.pcollections.PVector;
-import org.pcollections.TreePVector;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -37,10 +36,10 @@ public final class Baskets {
   }
 
   public static Basket ofArray(Collection<Basket> entries) {
-    return ofArray(TreePVector.from(entries));
+    return ofArray(ArrayContents.of(entries));
   }
 
-  public static Basket ofArray(PVector<Basket> entries) {
+  public static Basket ofArray(ArrayContents entries) {
     return new ArrayBasket(entries);
   }
 

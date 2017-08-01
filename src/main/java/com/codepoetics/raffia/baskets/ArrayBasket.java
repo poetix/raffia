@@ -1,13 +1,12 @@
 package com.codepoetics.raffia.baskets;
 
-import com.codepoetics.raffia.api.Basket;
+import com.codepoetics.raffia.api.ArrayContents;
 import com.codepoetics.raffia.api.Visitor;
-import org.pcollections.PVector;
 
 
-final class ArrayBasket extends BaseBasket<PVector<Basket>> {
+final class ArrayBasket extends BaseBasket<ArrayContents> {
 
-  ArrayBasket(PVector<Basket> value) {
+  ArrayBasket(ArrayContents value) {
     super(value);
   }
 

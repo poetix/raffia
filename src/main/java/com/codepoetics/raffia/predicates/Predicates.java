@@ -1,9 +1,8 @@
 package com.codepoetics.raffia.predicates;
 
-import com.codepoetics.raffia.api.Basket;
+import com.codepoetics.raffia.api.ArrayContents;
 import com.codepoetics.raffia.api.PropertySet;
 import com.codepoetics.raffia.api.Visitor;
-import org.pcollections.PVector;
 
 import java.math.BigDecimal;
 
@@ -35,7 +34,7 @@ public final class Predicates {
     }
 
     @Override
-    public Boolean visitArray(PVector<Basket> items) {
+    public Boolean visitArray(ArrayContents items) {
       return false;
     }
 
@@ -76,7 +75,7 @@ public final class Predicates {
 
   public static final Visitor<Boolean> isArray = new TypeTestVisitor() {
     @Override
-    public Boolean visitArray(PVector<Basket> items) {
+    public Boolean visitArray(ArrayContents items) {
       return true;
     }
   };

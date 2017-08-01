@@ -6,48 +6,45 @@ import com.codepoetics.raffia.api.PropertySet;
 import com.codepoetics.raffia.api.Visitor;
 import com.codepoetics.raffia.baskets.Baskets;
 import com.codepoetics.raffia.lenses.Lens;
-import com.codepoetics.raffia.predicates.NumberPredicates;
 import com.codepoetics.raffia.projections.Projections;
-import com.codepoetics.raffia.visitors.Visitors;
+import com.codepoetics.raffia.setters.Setters;
+import com.codepoetics.raffia.updaters.Updaters;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.util.List;
 
-import static com.codepoetics.raffia.StoreExample.*;
+import static com.codepoetics.raffia.StoreExample.store;
+import static com.codepoetics.raffia.injections.Injections.fromString;
 import static com.codepoetics.raffia.projections.Projections.asNumber;
-import static com.codepoetics.raffia.projections.Projections.asObject;
 import static com.codepoetics.raffia.projections.Projections.asString;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.*;
 
 public class Updating {
 
-  private static final Visitor<Basket> capitaliseString = Projections.map(asString, new Mapper<String, Basket>() {
+  private static final Visitor<Basket> capitaliseString = Updaters.ofString(new Mapper<String, String>() {
     @Override
-    public Basket map(String input) {
-      return Baskets.ofString(input.toUpperCase());
+    public String map(String input) {
+      return input.toUpperCase();
     }
   });
 
-  private static final Visitor<Basket> priceToString = Projections.map(asNumber, new Mapper<BigDecimal, Basket>() {
+  private static final Visitor<Basket> priceToString = Updaters.from(asNumber, new Mapper<BigDecimal, String>() {
     @Override
-    public Basket map(BigDecimal input) {
-      return Baskets.ofString(input.toString());
+    public String map(BigDecimal input) {
+      return input.toString();
     }
-  });
+  }, fromString);
 
-  private static final Visitor<Basket> addDescription = Projections.map(asObject, new Mapper<PropertySet, Basket>() {
+  private static final Visitor<Basket> addDescription = Updaters.ofObject(new Mapper<PropertySet, PropertySet>() {
     @Override
-    public Basket map(PropertySet input) {
-      return Baskets.ofObject(input.with("description",
+    public PropertySet map(PropertySet input) {
+      return input.with("description",
           Baskets.ofString(
               "\""
                   + input.get("title").visit(asString)
                   + "\", by "
-                  + input.get("author").visit(asString))));
+                  + input.get("author").visit(asString)));
     }
   });
 
@@ -83,6 +80,23 @@ public class Updating {
         Lens.create().toAny("description").getAll(asString, updated),
         hasItem("\"Sayings of the Century\", by Nigel Rees")
     );
+  }
+
+  @Test
+  public void rewritingAValue() {
+    Visitor<Boolean> authorIsNigel = Lens.create().to("author").matching("Nigel Rees");
+
+    Basket updated = Lens.create()
+        .toAny("book")
+        .toMatching("?", authorIsNigel)
+        .to("title")
+        .update(Setters.toString("Hallucinogenic Adventures vol. 13"), store);
+
+    System.out.println(updated);
+
+    assertThat(
+        Lens.create().toAny("book").toMatching("?", authorIsNigel).to("title").getOne(Projections.asString, updated),
+        equalTo("Hallucinogenic Adventures vol. 13"));
   }
 
 }

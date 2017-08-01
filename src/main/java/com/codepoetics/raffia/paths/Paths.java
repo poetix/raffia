@@ -2,7 +2,8 @@ package com.codepoetics.raffia.paths;
 
 import com.codepoetics.raffia.api.Path;
 import com.codepoetics.raffia.api.PathSegment;
-import org.pcollections.PVector;
+
+import java.util.List;
 
 public final class Paths {
 
@@ -15,7 +16,7 @@ public final class Paths {
     return EMPTY;
   }
 
-  public static Path create(PVector<PathSegment> segments) {
+  public static Path create(List<PathSegment> segments) {
     Path result = empty();
     for (int i = segments.size() - 1; i >=0; i--) {
       result = result.prepend(segments.get(i));

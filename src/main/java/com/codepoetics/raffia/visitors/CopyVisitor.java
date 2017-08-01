@@ -1,10 +1,10 @@
 package com.codepoetics.raffia.visitors;
 
+import com.codepoetics.raffia.api.ArrayContents;
 import com.codepoetics.raffia.api.Basket;
 import com.codepoetics.raffia.api.PropertySet;
 import com.codepoetics.raffia.api.Visitor;
 import com.codepoetics.raffia.baskets.Baskets;
-import org.pcollections.PVector;
 
 import java.math.BigDecimal;
 
@@ -31,7 +31,7 @@ final class CopyVisitor implements Visitor<Basket> {
   }
 
   @Override
-  public Basket visitArray(PVector<Basket> items) {
+  public Basket visitArray(ArrayContents items) {
     return Baskets.ofArray(items);
   }
 

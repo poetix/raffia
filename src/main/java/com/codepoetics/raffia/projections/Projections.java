@@ -1,10 +1,9 @@
 package com.codepoetics.raffia.projections;
 
-import com.codepoetics.raffia.api.Basket;
+import com.codepoetics.raffia.api.ArrayContents;
 import com.codepoetics.raffia.api.Mapper;
 import com.codepoetics.raffia.api.PropertySet;
 import com.codepoetics.raffia.api.Visitor;
-import org.pcollections.PVector;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -38,7 +37,7 @@ public final class Projections {
       }
 
       @Override
-      public T visitArray(PVector<Basket> items) {
+      public T visitArray(ArrayContents items) {
         return constant;
       }
 
@@ -81,7 +80,7 @@ public final class Projections {
       }
 
       @Override
-      public T visitArray(PVector<Basket> items) {
+      public T visitArray(ArrayContents items) {
         return predicate.visitArray(items)
             ? ifTrue.visitArray(items)
             : ifFalse.visitArray(items);
@@ -129,13 +128,13 @@ public final class Projections {
     }
 
     @Override
-    public T visitArray(PVector<Basket> items) {
-      return unexpected("an array");
+    public T visitArray(ArrayContents items) {
+      return unexpected("an beginArray");
     }
 
     @Override
     public T visitObject(PropertySet properties) {
-      return unexpected("an object");
+      return unexpected("an beginObject");
     }
   }
 
@@ -167,14 +166,14 @@ public final class Projections {
     }
   };
 
-  public static final Visitor<PVector<Basket>> asArray = new VisitorProjection<PVector<Basket>>("an array") {
+  public static final Visitor<ArrayContents> asArray = new VisitorProjection<ArrayContents>("an beginArray") {
     @Override
-    public PVector<Basket> visitArray(PVector<Basket> items) {
+    public ArrayContents visitArray(ArrayContents items) {
       return items;
     }
   };
 
-  public static final Visitor<PropertySet> asObject = new VisitorProjection<PropertySet>("an object") {
+  public static final Visitor<PropertySet> asObject = new VisitorProjection<PropertySet>("an beginObject") {
     @Override
     public PropertySet visitObject(PropertySet properties) {
       return properties;
@@ -182,16 +181,16 @@ public final class Projections {
   };
 
   public static <T> Visitor<T> atIndex(final int index, final Visitor<T> itemProjection) {
-    return new VisitorProjection<T>("an array") {
+    return new VisitorProjection<T>("an beginArray") {
       @Override
-      public T visitArray(PVector<Basket> items) {
+      public T visitArray(ArrayContents items) {
         return items.get(index).visit(itemProjection);
       }
     };
   }
 
   public static <T> Visitor<T> atKey(final String key, final Visitor<T> itemProjection) {
-    return new VisitorProjection<T>("an object") {
+    return new VisitorProjection<T>("an beginObject") {
       @Override
       public T visitObject(PropertySet properties) {
         return properties.get(key).visit(itemProjection);
@@ -222,7 +221,7 @@ public final class Projections {
       }
 
       @Override
-      public V visitArray(PVector<Basket> items) {
+      public V visitArray(ArrayContents items) {
         return mapper.map(visitor.visitArray(items));
       }
 

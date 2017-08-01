@@ -5,7 +5,6 @@ import com.codepoetics.raffia.baskets.Baskets;
 import com.codepoetics.raffia.predicates.Predicates;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.visitors.Visitors;
-import org.pcollections.PVector;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -79,10 +78,10 @@ final class DeepScanToObjectKeyPathSegment extends BasePathSegment {
     };
   }
 
-  private Mapper<PVector<Basket>, Basket> getArrayUpdateMapper(final AtomicReference<Visitor<Basket>> self) {
-    return new Mapper<PVector<Basket>, Basket>() {
+  private Mapper<ArrayContents, Basket> getArrayUpdateMapper(final AtomicReference<Visitor<Basket>> self) {
+    return new Mapper<ArrayContents, Basket>() {
       @Override
-      public Basket map(PVector<Basket> input) {
+      public Basket map(ArrayContents input) {
         List<Basket> updated = new ArrayList<>();
 
         for (Basket basket : input) {
@@ -94,10 +93,10 @@ final class DeepScanToObjectKeyPathSegment extends BasePathSegment {
     };
   }
 
-  private <T> Mapper<PVector<Basket>, List<T>> getArrayProjectionMapper(final AtomicReference<Visitor<List<T>>> self) {
-    return new Mapper<PVector<Basket>, List<T>>() {
+  private <T> Mapper<ArrayContents, List<T>> getArrayProjectionMapper(final AtomicReference<Visitor<List<T>>> self) {
+    return new Mapper<ArrayContents, List<T>>() {
       @Override
-      public List<T> map(PVector<Basket> input) {
+      public List<T> map(ArrayContents input) {
         List<T> results = new ArrayList<>();
         for (Basket basket : input) {
           results.addAll(basket.visit(self.get()));

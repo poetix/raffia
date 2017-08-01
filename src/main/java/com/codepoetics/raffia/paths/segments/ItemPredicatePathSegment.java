@@ -5,7 +5,6 @@ import com.codepoetics.raffia.baskets.Baskets;
 import com.codepoetics.raffia.predicates.Predicates;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.visitors.Visitors;
-import org.pcollections.PVector;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,11 +45,11 @@ final class ItemPredicatePathSegment extends BasePathSegment {
     );
   }
 
-  private Mapper<PVector<Basket>, Basket> getUpdateMapper(final Visitor<Basket> subUpdater) {
-    return new Mapper<PVector<Basket>, Basket>() {
+  private Mapper<ArrayContents, Basket> getUpdateMapper(final Visitor<Basket> subUpdater) {
+    return new Mapper<ArrayContents, Basket>() {
       @Override
-      public Basket map(PVector<Basket> items) {
-        PVector<Basket> updatedItems = items;
+      public Basket map(ArrayContents items) {
+        ArrayContents updatedItems = items;
         for (int i = 0; i < items.size(); i++) {
           if (indexValuePredicate.test(i, items.get(i))) {
             updatedItems = updatedItems.with(i, updatedItems.get(i).visit(subUpdater));
@@ -61,10 +60,10 @@ final class ItemPredicatePathSegment extends BasePathSegment {
     };
   }
 
-  private <V> Mapper<PVector<Basket>, List<V>> getProjectionMapper(final Visitor<List<V>> subProjector) {
-    return new Mapper<PVector<Basket>, List<V>>() {
+  private <V> Mapper<ArrayContents, List<V>> getProjectionMapper(final Visitor<List<V>> subProjector) {
+    return new Mapper<ArrayContents, List<V>>() {
       @Override
-      public List<V> map(PVector<Basket> items) {
+      public List<V> map(ArrayContents items) {
         List<V> result = new ArrayList<>();
         for (int i = 0; i < items.size(); i++) {
           if (indexValuePredicate.test(i, items.get(i))) {

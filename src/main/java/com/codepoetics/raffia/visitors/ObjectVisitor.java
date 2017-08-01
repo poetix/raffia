@@ -1,10 +1,6 @@
 package com.codepoetics.raffia.visitors;
 
-import com.codepoetics.raffia.api.Basket;
-import com.codepoetics.raffia.api.ObjectEntry;
-import com.codepoetics.raffia.api.PropertySet;
-import com.codepoetics.raffia.api.Visitor;
-import org.pcollections.PVector;
+import com.codepoetics.raffia.api.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -35,7 +31,7 @@ final class ObjectVisitor implements Visitor<Object> {
   }
 
   @Override
-  public Object visitArray(PVector<Basket> items) {
+  public Object visitArray(ArrayContents items) {
     List<Object> objectifiedItems = new ArrayList<>();
     for (Basket item : items) {
       objectifiedItems.add(item.visit(this));

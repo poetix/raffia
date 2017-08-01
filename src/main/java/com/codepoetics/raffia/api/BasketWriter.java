@@ -4,17 +4,16 @@ import java.math.BigDecimal;
 
 public interface BasketWriter<T extends BasketWriter<T>> {
 
-  T writeStartObject();
-  T writeEndObject();
+  T beginObject();
+  T beginArray();
 
-  T writeStartArray();
-  T writeEndArray();
+  T end();
 
-  T writeKey(String key);
+  T key(String key);
 
-  T writeString(String value);
-  T writeNumber(BigDecimal value);
-  T writeBoolean(boolean value);
-  T writeNull();
+  T add(String value);
+  T add(BigDecimal value);
+  T add(boolean value);
+  T addNull();
 
 }

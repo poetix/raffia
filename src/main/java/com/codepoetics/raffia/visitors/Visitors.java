@@ -1,7 +1,6 @@
 package com.codepoetics.raffia.visitors;
 
 import com.codepoetics.raffia.api.*;
-import org.pcollections.PVector;
 
 import java.math.BigDecimal;
 
@@ -12,6 +11,40 @@ public final class Visitors {
 
   public static final Visitor<Basket> copy = new CopyVisitor();
   public static final Visitor<Object> object = new ObjectVisitor();
+
+  public static <T> Visitor<T> constant(final T constant) {
+    return new Visitor<T>() {
+      @Override
+      public T visitString(String value) {
+        return constant;
+      }
+
+      @Override
+      public T visitBoolean(boolean value) {
+        return constant;
+      }
+
+      @Override
+      public T visitNumber(BigDecimal value) {
+        return constant;
+      }
+
+      @Override
+      public T visitNull() {
+        return constant;
+      }
+
+      @Override
+      public T visitArray(ArrayContents items) {
+        return constant;
+      }
+
+      @Override
+      public T visitObject(PropertySet properties) {
+        return constant;
+      }
+    };
+  }
 
   public static <T extends BasketWriter<T>> Visitor<T> writingTo(T writer) {
     return new WritingVisitor<T>(writer);
@@ -40,7 +73,7 @@ public final class Visitors {
       }
 
       @Override
-      public O visitArray(PVector<Basket> items) {
+      public O visitArray(ArrayContents items) {
         return second.map(first.visitArray(items)).visitArray(items);
       }
 

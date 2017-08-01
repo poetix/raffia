@@ -43,6 +43,14 @@ public class PropertySet implements Iterable<ObjectEntry> {
     return properties.get(key);
   }
 
+  public boolean containsKey(String key) {
+    return properties.containsKey(key);
+  }
+
+  public PropertySet minus(String key) {
+    return new PropertySet(keys.minus(key), properties.minus(key));
+  }
+
   public Map<String, Basket> toMap() {
     Map<String, Basket> result = new LinkedHashMap<>();
     for (String key : keys) {
@@ -89,9 +97,5 @@ public class PropertySet implements Iterable<ObjectEntry> {
         return ObjectEntry.of(key, properties.get(key));
       }
     };
-  }
-
-  public boolean containsKey(String key) {
-    return properties.containsKey(key);
   }
 }
