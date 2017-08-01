@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 
 import static com.codepoetics.raffia.StoreExample.store;
 import static com.codepoetics.raffia.injections.Injections.fromString;
+import static com.codepoetics.raffia.lenses.Lens.lens;
 import static com.codepoetics.raffia.projections.Projections.asNumber;
 import static com.codepoetics.raffia.projections.Projections.asString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -50,43 +51,43 @@ public class Updating {
 
   @Test
   public void capitaliseAuthorsOfAllBooks() {
-    Basket updated = Lens.create().toAny("author").update(capitaliseString, store);
+    Basket updated = lens().toAny("author").update(capitaliseString, store);
 
     System.out.println(updated);
 
     assertThat(
-        Lens.create().toAny("author").getAll(asString, updated),
+        lens().toAny("author").getAll(asString, updated),
         contains("NIGEL REES", "EVELYN WAUGH", "HERMAN MELVILLE", "J. R. R. TOLKEIN"));
   }
 
   @Test
   public void convertPricesToStrings() {
-    Basket updated = Lens.create().toAny("price").update(priceToString, store);
+    Basket updated = lens().toAny("price").update(priceToString, store);
 
     System.out.println(updated);
 
     assertThat(
-        Lens.create().toAny("price").getAll(asString, updated),
+        lens().toAny("price").getAll(asString, updated),
         contains("19.95", "8.95", "12.99", "8.99", "22.99"));
   }
 
   @Test
   public void addDescriptionStringsToBooks() {
-    Basket updated = Lens.create().toAny("book").toAll().update(addDescription, store);
+    Basket updated = lens().toAny("book").toAll().update(addDescription, store);
 
     System.out.println(updated);
 
     assertThat(
-        Lens.create().toAny("description").getAll(asString, updated),
+        lens().toAny("description").getAll(asString, updated),
         hasItem("\"Sayings of the Century\", by Nigel Rees")
     );
   }
 
   @Test
   public void rewritingAValue() {
-    Visitor<Boolean> authorIsNigel = Lens.create().to("author").matching("Nigel Rees");
+    Visitor<Boolean> authorIsNigel = lens().to("author").matching("Nigel Rees");
 
-    Basket updated = Lens.create()
+    Basket updated = lens()
         .toAny("book")
         .toMatching("?", authorIsNigel)
         .to("title")
@@ -95,7 +96,7 @@ public class Updating {
     System.out.println(updated);
 
     assertThat(
-        Lens.create().toAny("book").toMatching("?", authorIsNigel).to("title").getOne(Projections.asString, updated),
+        lens().toAny("book").toMatching("?", authorIsNigel).to("title").getOne(Projections.asString, updated),
         equalTo("Hallucinogenic Adventures vol. 13"));
   }
 

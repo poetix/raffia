@@ -19,7 +19,7 @@ import java.util.Set;
 
 public class Lens {
 
-  public static Lens create() {
+  public static Lens lens() {
     return new Lens(TreePVector.<PathSegment>empty());
   }
 
