@@ -87,7 +87,7 @@ public final class Writers {
 
     @Override
     public BasketWeavingWriter key(String key) {
-      throw new IllegalStateException("key called, but not writing beginObject");
+      throw new IllegalStateException("key called, but not writing object");
     }
   }
 

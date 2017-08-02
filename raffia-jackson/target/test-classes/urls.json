@@ -1,0 +1,11 @@
+[
+  {
+    "url": "http://DOMAIN/foo/bar",
+    "name": "foobar"
+  },
+  {
+    "nested": {
+      "href": "http://DOMAIN/baz/xyzzy"
+    }
+  }
+]
