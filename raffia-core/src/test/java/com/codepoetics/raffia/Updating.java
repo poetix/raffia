@@ -51,12 +51,12 @@ public class Updating {
 
   @Test
   public void capitaliseAuthorsOfAllBooks() {
-    Basket updated = lens().toAny("author").update(capitaliseString, store);
+    Basket updated = lens("$..author").update(capitaliseString, store);
 
     System.out.println(updated);
 
     assertThat(
-        lens().toAny("author").getAll(asString, updated),
+        lens("$..author").getAll(asString, updated),
         contains("NIGEL REES", "EVELYN WAUGH", "HERMAN MELVILLE", "J. R. R. TOLKEIN"));
   }
 
@@ -67,13 +67,13 @@ public class Updating {
     System.out.println(updated);
 
     assertThat(
-        lens().toAny("price").getAll(asString, updated),
+        lens("$..price").getAll(asString, updated),
         contains("19.95", "8.95", "12.99", "8.99", "22.99"));
   }
 
   @Test
   public void addDescriptionStringsToBooks() {
-    Basket updated = lens().toAny("book").toAll().update(addDescription, store);
+    Basket updated = lens("$..book").toAll().update(addDescription, store);
 
     System.out.println(updated);
 
@@ -85,10 +85,9 @@ public class Updating {
 
   @Test
   public void rewritingAValue() {
-    Visitor<Boolean> authorIsNigel = lens().to("author").matching("Nigel Rees");
+    Visitor<Boolean> authorIsNigel = lens("$..author").matching("Nigel Rees");
 
-    Basket updated = lens()
-        .toAny("book")
+    Basket updated = lens("$..book")
         .toMatching("?", authorIsNigel)
         .to("title")
         .update(Setters.toString("Hallucinogenic Adventures vol. 13"), store);
@@ -96,7 +95,7 @@ public class Updating {
     System.out.println(updated);
 
     assertThat(
-        lens().toAny("book").toMatching("?", authorIsNigel).to("title").getOne(Projections.asString, updated),
+        lens("$..book").toMatching(authorIsNigel).to("title").getOne(Projections.asString, updated),
         equalTo("Hallucinogenic Adventures vol. 13"));
   }
 

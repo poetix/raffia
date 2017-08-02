@@ -19,6 +19,10 @@ import java.util.Set;
 
 public class Lens {
 
+  public static Lens lens(String path) {
+    return new Lens(PathParser.parse(path));
+  }
+
   public static Lens lens() {
     return new Lens(TreePVector.<PathSegment>empty());
   }

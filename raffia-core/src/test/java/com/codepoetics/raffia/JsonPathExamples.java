@@ -25,28 +25,28 @@ public class JsonPathExamples {
   @Test
   public void authorsOfAllBooks() {
     assertThat(
-        lens().to("store").to("book").toAll().to("author").getAll(asString, store),
+        lens("$.store.book[*].author").getAll(asString, store),
         contains("Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkein"));
   }
 
   @Test
   public void allAuthors() {
     assertThat(
-        lens().toAny("author").getAll(asString, store),
+        lens("$..author").getAll(asString, store),
         contains("Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkein"));
   }
 
   @Test
   public void getAllItems() {
     assertThat(
-        lens().to("store").toAll().toAll().getAll(store),
+        lens("$.store.*[*]").getAll(store),
         contains(REES, WAUGH, MELVILLE, TOLKEIN, RED_BIKE));
   }
 
   @Test
   public void getAllPrices() {
     assertThat(
-        lens().to("store").toAny("price").getAll(asNumber, store),
+        lens("$.store..price").getAll(asNumber, store),
         contains(
           new BigDecimal("8.95"),
           new BigDecimal("12.99"),
@@ -57,19 +57,18 @@ public class JsonPathExamples {
 
   @Test
   public void getThirdBook() {
-    assertThat(lens().toAny("book").to(2).getOne(store), equalTo(MELVILLE));
+    assertThat(lens("$..book[2]").getOne(store), equalTo(MELVILLE));
   }
 
   @Test
   public void getSecondToLastBook() {
-    assertThat(lens().toAny("book").to(-2).getOne(store), equalTo(MELVILLE));
+    assertThat(lens("$..book[-2]").getOne(store), equalTo(MELVILLE));
   }
 
   @Test
   public void getFirstTwoBooks() {
     assertThat(
-        lens()
-            .toAny("book")
+        lens("$..book")
             .to(0, 1)
             .getAll(store),
         contains(REES, WAUGH));
@@ -78,8 +77,7 @@ public class JsonPathExamples {
   @Test
   public void getBooksWithIsbns() {
     assertThat(
-        lens()
-            .toAny("book")
+        lens("$..book")
             .toHavingKey("isbn")
             .getAll(store),
         contains(MELVILLE, TOLKEIN));
@@ -87,10 +85,10 @@ public class JsonPathExamples {
 
   @Test
   public void getCheapBooks() {
-    Visitor<Boolean> priceIsLessThanTen = lens().to("price").matchingNumber(isLessThan(10));
+    Visitor<Boolean> priceIsLessThanTen = lens("$.price").matchingNumber(isLessThan(10));
 
     assertThat(
-        lens().toAny("book").toMatching(priceIsLessThanTen).getAll(store),
+        lens("$..book").toMatching(priceIsLessThanTen).getAll(store),
         contains(REES, MELVILLE));
   }
 
@@ -99,14 +97,14 @@ public class JsonPathExamples {
     final Mapper<BigDecimal, Visitor<List<Basket>>> priceIsLessThan = new Mapper<BigDecimal, Visitor<List<Basket>>>() {
       @Override
       public Visitor<List<Basket>> map(final BigDecimal expensive) {
-        Visitor<Boolean> priceIsCheap = lens().to("price").matchingNumber(isLessThan(expensive));
+        Visitor<Boolean> priceIsCheap = lens("$.price").matchingNumber(isLessThan(expensive));
 
-        return lens().toAny("book").toMatching(priceIsCheap).gettingAll();
+        return lens("$..book").toMatching(priceIsCheap).gettingAll();
       }
     };
 
     Visitor<List<Basket>> arbitrarilyCheapBooks = Visitors.chain(
-        lens().toAny("expensive").gettingOne(asNumber), priceIsLessThan);
+        lens("$..expensive").gettingOne(asNumber), priceIsLessThan);
 
     assertThat(lens().project(arbitrarilyCheapBooks, store), contains(REES, MELVILLE));
   }
