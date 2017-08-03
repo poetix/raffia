@@ -47,6 +47,10 @@ public final class Baskets {
     return ofObject(PropertySet.of(entries));
   }
 
+  public static Basket ofObject(Collection<ObjectEntry> entries) {
+    return ofObject(PropertySet.of(entries));
+  }
+
   public static Basket ofObject(Map<String, Basket> properties) {
     return ofObject(PropertySet.of(properties));
   }

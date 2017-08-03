@@ -13,14 +13,16 @@ import org.pcollections.PVector;
 import org.pcollections.TreePVector;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class Lens {
 
-  public static Lens lens(String path) {
-    return new Lens(PathParser.parse(path));
+  @SafeVarargs
+  public static Lens lens(String path, Visitor<Boolean>...predicates) {
+    return new Lens(PathParser.parse(path, TreePVector.from(Arrays.asList(predicates))));
   }
 
   public static Lens lens() {
@@ -98,7 +100,7 @@ public class Lens {
   }
 
   public Lens toHavingKey(String key) {
-    return toMatching("?(@." + key + ")", Predicates.isObjectWithKey(key));
+    return toMatching("?(@." + key + ")", Predicates.hasKey(key));
   }
 
   public Path getPath() {

@@ -57,18 +57,18 @@ public class Updating {
 
     assertThat(
         lens("$..author").getAll(asString, updated),
-        contains("NIGEL REES", "EVELYN WAUGH", "HERMAN MELVILLE", "J. R. R. TOLKEIN"));
+        contains("NIGEL REES", "EVELYN WAUGH", "HERMAN MELVILLE", "J. R. R. TOLKIEN"));
   }
 
   @Test
   public void convertPricesToStrings() {
-    Basket updated = lens().toAny("price").update(priceToString, store);
+    Basket updated = lens("$..price").update(priceToString, store);
 
     System.out.println(updated);
 
     assertThat(
         lens("$..price").getAll(asString, updated),
-        contains("19.95", "8.95", "12.99", "8.99", "22.99"));
+        contains("8.95", "12.99", "8.99", "22.99", "19.95"));
   }
 
   @Test

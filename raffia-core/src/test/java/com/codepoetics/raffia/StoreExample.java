@@ -10,7 +10,7 @@ public class StoreExample {
   public static final Basket REES = book("reference", "Nigel Rees", "Sayings of the Century", "8.95");
   public static final Basket WAUGH = book("fiction", "Evelyn Waugh", "Sword of Honour", "12.99");
   public static final Basket MELVILLE = book("fiction", "Herman Melville", "Moby Dick", "0-553-21311-3", "8.99");
-  public static final Basket TOLKEIN = book("fiction", "J. R. R. Tolkein", "The Lord of the Rings", "0-395-19395-8", "22.99");
+  public static final Basket TOLKIEN = book("fiction", "J. R. R. Tolkien", "The Lord of the Rings", "0-395-19395-8", "22.99");
 
   public static final Basket RED_BIKE = Raffia.builder().beginObject()
       .add("color", "red")
@@ -21,7 +21,7 @@ public class StoreExample {
   public static final Basket store = Raffia.builder().beginObject()
         .key("store")
           .beginObject()
-            .addArray("book", REES, WAUGH, MELVILLE, TOLKEIN)
+            .addArray("book", REES, WAUGH, MELVILLE, TOLKIEN)
             .addArray("bicycle", RED_BIKE)
           .end()
         .add("expensive", new BigDecimal("10"))

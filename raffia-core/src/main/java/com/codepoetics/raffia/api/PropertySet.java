@@ -39,6 +39,10 @@ public class PropertySet implements Iterable<ObjectEntry> {
       : new PropertySet(keys.plus(key), properties.plus(key, basket));
   }
 
+  public int size() {
+    return properties.size();
+  }
+
   public Basket get(String key) {
     return properties.get(key);
   }

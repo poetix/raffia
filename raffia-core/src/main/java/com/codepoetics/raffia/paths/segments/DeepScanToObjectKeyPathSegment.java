@@ -55,25 +55,25 @@ final class DeepScanToObjectKeyPathSegment extends BasePathSegment {
     return self.get();
   }
 
-  private Mapper<PropertySet, Basket> getObjectUpdateMapper(final Visitor<Basket> subUpdater, final AtomicReference<Visitor<Basket>> self) {
+  private Mapper<PropertySet, Basket> getObjectUpdateMapper(final Visitor<Basket> continuation, final AtomicReference<Visitor<Basket>> self) {
     return new Mapper<PropertySet, Basket>() {
       @Override
       public Basket map(PropertySet input) {
-        Map<String, Basket> updated = new HashMap<>();
+        List<ObjectEntry> entries = new ArrayList<>(input.size());
 
         for (ObjectEntry entry : input) {
           if (entry.getKey().equals(key)) {
-            updateWith(updated, entry, subUpdater);
+            entries.add(updateWith(entry, continuation));
           } else {
-            updateWith(updated, entry, self.get());
+            entries.add(updateWith(entry, self.get()));
           }
         }
 
-        return Baskets.ofObject(updated);
+        return Baskets.ofObject(entries);
       }
 
-      private void updateWith(Map<String, Basket> updated, ObjectEntry entry, Visitor<Basket> updater) {
-        updated.put(entry.getKey(), entry.getValue().visit(updater));
+      private ObjectEntry updateWith(ObjectEntry entry, Visitor<Basket> updater) {
+        return ObjectEntry.of(entry.getKey(), entry.getValue().visit(updater));
       }
     };
   }
@@ -106,14 +106,14 @@ final class DeepScanToObjectKeyPathSegment extends BasePathSegment {
     };
   }
 
-  private <T> Mapper<PropertySet, List<T>> getObjectProjectionMapper(final Visitor<List<T>> subProjector, final AtomicReference<Visitor<List<T>>> self) {
+  private <T> Mapper<PropertySet, List<T>> getObjectProjectionMapper(final Visitor<List<T>> continuation, final AtomicReference<Visitor<List<T>>> self) {
     return new Mapper<PropertySet, List<T>>() {
       @Override
       public List<T> map(PropertySet input) {
         List<T> results = new ArrayList<>();
         for (ObjectEntry entry : input) {
           if (entry.getKey().equals(key)) {
-            results.addAll(entry.getValue().visit(subProjector));
+            results.addAll(entry.getValue().visit(continuation));
           } else {
             results.addAll(entry.getValue().visit(self.get()));
           }

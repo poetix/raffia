@@ -9,15 +9,17 @@ import com.codepoetics.raffia.predicates.Predicates;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.visitors.Visitors;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 final class ObjectKeyPathSegment extends BasePathSegment {
 
-  private final String key;
+  private final List<String> keys;
 
-  ObjectKeyPathSegment(String key) {
-    this.key = key;
+  ObjectKeyPathSegment(List<String> keys) {
+    this.keys = keys;
   }
 
   @Override
@@ -38,29 +40,58 @@ final class ObjectKeyPathSegment extends BasePathSegment {
     );
   }
 
-  private Mapper<PropertySet, Basket> getUpdateMapper(final Visitor<Basket> subUpdater) {
+  private Mapper<PropertySet, Basket> getUpdateMapper(final Visitor<Basket> continuation) {
     return new Mapper<PropertySet, Basket>() {
       @Override
       public Basket map(PropertySet input) {
-        return Baskets.ofObject(input.with(key, input.get(key).visit(subUpdater)));
+        PropertySet updated = input;
+        for (String key : keys) {
+          Basket atKey = updated.get(key);
+          if (atKey != null) {
+            updated = updated.with(key, atKey.visit(continuation));
+          }
+        }
+        return Baskets.ofObject(updated);
       }
     };
   }
 
-  private <V> Mapper<PropertySet, List<V>> getProjectionMapper(final Visitor<List<V>> subProjector) {
+  private <V> Mapper<PropertySet, List<V>> getProjectionMapper(final Visitor<List<V>> continuation) {
     return new Mapper<PropertySet, List<V>>() {
       @Override
       public List<V> map(PropertySet properties) {
-        Basket atKey = properties.get(key);
-        return atKey == null
-            ? Collections.<V>emptyList()
-            : atKey.visit(subProjector);
+        List<V> results = new ArrayList<>();
+        for (String key : keys) {
+          Basket atKey = properties.get(key);
+          if (atKey != null) {
+            results.addAll(atKey.visit(continuation));
+          }
+        }
+        return results;
       }
     };
   }
 
   @Override
   public String representation() {
-    return "." + key;
+    return keys.size() == 1
+        ? "." + keys.get(0)
+        : indexForm();
+  }
+
+  private String indexForm() {
+    StringBuilder sb = new StringBuilder();
+    boolean first = true;
+    sb.append("[");
+    for (String key : keys) {
+      if (first) {
+        first = false;
+      } else {
+        sb.append(", ");
+      }
+      sb.append("'").append(key).append("'");
+    }
+    sb.append("]");
+    return sb.toString();
   }
 }

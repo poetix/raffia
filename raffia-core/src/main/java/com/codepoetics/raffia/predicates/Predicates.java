@@ -87,7 +87,7 @@ public final class Predicates {
     }
   };
 
-  public static Visitor<Boolean> isObjectWithKey(final String key) {
+  public static Visitor<Boolean> hasKey(final String key) {
     return new TypeTestVisitor() {
       @Override
       public Boolean visitObject(PropertySet properties) {

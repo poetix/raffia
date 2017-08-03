@@ -3,9 +3,8 @@ package com.codepoetics.raffia;
 import com.codepoetics.raffia.api.Basket;
 import com.codepoetics.raffia.api.Mapper;
 import com.codepoetics.raffia.api.Visitor;
-import com.codepoetics.raffia.lenses.Lens;
-import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.visitors.Visitors;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -14,11 +13,13 @@ import java.util.List;
 import static com.codepoetics.raffia.StoreExample.*;
 import static com.codepoetics.raffia.lenses.Lens.lens;
 import static com.codepoetics.raffia.predicates.NumberPredicates.isLessThan;
+import static com.codepoetics.raffia.predicates.Predicates.hasKey;
 import static com.codepoetics.raffia.projections.Projections.asNumber;
 import static com.codepoetics.raffia.projections.Projections.asString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 
 public class JsonPathExamples {
 
@@ -26,21 +27,42 @@ public class JsonPathExamples {
   public void authorsOfAllBooks() {
     assertThat(
         lens("$.store.book[*].author").getAll(asString, store),
-        contains("Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkein"));
+        contains("Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien"));
   }
 
   @Test
   public void allAuthors() {
     assertThat(
         lens("$..author").getAll(asString, store),
-        contains("Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkein"));
+        contains("Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien"));
   }
 
   @Test
   public void getAllItems() {
     assertThat(
         lens("$.store.*[*]").getAll(store),
-        contains(REES, WAUGH, MELVILLE, TOLKEIN, RED_BIKE));
+        contains(REES, WAUGH, MELVILLE, TOLKIEN, RED_BIKE));
+  }
+
+  @Test
+  public void getBooksAndBicycles() {
+    assertThat(
+        lens("$.store['book', 'bicycle'][*]").getAll(store),
+        contains(REES, WAUGH, MELVILLE, TOLKIEN, RED_BIKE));
+  }
+
+  @Test
+  public void getBicyclesAndBooks() {
+    assertThat(
+        lens("$.store['bicycle', 'book'][*]").getAll(store),
+        contains(RED_BIKE, REES, WAUGH, MELVILLE, TOLKIEN));
+  }
+
+  @Test
+  public void getBicyclesAndBooksAndBalloons() {
+    assertThat(
+        lens("$.store['bicycle', 'book', 'balloon'][*]").getAll(store),
+        contains(RED_BIKE, REES, WAUGH, MELVILLE, TOLKIEN));
   }
 
   @Test
@@ -57,30 +79,53 @@ public class JsonPathExamples {
 
   @Test
   public void getThirdBook() {
-    assertThat(lens("$..book[2]").getOne(store), equalTo(MELVILLE));
+    assertThat(lens("$..book[2 ]").getOne(store), equalTo(MELVILLE));
   }
 
   @Test
   public void getSecondToLastBook() {
-    assertThat(lens("$..book[-2]").getOne(store), equalTo(MELVILLE));
+    assertThat(lens("$..book[ -2]").getOne(store), equalTo(MELVILLE));
+  }
+
+  @Test
+  public void getInexistentBook() {
+    assertThat(lens("$..book[100]").getAll(store), hasSize(0));
+  }
+
+  @Test
+  public void getInexistent() {
+    assertThat(lens("$.gruffalo").getAll(store), hasSize(0));
+  }
+
+  @Test
+  public void deepScanForInexistent() {
+    assertThat(lens("$..gruffalo").getAll(store), hasSize(0));
   }
 
   @Test
   public void getFirstTwoBooks() {
     assertThat(
-        lens("$..book")
-            .to(0, 1)
-            .getAll(store),
+        lens("$..book[0, 1]").getAll(store),
         contains(REES, WAUGH));
   }
 
   @Test
-  public void getBooksWithIsbns() {
+  public void getFirstTwoBooksAndInexistentBook() {
     assertThat(
-        lens("$..book")
-            .toHavingKey("isbn")
-            .getAll(store),
-        contains(MELVILLE, TOLKEIN));
+        lens("$..book[0, 100, 1]").getAll(store),
+        contains(REES, WAUGH));
+  }
+
+  @Test
+  public void getFirstTwoBooksInReverseOrder() {
+    assertThat(
+        lens("$..book[ 1, 0]").getAll(store),
+        contains(WAUGH, REES));
+  }
+
+  @Test
+  public void getBooksWithIsbns() {
+    assertThat(lens("$..book[?]", hasKey("isbn")).getAll(store), contains(MELVILLE, TOLKIEN));
   }
 
   @Test
@@ -88,7 +133,7 @@ public class JsonPathExamples {
     Visitor<Boolean> priceIsLessThanTen = lens("$.price").matchingNumber(isLessThan(10));
 
     assertThat(
-        lens("$..book").toMatching(priceIsLessThanTen).getAll(store),
+        lens("$..book[?]", priceIsLessThanTen).getAll(store),
         contains(REES, MELVILLE));
   }
 
@@ -99,14 +144,14 @@ public class JsonPathExamples {
       public Visitor<List<Basket>> map(final BigDecimal expensive) {
         Visitor<Boolean> priceIsCheap = lens("$.price").matchingNumber(isLessThan(expensive));
 
-        return lens("$..book").toMatching(priceIsCheap).gettingAll();
+        return lens("$..book[?]", priceIsCheap).gettingAll();
       }
     };
 
     Visitor<List<Basket>> arbitrarilyCheapBooks = Visitors.chain(
         lens("$..expensive").gettingOne(asNumber), priceIsLessThan);
 
-    assertThat(lens().project(arbitrarilyCheapBooks, store), contains(REES, MELVILLE));
+    assertThat(store.visit(arbitrarilyCheapBooks), contains(REES, MELVILLE));
   }
 
 }

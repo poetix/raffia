@@ -9,15 +9,16 @@ import com.codepoetics.raffia.predicates.Predicates;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.visitors.Visitors;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 final class ArrayIndexPathSegment extends BasePathSegment {
 
-  private final int index;
+  private final List<Integer> indices;
 
-  ArrayIndexPathSegment(int index) {
-    this.index = index;
+  ArrayIndexPathSegment(List<Integer> indices) {
+    this.indices = indices;
   }
 
 
@@ -39,33 +40,41 @@ final class ArrayIndexPathSegment extends BasePathSegment {
     );
   }
 
-  private Mapper<ArrayContents, Basket> getUpdateMapper(final Visitor<Basket> subUpdater) {
+  private Mapper<ArrayContents, Basket> getUpdateMapper(final Visitor<Basket> continuation) {
     return new Mapper<ArrayContents, Basket>() {
       @Override
       public Basket map(ArrayContents items) {
-        return Baskets.ofArray(items.with(index, items.get(index).visit(subUpdater)));
+        ArrayContents updated = items;
+        for (int index : indices) {
+          int actual = index < 0 ? items.size() + index : index;
+          if (actual < items.size()) {
+            updated = updated.with(actual, updated.get(actual).visit(continuation));
+          }
+        }
+        return Baskets.ofArray(updated);
       }
     };
   }
 
-  private <V> Mapper<ArrayContents, List<V>> getProjectionMapper(final Visitor<List<V>> subProjector) {
+  private <V> Mapper<ArrayContents, List<V>> getProjectionMapper(final Visitor<List<V>> continuation) {
     return new Mapper<ArrayContents, List<V>>() {
       @Override
       public List<V> map(ArrayContents input) {
-        return index >= 0
-          ? input.size() > index
-            ? input.get(index).visit(subProjector)
-            : Collections.<V>emptyList()
-          : input.size() > -index
-            ? input.get(input.size() + index).visit(subProjector)
-            : Collections.<V>emptyList();
+        List<V> results = new ArrayList<>();
+        for (int index : indices) {
+          int actual = index < 0 ? input.size() + index : index;
+          if (actual < input.size()) {
+            results.addAll(input.get(actual).visit(continuation));
+          }
+        }
+        return results;
       }
     };
   }
 
   @Override
   public String representation() {
-    return "[" + index + "]";
+    return indices.toString();
   }
 
 }
