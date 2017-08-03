@@ -4,7 +4,6 @@ import com.codepoetics.raffia.api.Basket;
 import com.codepoetics.raffia.api.Mapper;
 import com.codepoetics.raffia.api.Visitor;
 import com.codepoetics.raffia.visitors.Visitors;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -17,9 +16,7 @@ import static com.codepoetics.raffia.predicates.Predicates.hasKey;
 import static com.codepoetics.raffia.projections.Projections.asNumber;
 import static com.codepoetics.raffia.projections.Projections.asString;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 
 public class JsonPathExamples {
 

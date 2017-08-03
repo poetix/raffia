@@ -5,7 +5,6 @@ import com.codepoetics.raffia.api.Mapper;
 import com.codepoetics.raffia.api.PropertySet;
 import com.codepoetics.raffia.api.Visitor;
 import com.codepoetics.raffia.baskets.Baskets;
-import com.codepoetics.raffia.lenses.Lens;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.setters.Setters;
 import com.codepoetics.raffia.updaters.Updaters;
@@ -53,8 +52,6 @@ public class Updating {
   public void capitaliseAuthorsOfAllBooks() {
     Basket updated = lens("$..author").update(capitaliseString, store);
 
-    System.out.println(updated);
-
     assertThat(
         lens("$..author").getAll(asString, updated),
         contains("NIGEL REES", "EVELYN WAUGH", "HERMAN MELVILLE", "J. R. R. TOLKIEN"));
@@ -64,8 +61,6 @@ public class Updating {
   public void convertPricesToStrings() {
     Basket updated = lens("$..price").update(priceToString, store);
 
-    System.out.println(updated);
-
     assertThat(
         lens("$..price").getAll(asString, updated),
         contains("8.95", "12.99", "8.99", "22.99", "19.95"));
@@ -74,8 +69,6 @@ public class Updating {
   @Test
   public void addDescriptionStringsToBooks() {
     Basket updated = lens("$..book").toAll().update(addDescription, store);
-
-    System.out.println(updated);
 
     assertThat(
         lens().toAny("description").getAll(asString, updated),
@@ -87,12 +80,8 @@ public class Updating {
   public void rewritingAValue() {
     Visitor<Boolean> authorIsNigel = lens("$..author").matching("Nigel Rees");
 
-    Basket updated = lens("$..book")
-        .toMatching("?", authorIsNigel)
-        .to("title")
+    Basket updated = lens("$..book[?].title", authorIsNigel)
         .update(Setters.toString("Hallucinogenic Adventures vol. 13"), store);
-
-    System.out.println(updated);
 
     assertThat(
         lens("$..book").toMatching(authorIsNigel).to("title").getOne(Projections.asString, updated),

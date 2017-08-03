@@ -1,6 +1,5 @@
 package com.codepoetics.raffia.lenses;
 
-import com.codepoetics.raffia.api.IndexValuePredicate;
 import com.codepoetics.raffia.api.PathSegment;
 import com.codepoetics.raffia.api.Visitor;
 import com.codepoetics.raffia.paths.segments.PathSegments;
@@ -18,8 +17,8 @@ final class PathParser {
 
   private static final Pattern keyExpr = Pattern.compile("^\\.[a-zA-Z0-9\\-_]+");
   private static final Pattern deepKeyExpr = Pattern.compile("^\\.\\.[a-zA-Z0-9\\-_]+");
-  private static final Pattern indexExpr = Pattern.compile("^\\[([^\\]]+)\\]");
-  private static final Pattern integerExpr = Pattern.compile("^\\-?[0-9]+$");
+  private static final Pattern indexExpr = Pattern.compile("^\\[([^]]+)]");
+  private static final Pattern integerExpr = Pattern.compile("^-?[0-9]+$");
 
   static PVector<PathSegment> parse(String pathString, PVector<Visitor<Boolean>> predicates) {
     String trimmed = pathString.trim();

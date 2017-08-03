@@ -12,7 +12,6 @@ import com.codepoetics.raffia.visitors.Visitors;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Pattern;
 
 final class ObjectKeyPathSegment extends BasePathSegment {
 

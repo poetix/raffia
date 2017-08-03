@@ -148,7 +148,7 @@ public final class Projections {
   public static final Visitor<Boolean> asBoolean = new VisitorProjection<Boolean>("a boolean") {
     @Override
     public Boolean visitBoolean(boolean value) {
-      return super.visitBoolean(value);
+      return value;
     }
   };
 

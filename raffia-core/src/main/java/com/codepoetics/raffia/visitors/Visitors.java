@@ -47,7 +47,7 @@ public final class Visitors {
   }
 
   public static <T extends BasketWriter<T>> Visitor<T> writingTo(T writer) {
-    return new WritingVisitor<T>(writer);
+    return new WritingVisitor<>(writer);
   }
 
   public static <I, O> Visitor<O> chain(final Visitor<I> first, final Mapper<I, Visitor<O>> second) {

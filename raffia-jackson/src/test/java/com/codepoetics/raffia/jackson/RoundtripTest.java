@@ -1,7 +1,6 @@
 package com.codepoetics.raffia.jackson;
 
 import com.codepoetics.raffia.api.Basket;
-import com.codepoetics.raffia.api.BasketWriter;
 import com.codepoetics.raffia.lenses.Lens;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.writers.PassThroughWriter;

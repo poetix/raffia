@@ -14,6 +14,7 @@ public final class Mappers {
     }
   };
 
+  @SuppressWarnings("unchecked")
   public static <T> Mapper<T, T> id() {
     return (Mapper<T, T>) ID;
   }
