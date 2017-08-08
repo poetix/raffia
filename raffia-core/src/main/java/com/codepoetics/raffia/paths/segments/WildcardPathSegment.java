@@ -12,7 +12,6 @@ import java.util.List;
 
 class WildcardPathSegment extends BasePathSegment {
 
-
   WildcardPathSegment() {
   }
 
@@ -100,6 +99,16 @@ class WildcardPathSegment extends BasePathSegment {
         return results;
       }
     };
+  }
+
+  @Override
+  public PathSegmentMatchResult matchesIndex(int index) {
+    return PathSegmentMatchResult.MATCHED_BOUND;
+  }
+
+  @Override
+  public PathSegmentMatchResult matchesKey(String key) {
+    return PathSegmentMatchResult.MATCHED_BOUND;
   }
 
   @Override

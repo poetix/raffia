@@ -10,21 +10,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-final class ItemPredicatePathSegment extends BasePathSegment {
-
-  static final PathSegment all = new ItemPredicatePathSegment("*", new IndexValuePredicate() {
-    @Override
-    public boolean test(int index, Basket value) {
-      return true;
-    }
-  });
+final class MatchingItemPathSegment extends BasePathSegment {
 
   private final String representation;
-  private final IndexValuePredicate indexValuePredicate;
+  private final Visitor<Boolean> predicate;
 
-  ItemPredicatePathSegment(String representation, IndexValuePredicate indexValuePredicate) {
+  MatchingItemPathSegment(String representation, Visitor<Boolean> predicate) {
     this.representation = representation;
-    this.indexValuePredicate = indexValuePredicate;
+    this.predicate = predicate;
   }
 
   @Override
@@ -51,7 +44,7 @@ final class ItemPredicatePathSegment extends BasePathSegment {
       public Basket map(ArrayContents items) {
         ArrayContents updatedItems = items;
         for (int i = 0; i < items.size(); i++) {
-          if (indexValuePredicate.test(i, items.get(i))) {
+          if (items.get(i).visit(predicate)) {
             updatedItems = updatedItems.with(i, updatedItems.get(i).visit(subUpdater));
           }
         }
@@ -66,13 +59,23 @@ final class ItemPredicatePathSegment extends BasePathSegment {
       public List<V> map(ArrayContents items) {
         List<V> result = new ArrayList<>();
         for (int i = 0; i < items.size(); i++) {
-          if (indexValuePredicate.test(i, items.get(i))) {
+          if (items.get(i).visit(predicate)) {
             result.addAll(items.get(i).visit(subProjector));
           }
         }
         return result;
       }
     };
+  }
+
+  @Override
+  public PathSegmentMatchResult matchesIndex(int index) {
+    throw new UnsupportedOperationException("Cannot apply path predicates to streaming data");
+  }
+
+  @Override
+  public PathSegmentMatchResult matchesKey(String key) {
+    throw new UnsupportedOperationException("Cannot apply path predicates to streaming data");
   }
 
   @Override

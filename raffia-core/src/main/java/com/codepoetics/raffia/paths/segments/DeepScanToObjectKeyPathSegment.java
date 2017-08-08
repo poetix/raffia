@@ -126,6 +126,16 @@ final class DeepScanToObjectKeyPathSegment extends BasePathSegment {
   }
 
   @Override
+  public PathSegmentMatchResult matchesIndex(int index) {
+    return PathSegmentMatchResult.MATCHED_UNBOUND;
+  }
+
+  @Override
+  public PathSegmentMatchResult matchesKey(String key) {
+    return this.key.equals(key) ? PathSegmentMatchResult.MATCHED_BOUND : PathSegmentMatchResult.MATCHED_UNBOUND;
+  }
+
+  @Override
   public String representation() {
     return ".." + key;
   }

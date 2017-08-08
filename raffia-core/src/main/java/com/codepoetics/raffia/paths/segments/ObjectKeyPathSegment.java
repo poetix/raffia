@@ -1,23 +1,21 @@
 package com.codepoetics.raffia.paths.segments;
 
-import com.codepoetics.raffia.api.Basket;
-import com.codepoetics.raffia.api.Mapper;
-import com.codepoetics.raffia.api.PropertySet;
-import com.codepoetics.raffia.api.Visitor;
+import com.codepoetics.raffia.api.*;
 import com.codepoetics.raffia.baskets.Baskets;
 import com.codepoetics.raffia.predicates.Predicates;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.visitors.Visitors;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 final class ObjectKeyPathSegment extends BasePathSegment {
 
-  private final List<String> keys;
+  private final Collection<String> keys;
 
-  ObjectKeyPathSegment(List<String> keys) {
+  ObjectKeyPathSegment(Collection<String> keys) {
     this.keys = keys;
   }
 
@@ -72,9 +70,19 @@ final class ObjectKeyPathSegment extends BasePathSegment {
   }
 
   @Override
+  public PathSegmentMatchResult matchesIndex(int index) {
+    return PathSegmentMatchResult.UNMATCHED;
+  }
+
+  @Override
+  public PathSegmentMatchResult matchesKey(String key) {
+    return keys.contains(key) ? PathSegmentMatchResult.MATCHED_BOUND : PathSegmentMatchResult.UNMATCHED;
+  }
+
+  @Override
   public String representation() {
     return keys.size() == 1
-        ? "." + keys.get(0)
+        ? "." + keys.iterator().next()
         : indexForm();
   }
 

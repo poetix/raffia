@@ -3,7 +3,6 @@ package com.codepoetics.raffia.lenses;
 import com.codepoetics.raffia.api.*;
 import com.codepoetics.raffia.paths.Paths;
 import com.codepoetics.raffia.paths.segments.PathSegments;
-import com.codepoetics.raffia.predicates.IndexValuePredicates;
 import com.codepoetics.raffia.predicates.NumberPredicates;
 import com.codepoetics.raffia.predicates.Predicates;
 import com.codepoetics.raffia.predicates.StringPredicates;
@@ -44,23 +43,7 @@ public class Lens {
   }
 
   public Lens to(int first, int...subsequent) {
-    StringBuilder representation = new StringBuilder();
-    final Set<Integer> indexSet = new HashSet<>();
-    indexSet.add(first);
-    representation.append(first);
-
-    for (int index : subsequent) {
-      representation.append(",");
-      representation.append(index);
-      indexSet.add(index);
-    }
-
-    return toMatching(representation.toString(), new IndexValuePredicate() {
-      @Override
-      public boolean test(int index, Basket value) {
-        return indexSet.contains(index);
-      }
-    });
+    return plus(PathSegments.ofArrayIndices(first, subsequent));
   }
 
   public Lens toAll() {
@@ -71,24 +54,12 @@ public class Lens {
     return plus(PathSegments.ofObjectKey(objectKey));
   }
 
+  public Lens to(String first, String...remaining) {
+    return plus(PathSegments.ofObjectKeys(first, remaining));
+  }
+
   public Lens toAny(String objectKey) {
     return plus(PathSegments.ofAny(objectKey));
-  }
-
-  public Lens toMatching(IndexValuePredicate predicate) {
-    return toMatching("?", predicate);
-  }
-
-  public Lens toMatching(String representation, IndexValuePredicate predicate) {
-    return plus(PathSegments.itemMatching(representation, predicate));
-  }
-
-  public Lens toMatching(IndexPredicate predicate) {
-    return toMatching("?", predicate);
-  }
-
-  public Lens toMatching(String representation, IndexPredicate predicate) {
-    return toMatching(representation, IndexValuePredicates.indexMatches(predicate));
   }
 
   public Lens toMatching(Visitor<Boolean> valuePredicate) {
@@ -96,7 +67,7 @@ public class Lens {
   }
 
   public Lens toMatching(String representation, Visitor<Boolean> valuePredicate) {
-    return toMatching(representation, IndexValuePredicates.valueMatches(valuePredicate));
+    return plus(PathSegments.itemMatching(representation, valuePredicate));
   }
 
   public Lens toHavingKey(String key) {

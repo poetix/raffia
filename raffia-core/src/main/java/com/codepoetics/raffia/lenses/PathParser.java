@@ -3,10 +3,12 @@ package com.codepoetics.raffia.lenses;
 import com.codepoetics.raffia.api.PathSegment;
 import com.codepoetics.raffia.api.Visitor;
 import com.codepoetics.raffia.paths.segments.PathSegments;
-import com.codepoetics.raffia.predicates.IndexValuePredicates;
 import org.pcollections.PVector;
 import org.pcollections.TreePVector;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,9 +52,7 @@ final class PathParser {
       }
 
       return parseRemaining(
-          parsed.plus(
-              PathSegments.itemMatching("[?]",
-                  IndexValuePredicates.valueMatches(predicates.get(0)))),
+          parsed.plus(PathSegments.itemMatching("[?]", predicates.get(0))),
           remaining.substring(3),
           predicates.minus(0));
     }
@@ -107,23 +107,25 @@ final class PathParser {
   }
 
   private static PathSegment toKeys(String[] indices) {
-    String[] keys = new String[indices.length];
+    Collection<String> keys = new ArrayList<>(indices.length);
     for (int i = 0; i < indices.length; i++) {
       String keyExpr = indices[i].trim();
-      keys[i] = keyExpr.substring(1, keyExpr.length() - 1).trim();
+      keys.add(keyExpr.substring(1, keyExpr.length() - 1).trim());
     }
     return PathSegments.ofObjectKeys(keys);
   }
 
   private static PathSegment toArrayIndices(String[] indices) {
-    Integer[] intIndices = new Integer[indices.length];
-    for (int i = 0; i < indices.length; i++) {
-      String index = indices[i].trim();
-      if (!integerExpr.matcher(index).matches()) {
-        throw new IllegalArgumentException("Unrecognised index expression:" + index);
+    List<Integer> intIndices = new ArrayList<>(indices.length);
+
+    for (String index : indices) {
+      String trimmed = index.trim();
+      if (!integerExpr.matcher(trimmed).matches()) {
+        throw new IllegalArgumentException("Unrecognised index expression:" + trimmed);
       }
-      intIndices[i] = Integer.valueOf(index);
+      intIndices.add(Integer.valueOf(trimmed));
     }
+
     return PathSegments.ofArrayIndices(intIndices);
   }
 }
