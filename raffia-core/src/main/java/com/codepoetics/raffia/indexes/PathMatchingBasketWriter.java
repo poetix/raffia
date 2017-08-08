@@ -255,10 +255,21 @@ public abstract class PathMatchingBasketWriter<T extends BasketWriter<T>> implem
         return enter(target.beginObject(), pathToMatch, indexTrail.enterObject());
       }
 
+      if (pathToMatch.head().isConditional()) {
+        return new TransformingWriter<>(
+            target,
+            this,
+            pathToMatch.head().createConditionalUpdater(pathToMatch.tail(), transformer),
+            Writers.weaving().beginObject());
+      }
+
       switch (indexTrail.head().isMatchedBy(pathToMatch.head())) {
-        case UNMATCHED: return new PassThroughWriter<>(target.beginObject(),this);
-        case MATCHED_UNBOUND: return enter(target.beginObject(), pathToMatch, indexTrail.enterObject());
-        default: return enter(target.beginObject(), pathToMatch.tail(), indexTrail.enterObject());
+        case UNMATCHED:
+          return new PassThroughWriter<>(target.beginObject(), this);
+        case MATCHED_UNBOUND:
+          return enter(target.beginObject(), pathToMatch, indexTrail.tail().enterObject());
+        default:
+          return enter(target.beginObject(), pathToMatch.tail(), indexTrail.tail().enterObject());
       }
     }
 
@@ -272,10 +283,21 @@ public abstract class PathMatchingBasketWriter<T extends BasketWriter<T>> implem
         return enter(target.beginArray(), pathToMatch, indexTrail.enterArray());
       }
 
+      if (pathToMatch.head().isConditional()) {
+        return new TransformingWriter<>(
+            target,
+            this,
+            pathToMatch.head().createConditionalUpdater(pathToMatch.tail(), transformer),
+            Writers.weaving().beginArray());
+      }
+
       switch (indexTrail.head().isMatchedBy(pathToMatch.head())) {
-        case UNMATCHED: return new PassThroughWriter<>(target.beginArray(),this);
-        case MATCHED_UNBOUND: return enter(target.beginArray(), pathToMatch, indexTrail.enterArray());
-        default: return enter(target.beginArray(), pathToMatch.tail(), indexTrail.enterArray());
+        case UNMATCHED:
+          return new PassThroughWriter<>(target.beginArray(), this);
+        case MATCHED_UNBOUND:
+          return enter(target.beginArray(), pathToMatch, indexTrail.tail().enterArray());
+        default:
+          return enter(target.beginArray(), pathToMatch.tail(), indexTrail.tail().enterArray());
       }
     }
 
@@ -303,28 +325,28 @@ public abstract class PathMatchingBasketWriter<T extends BasketWriter<T>> implem
 
     @Override
     public PathMatchingBasketWriter<T> add(String value) {
-      return indexTrail.isMatchedBy(pathToMatch)
+      return (indexTrail.isMatchedBy(pathToMatch))
         ? writeTransformed(Baskets.ofString(value))
         : advance(target.add(value));
     }
 
     @Override
     public PathMatchingBasketWriter<T> add(BigDecimal value) {
-      return indexTrail.isMatchedBy(pathToMatch)
-          ? writeTransformed(Baskets.ofNumber(value))
-          : advance(target.add(value));
+      return (indexTrail.isMatchedBy(pathToMatch))
+        ? writeTransformed(Baskets.ofNumber(value))
+        : advance(target.add(value));
     }
 
     @Override
     public PathMatchingBasketWriter<T> add(boolean value) {
-      return indexTrail.isMatchedBy(pathToMatch)
+      return (indexTrail.isMatchedBy(pathToMatch))
           ? writeTransformed(Baskets.ofBoolean(value))
           : advance(target.add(value));
     }
 
     @Override
     public PathMatchingBasketWriter<T> addNull() {
-      return indexTrail.isMatchedBy(pathToMatch)
+      return (indexTrail.isMatchedBy(pathToMatch))
           ? writeTransformed(Baskets.ofNull())
           : advance(target.addNull());
     }

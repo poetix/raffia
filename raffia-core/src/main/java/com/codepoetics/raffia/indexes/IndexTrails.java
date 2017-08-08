@@ -1,9 +1,6 @@
 package com.codepoetics.raffia.indexes;
 
-import com.codepoetics.raffia.api.IndexElement;
-import com.codepoetics.raffia.api.IndexTrail;
-import com.codepoetics.raffia.api.Path;
-import com.codepoetics.raffia.api.PathSegment;
+import com.codepoetics.raffia.api.*;
 import org.pcollections.PVector;
 import org.pcollections.TreePVector;
 
@@ -66,6 +63,10 @@ public final class IndexTrails {
 
       PathSegment pathSegment = path.head();
       IndexElement indexElement = head();
+
+      if (pathSegment.isConditional()) {
+        return false;
+      }
 
       switch (indexElement.isMatchedBy(pathSegment)) {
         case MATCHED_UNBOUND:

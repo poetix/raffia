@@ -5,7 +5,6 @@ com/codepoetics/raffia/projections/Projections.class
 com/codepoetics/raffia/writers/Writers$ObjectBasketWeavingWriter.class
 com/codepoetics/raffia/api/BasketWeavingWriter.class
 com/codepoetics/raffia/predicates/Predicates$1.class
-com/codepoetics/raffia/paths/segments/DeepScanToObjectKeyPathSegment$4.class
 com/codepoetics/raffia/baskets/NullBasket.class
 com/codepoetics/raffia/defences/Defences.class
 com/codepoetics/raffia/injections/Injections$5.class
@@ -28,7 +27,6 @@ com/codepoetics/raffia/projections/Projections$12.class
 com/codepoetics/raffia/predicates/Predicates$6.class
 com/codepoetics/raffia/api/Visitor.class
 com/codepoetics/raffia/mappers/Mappers.class
-com/codepoetics/raffia/paths/segments/WildcardPathSegment$3.class
 com/codepoetics/raffia/updaters/Updaters$1.class
 com/codepoetics/raffia/indexes/PathMatchingBasketWriter$WeavingWriter.class
 com/codepoetics/raffia/projections/Projections$7.class
@@ -54,7 +52,6 @@ com/codepoetics/raffia/paths/Paths$EmptyPath.class
 com/codepoetics/raffia/paths/segments/WildcardPathSegment.class
 com/codepoetics/raffia/projections/Projections$5.class
 com/codepoetics/raffia/paths/segments/WildcardPathSegment$1.class
-com/codepoetics/raffia/paths/segments/DeepScanToObjectKeyPathSegment$3.class
 com/codepoetics/raffia/predicates/Predicates$2.class
 com/codepoetics/raffia/writers/Writers.class
 com/codepoetics/raffia/api/BasketWriter.class
@@ -82,7 +79,6 @@ com/codepoetics/raffia/visitors/CopyVisitor.class
 com/codepoetics/raffia/projections/Projections$11.class
 com/codepoetics/raffia/Raffia.class
 com/codepoetics/raffia/predicates/NumberPredicates$1.class
-com/codepoetics/raffia/paths/segments/WildcardPathSegment$4.class
 com/codepoetics/raffia/paths/segments/ObjectKeyPathSegment$2.class
 com/codepoetics/raffia/baskets/BooleanBasket.class
 com/codepoetics/raffia/lenses/PathParser.class
@@ -94,12 +90,14 @@ com/codepoetics/raffia/api/IndexElement.class
 com/codepoetics/raffia/api/PropertySet.class
 com/codepoetics/raffia/updaters/Updaters$4.class
 com/codepoetics/raffia/api/ObjectEntry.class
+com/codepoetics/raffia/paths/segments/StructUpdater.class
 com/codepoetics/raffia/predicates/Predicates$3.class
 com/codepoetics/raffia/paths/segments/PathSegments.class
 com/codepoetics/raffia/writers/Writers$ValueBasketWeavingWriter.class
 com/codepoetics/raffia/paths/segments/BasePathSegment.class
 com/codepoetics/raffia/paths/segments/MatchingItemPathSegment.class
 com/codepoetics/raffia/baskets/ArrayBasket.class
+com/codepoetics/raffia/paths/segments/StructProjector.class
 com/codepoetics/raffia/visitors/Visitors$2.class
 com/codepoetics/raffia/indexes/IndexElements$1.class
 com/codepoetics/raffia/paths/Paths$1.class

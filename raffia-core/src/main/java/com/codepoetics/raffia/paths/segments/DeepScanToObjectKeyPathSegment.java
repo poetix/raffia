@@ -20,54 +20,28 @@ final class DeepScanToObjectKeyPathSegment extends BasePathSegment {
   }
 
   @Override
-  protected Visitor<Basket> createUpdater(Visitor<Basket> continuation) {
-    final AtomicReference<Visitor<Basket>> self = new AtomicReference<>();
-
-    Visitor<Basket> arrayVisitor = Projections.map(Projections.asArray, getArrayUpdateMapper(self));
-    Visitor<Basket> objectVisitor = Projections.map(Projections.asObject, getObjectUpdateMapper(continuation, self));
-
-    self.set(Projections.branch(
-        Predicates.isArray,
-        arrayVisitor,
-        Projections.branch(
-            Predicates.isObject,
-            objectVisitor,
-            Visitors.copy
-        )
-    ));
-
-    return self.get();
-  }
-
-  @Override
-  protected <T> Visitor<List<T>> createProjector(Visitor<List<T>> continuation) {
-    final AtomicReference<Visitor<List<T>>> self = new AtomicReference<>();
-
-    Visitor<List<T>> arrayVisitor = Projections.map(Projections.asArray, getArrayProjectionMapper(self));
-    Visitor<List<T>> objectVisitor = Projections.map(Projections.asObject, getObjectProjectionMapper(continuation, self));
-
-    self.set(Projections.branch(
-        Predicates.isArray,
-        arrayVisitor,
-        Projections.branch(
-            Predicates.isObject,
-            objectVisitor,
-            Projections.constant(Collections.<T>emptyList()))));
-
-    return self.get();
-  }
-
-  private Mapper<PropertySet, Basket> getObjectUpdateMapper(final Visitor<Basket> continuation, final AtomicReference<Visitor<Basket>> self) {
-    return new Mapper<PropertySet, Basket>() {
+  protected Visitor<Basket> createUpdater(final Visitor<Basket> continuation) {
+    return new StructUpdater() {
       @Override
-      public Basket map(PropertySet input) {
-        List<ObjectEntry> entries = new ArrayList<>(input.size());
+      public Basket visitArray(ArrayContents items) {
+        List<Basket> updated = new ArrayList<>();
 
-        for (ObjectEntry entry : input) {
+        for (Basket basket : items) {
+          updated.add(basket.visit(this));
+        }
+
+        return Baskets.ofArray(updated);
+      }
+
+      @Override
+      public Basket visitObject(PropertySet properties) {
+        List<ObjectEntry> entries = new ArrayList<>(properties.size());
+
+        for (ObjectEntry entry : properties) {
           if (entry.getKey().equals(key)) {
             entries.add(updateWith(entry, continuation));
           } else {
-            entries.add(updateWith(entry, self.get()));
+            entries.add(updateWith(entry, this));
           }
         }
 
@@ -80,44 +54,26 @@ final class DeepScanToObjectKeyPathSegment extends BasePathSegment {
     };
   }
 
-  private Mapper<ArrayContents, Basket> getArrayUpdateMapper(final AtomicReference<Visitor<Basket>> self) {
-    return new Mapper<ArrayContents, Basket>() {
+  @Override
+  protected <T> Visitor<List<T>> createProjector(final Visitor<List<T>> continuation) {
+    return new StructProjector<T>() {
       @Override
-      public Basket map(ArrayContents input) {
-        List<Basket> updated = new ArrayList<>();
-
-        for (Basket basket : input) {
-          updated.add(basket.visit(self.get()));
-        }
-
-        return Baskets.ofArray(updated);
-      }
-    };
-  }
-
-  private <T> Mapper<ArrayContents, List<T>> getArrayProjectionMapper(final AtomicReference<Visitor<List<T>>> self) {
-    return new Mapper<ArrayContents, List<T>>() {
-      @Override
-      public List<T> map(ArrayContents input) {
+      public List<T> visitArray(ArrayContents items) {
         List<T> results = new ArrayList<>();
-        for (Basket basket : input) {
-          results.addAll(basket.visit(self.get()));
+        for (Basket basket : items) {
+          results.addAll(basket.visit(this));
         }
         return results;
       }
-    };
-  }
 
-  private <T> Mapper<PropertySet, List<T>> getObjectProjectionMapper(final Visitor<List<T>> continuation, final AtomicReference<Visitor<List<T>>> self) {
-    return new Mapper<PropertySet, List<T>>() {
       @Override
-      public List<T> map(PropertySet input) {
+      public List<T> visitObject(PropertySet properties) {
         List<T> results = new ArrayList<>();
-        for (ObjectEntry entry : input) {
+        for (ObjectEntry entry : properties) {
           if (entry.getKey().equals(key)) {
             results.addAll(entry.getValue().visit(continuation));
           } else {
-            results.addAll(entry.getValue().visit(self.get()));
+            results.addAll(entry.getValue().visit(this));
           }
         }
         return results;
@@ -132,7 +88,9 @@ final class DeepScanToObjectKeyPathSegment extends BasePathSegment {
 
   @Override
   public PathSegmentMatchResult matchesKey(String key) {
-    return this.key.equals(key) ? PathSegmentMatchResult.MATCHED_BOUND : PathSegmentMatchResult.MATCHED_UNBOUND;
+    return this.key.equals(key)
+        ? PathSegmentMatchResult.MATCHED_BOUND
+        : PathSegmentMatchResult.MATCHED_UNBOUND;
   }
 
   @Override

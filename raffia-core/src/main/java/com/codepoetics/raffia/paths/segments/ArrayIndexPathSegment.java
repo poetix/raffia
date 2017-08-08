@@ -19,29 +19,11 @@ final class ArrayIndexPathSegment extends BasePathSegment {
     this.indices = indices;
   }
 
-
   @Override
-  protected Visitor<Basket> createUpdater(Visitor<Basket> continuation) {
-    return Projections.branch(
-        Predicates.isArray,
-        Projections.map(Projections.asArray, getUpdateMapper(continuation)),
-        Visitors.copy
-    );
-  }
-
-  @Override
-  protected <T> Visitor<List<T>> createProjector(Visitor<List<T>> continuation) {
-    return Projections.branch(
-        Predicates.isArray,
-        Projections.map(Projections.asArray, getProjectionMapper(continuation)),
-        Projections.constant(Collections.<T>emptyList())
-    );
-  }
-
-  private Mapper<ArrayContents, Basket> getUpdateMapper(final Visitor<Basket> continuation) {
-    return new Mapper<ArrayContents, Basket>() {
+  protected Visitor<Basket> createUpdater(final Visitor<Basket> continuation) {
+    return new StructUpdater() {
       @Override
-      public Basket map(ArrayContents items) {
+      public Basket visitArray(ArrayContents items) {
         ArrayContents updated = items;
         for (int index : indices) {
           int actual = index < 0 ? items.size() + index : index;
@@ -51,21 +33,32 @@ final class ArrayIndexPathSegment extends BasePathSegment {
         }
         return Baskets.ofArray(updated);
       }
+
+      @Override
+      public Basket visitObject(PropertySet properties) {
+        return Baskets.ofObject(properties);
+      }
     };
   }
 
-  private <V> Mapper<ArrayContents, List<V>> getProjectionMapper(final Visitor<List<V>> continuation) {
-    return new Mapper<ArrayContents, List<V>>() {
+  @Override
+  protected <T> Visitor<List<T>> createProjector(final Visitor<List<T>> continuation) {
+    return new StructProjector<T>() {
       @Override
-      public List<V> map(ArrayContents input) {
-        List<V> results = new ArrayList<>();
+      public List<T> visitArray(ArrayContents items) {
+        List<T> results = new ArrayList<>();
         for (int index : indices) {
-          int actual = index < 0 ? input.size() + index : index;
-          if (actual < input.size()) {
-            results.addAll(input.get(actual).visit(continuation));
+          int actual = index < 0 ? items.size() + index : index;
+          if (actual < items.size()) {
+            results.addAll(items.get(actual).visit(continuation));
           }
         }
         return results;
+      }
+
+      @Override
+      public List<T> visitObject(PropertySet properties) {
+        return Collections.emptyList();
       }
     };
   }

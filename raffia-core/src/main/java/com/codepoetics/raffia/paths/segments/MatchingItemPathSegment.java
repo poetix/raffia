@@ -21,61 +21,82 @@ final class MatchingItemPathSegment extends BasePathSegment {
   }
 
   @Override
-  protected Visitor<Basket> createUpdater(Visitor<Basket> continuation) {
+  public boolean isConditional() {
+    return true;
+  }
+
+  @Override
+  public Visitor<Basket> createConditionalUpdater(Path tail, Visitor<Basket> updater) {
     return Projections.branch(
-        Predicates.isArray,
-        Projections.map(Projections.asArray, getUpdateMapper(continuation)),
+        predicate,
+        tail.isEmpty() ? updater : tail.head().createUpdater(tail, updater),
         Visitors.copy
     );
   }
 
   @Override
-  protected <T> Visitor<List<T>> createProjector(Visitor<List<T>> continuation) {
-    return Projections.branch(
-        Predicates.isArray,
-        Projections.map(Projections.asArray, getProjectionMapper(continuation)),
-        Projections.constant(Collections.<T>emptyList())
-    );
-  }
-
-  private Mapper<ArrayContents, Basket> getUpdateMapper(final Visitor<Basket> subUpdater) {
-    return new Mapper<ArrayContents, Basket>() {
+  protected Visitor<Basket> createUpdater(final Visitor<Basket> continuation) {
+    return new StructUpdater() {
       @Override
-      public Basket map(ArrayContents items) {
-        ArrayContents updatedItems = items;
+      public Basket visitArray(ArrayContents items) {
+        ArrayContents updated = items;
         for (int i = 0; i < items.size(); i++) {
-          if (items.get(i).visit(predicate)) {
-            updatedItems = updatedItems.with(i, updatedItems.get(i).visit(subUpdater));
+          Basket item = items.get(i);
+          if (item.visit(predicate)) {
+            updated = updated.with(i, item.visit(continuation));
           }
         }
-        return Baskets.ofArray(updatedItems);
+        return Baskets.ofArray(updated);
+      }
+
+      @Override
+      public Basket visitObject(PropertySet properties) {
+        PropertySet updated = properties;
+        for (ObjectEntry entry : properties) {
+          if (entry.getValue().visit(predicate)) {
+            updated = updated.with(entry.getKey(), entry.getValue().visit(continuation));
+          }
+        }
+        return Baskets.ofObject(updated);
       }
     };
   }
 
-  private <V> Mapper<ArrayContents, List<V>> getProjectionMapper(final Visitor<List<V>> subProjector) {
-    return new Mapper<ArrayContents, List<V>>() {
+  @Override
+  protected <T> Visitor<List<T>> createProjector(final Visitor<List<T>> continuation) {
+    return new StructProjector<T>() {
       @Override
-      public List<V> map(ArrayContents items) {
-        List<V> result = new ArrayList<>();
-        for (int i = 0; i < items.size(); i++) {
-          if (items.get(i).visit(predicate)) {
-            result.addAll(items.get(i).visit(subProjector));
+      public List<T> visitArray(ArrayContents items) {
+        List<T> results = new ArrayList<>();
+        for (Basket item : items) {
+          if (item.visit(predicate)) {
+            results.addAll(item.visit(continuation));
           }
         }
-        return result;
+        return results;
+      }
+
+      @Override
+      public List<T> visitObject(PropertySet properties) {
+        List<T> results = new ArrayList<>();
+        for (ObjectEntry entry : properties) {
+          if (entry.getValue().visit(predicate)) {
+            results.addAll(entry.getValue().visit(continuation));
+          }
+        }
+        return results;
       }
     };
   }
 
   @Override
   public PathSegmentMatchResult matchesIndex(int index) {
-    throw new UnsupportedOperationException("Cannot apply path predicates to streaming data");
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public PathSegmentMatchResult matchesKey(String key) {
-    throw new UnsupportedOperationException("Cannot apply path predicates to streaming data");
+    throw new UnsupportedOperationException();
   }
 
   @Override

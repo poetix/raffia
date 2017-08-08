@@ -6,6 +6,7 @@ import com.codepoetics.raffia.predicates.Predicates;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.visitors.Visitors;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,42 +17,24 @@ class WildcardPathSegment extends BasePathSegment {
   }
 
   @Override
-  public Visitor<Basket> createUpdater(Visitor<Basket> continuation) {
-    Visitor<Basket> arrayVisitor = Projections.map(Projections.asArray, getArrayUpdateMapper(continuation));
-    Visitor<Basket> objectVisitor = Projections.map(Projections.asObject, getObjectUpdateMapper(continuation));
-
-    return Projections.branch(
-        Predicates.isArray,
-        arrayVisitor,
-        Projections.branch(
-            Predicates.isObject,
-            objectVisitor,
-            Visitors.copy
-        )
-    );
-  }
-
-  @Override
-  public <T> Visitor<List<T>> createProjector(Visitor<List<T>> continuation) {
-    Visitor<List<T>> arrayVisitor = Projections.map(Projections.asArray, getArrayProjectionMapper(continuation));
-    Visitor<List<T>> objectVisitor = Projections.map(Projections.asObject, getObjectProjectionMapper(continuation));
-
-    return Projections.branch(
-        Predicates.isArray,
-        arrayVisitor,
-        Projections.branch(
-            Predicates.isObject,
-            objectVisitor,
-            Projections.constant(Collections.<T>emptyList())));
-  }
-
-  private Mapper<PropertySet, Basket> getObjectUpdateMapper(final Visitor<Basket> continuation) {
-    return new Mapper<PropertySet, Basket>() {
+  public Visitor<Basket> createUpdater(final Visitor<Basket> continuation) {
+    return new StructUpdater() {
       @Override
-      public Basket map(PropertySet input) {
-        List<ObjectEntry> entries = new ArrayList<>(input.size());
+      public Basket visitArray(ArrayContents items) {
+        List<Basket> updated = new ArrayList<>(items.size());
 
-        for (ObjectEntry entry : input) {
+        for (Basket basket : items) {
+          updated.add(basket.visit(continuation));
+        }
+
+        return Baskets.ofArray(updated);
+      }
+
+      @Override
+      public Basket visitObject(PropertySet properties) {
+        List<ObjectEntry> entries = new ArrayList<>(properties.size());
+
+        for (ObjectEntry entry : properties) {
           entries.add(ObjectEntry.of(entry.getKey(), entry.getValue().visit(continuation)));
         }
 
@@ -60,41 +43,23 @@ class WildcardPathSegment extends BasePathSegment {
     };
   }
 
-  private Mapper<ArrayContents, Basket> getArrayUpdateMapper(final Visitor<Basket> continuation) {
-    return new Mapper<ArrayContents, Basket>() {
+  @Override
+  public <T> Visitor<List<T>> createProjector(final Visitor<List<T>> continuation) {
+    return new StructProjector<T>() {
       @Override
-      public Basket map(ArrayContents input) {
-        List<Basket> updated = new ArrayList<>(input.size());
-
-        for (Basket basket : input) {
-          updated.add(basket.visit(continuation));
-        }
-
-        return Baskets.ofArray(updated);
-      }
-    };
-  }
-
-  private <T> Mapper<ArrayContents, List<T>> getArrayProjectionMapper(final Visitor<List<T>> continuation) {
-    return new Mapper<ArrayContents, List<T>>() {
-      @Override
-      public List<T> map(ArrayContents input) {
+      public List<T> visitArray(ArrayContents items) {
         List<T> results = new ArrayList<>();
-        for (Basket basket : input) {
+        for (Basket basket : items) {
           results.addAll(basket.visit(continuation));
         }
         return results;
       }
-    };
-  }
 
-  private <T> Mapper<PropertySet, List<T>> getObjectProjectionMapper(final Visitor<List<T>> continuation) {
-    return new Mapper<PropertySet, List<T>>() {
       @Override
-      public List<T> map(PropertySet input) {
+      public List<T> visitObject(PropertySet properties) {
         List<T> results = new ArrayList<>();
-        for (ObjectEntry entry : input) {
-            results.addAll(entry.getValue().visit(continuation));
+        for (ObjectEntry entry : properties) {
+          results.addAll(entry.getValue().visit(continuation));
         }
         return results;
       }

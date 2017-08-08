@@ -24,8 +24,8 @@ final class PathParser {
 
   static PVector<PathSegment> parse(String pathString, PVector<Visitor<Boolean>> predicates) {
     String trimmed = pathString.trim();
-    if (!trimmed.startsWith("$")) {
-      throw new IllegalArgumentException("Path string must begin with $");
+    if (!trimmed.startsWith("$") &! trimmed.startsWith("@")) {
+      throw new IllegalArgumentException("Path string must begin with $ or @");
     }
     return parseRemaining(TreePVector.<PathSegment>empty(), trimmed.substring(1), predicates);
   }

@@ -1,6 +1,7 @@
 package com.codepoetics.raffia.updaters;
 
 import com.codepoetics.raffia.api.*;
+import com.codepoetics.raffia.lenses.Lens;
 import com.codepoetics.raffia.projections.Projections;
 
 import java.math.BigDecimal;
@@ -89,6 +90,14 @@ public final class Updaters {
         return input.minus(key);
       }
     });
+  }
+
+  public static Visitor<Basket> updating(final int index, final Visitor<Basket> itemUpdater) {
+    return Lens.lens().to(index).updating(itemUpdater);
+  }
+
+  public static Visitor<Basket> updating(String key, Visitor<Basket> itemUpdater) {
+    return Lens.lens().to(key).updating(itemUpdater);
   }
 
 }
