@@ -1,8 +1,6 @@
 package com.codepoetics.raffia.paths.segments;
 
-import com.codepoetics.raffia.api.ArrayContents;
 import com.codepoetics.raffia.api.Basket;
-import com.codepoetics.raffia.api.PropertySet;
 import com.codepoetics.raffia.api.Visitor;
 import com.codepoetics.raffia.baskets.Baskets;
 

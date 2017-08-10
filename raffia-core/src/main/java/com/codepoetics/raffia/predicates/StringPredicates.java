@@ -1,6 +1,7 @@
 package com.codepoetics.raffia.predicates;
 
 import com.codepoetics.raffia.api.Mapper;
+import com.codepoetics.raffia.api.Visitor;
 
 public final class StringPredicates {
 

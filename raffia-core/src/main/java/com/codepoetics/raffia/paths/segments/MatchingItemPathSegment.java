@@ -2,7 +2,6 @@ package com.codepoetics.raffia.paths.segments;
 
 import com.codepoetics.raffia.api.*;
 import com.codepoetics.raffia.baskets.Baskets;
-import com.codepoetics.raffia.predicates.Predicates;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.visitors.Visitors;
 
@@ -26,11 +25,22 @@ final class MatchingItemPathSegment extends BasePathSegment {
   }
 
   @Override
-  public Visitor<Basket> createConditionalUpdater(Path tail, Visitor<Basket> updater) {
+  public Visitor<Basket> createItemUpdater(Path tail, Visitor<Basket> updater) {
     return Projections.branch(
         predicate,
         tail.isEmpty() ? updater : tail.head().createUpdater(tail, updater),
         Visitors.copy
+    );
+  }
+
+  @Override
+  public Visitor<List<Basket>> createConditionalProjector(Path tail) {
+    return Projections.branch(
+        predicate,
+        tail.isEmpty()
+            ? Projections.listOf(Visitors.copy)
+            : tail.head().createProjector(tail, Projections.listOf(Visitors.copy)),
+        Visitors.constant(Collections.<Basket>emptyList())
     );
   }
 
@@ -101,7 +111,7 @@ final class MatchingItemPathSegment extends BasePathSegment {
 
   @Override
   public String representation() {
-    return "[" + representation + "]";
+    return representation;
   }
 
 }

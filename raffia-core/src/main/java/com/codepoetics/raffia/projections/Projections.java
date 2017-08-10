@@ -129,12 +129,12 @@ public final class Projections {
 
     @Override
     public T visitArray(ArrayContents items) {
-      return unexpected("an beginArray");
+      return unexpected("an array");
     }
 
     @Override
     public T visitObject(PropertySet properties) {
-      return unexpected("an beginObject");
+      return unexpected("an object");
     }
   }
 
@@ -166,14 +166,14 @@ public final class Projections {
     }
   };
 
-  public static final Visitor<ArrayContents> asArray = new VisitorProjection<ArrayContents>("an beginArray") {
+  public static final Visitor<ArrayContents> asArray = new VisitorProjection<ArrayContents>("an array") {
     @Override
     public ArrayContents visitArray(ArrayContents items) {
       return items;
     }
   };
 
-  public static final Visitor<PropertySet> asObject = new VisitorProjection<PropertySet>("an beginObject") {
+  public static final Visitor<PropertySet> asObject = new VisitorProjection<PropertySet>("an object") {
     @Override
     public PropertySet visitObject(PropertySet properties) {
       return properties;
@@ -181,7 +181,7 @@ public final class Projections {
   };
 
   public static <T> Visitor<T> atIndex(final int index, final Visitor<T> itemProjection) {
-    return new VisitorProjection<T>("an beginArray") {
+    return new VisitorProjection<T>("an array") {
       @Override
       public T visitArray(ArrayContents items) {
         return items.get(index).visit(itemProjection);
@@ -190,7 +190,7 @@ public final class Projections {
   }
 
   public static <T> Visitor<T> atKey(final String key, final Visitor<T> itemProjection) {
-    return new VisitorProjection<T>("an beginObject") {
+    return new VisitorProjection<T>("an object") {
       @Override
       public T visitObject(PropertySet properties) {
         return properties.get(key).visit(itemProjection);

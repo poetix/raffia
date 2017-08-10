@@ -127,7 +127,7 @@ public final class Writers {
 
     @Override
     public BasketWeavingWriter key(String key) {
-      throw new IllegalStateException("key called while writing beginArray");
+      throw new IllegalStateException("key() called while writing array");
     }
   }
 
@@ -145,7 +145,7 @@ public final class Writers {
     @Override
     public PersistentBasketWeavingWriter add(Basket basket) {
       if (key == null) {
-        throw new IllegalStateException("plus called while writing beginObject, but key not given");
+        throw new IllegalStateException("add() called while writing object, but key not given");
       }
       return new ObjectBasketWeavingWriter(parent, null, contents.plus(ObjectEntry.of(key, basket)));
     }
@@ -168,7 +168,7 @@ public final class Writers {
     @Override
     public BasketWeavingWriter beginArray() {
       if (key == null) {
-        throw new IllegalStateException("beginArray called while writing beginObject, but key not given");
+        throw new IllegalStateException("beginArray() called while writing object, but key not given");
       }
       return new ArrayBasketWeavingWriter(this, ArrayContents.empty());
     }
@@ -176,7 +176,7 @@ public final class Writers {
     @Override
     public BasketWeavingWriter key(String key) {
       if (this.key != null) {
-        throw new IllegalStateException("key called, but key already set");
+        throw new IllegalStateException("key() called, but key already set");
       }
       return new ObjectBasketWeavingWriter(parent, key, contents);
     }

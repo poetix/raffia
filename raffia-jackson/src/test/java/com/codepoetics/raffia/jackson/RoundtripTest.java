@@ -1,18 +1,20 @@
 package com.codepoetics.raffia.jackson;
 
 import com.codepoetics.raffia.api.Basket;
+import com.codepoetics.raffia.api.BasketWeavingWriter;
 import com.codepoetics.raffia.api.Mapper;
-import com.codepoetics.raffia.api.PropertySet;
 import com.codepoetics.raffia.api.Visitor;
-import com.codepoetics.raffia.indexes.PathMatchingBasketWriter;
-import com.codepoetics.raffia.lenses.Lens;
+import com.codepoetics.raffia.indexes.FilteringWriter;
+import com.codepoetics.raffia.predicates.NumberPredicates;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.updaters.Updaters;
 import com.codepoetics.raffia.writers.PassThroughWriter;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.List;
 
 import static com.codepoetics.raffia.lenses.Lens.lens;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -73,8 +75,8 @@ public class RoundtripTest {
 
     StringWriter stringWriter = new StringWriter();
 
-    PathMatchingBasketWriter<JsonWriter> transformer = PathMatchingBasketWriter.with(
-        lens("$..book[?]", lens("@.author").matching("Nigel Rees")).getPath(),
+    FilteringWriter<JsonWriter> transformer = FilteringWriter.rewriting(
+        lens("$..book[?]", lens("@.author").matching("Nigel Rees")),
         JsonWriter.writingTo(stringWriter),
         uppercaseTitle
     );
@@ -85,5 +87,20 @@ public class RoundtripTest {
 
     assertThat(stringWriter.toString(), containsString("SAYINGS OF THE CENTURY"));
     assertThat(stringWriter.toString(), containsString("The Lord of the Rings"));
+  }
+
+  @Ignore
+  @Test
+  public void projectAuthorsOfCheapBooks() throws IOException {
+    FilteringWriter<BasketWeavingWriter> filter = FilteringWriter.projecting(
+        lens("$.store.book[?].author", lens("@.price").matchingNumber(NumberPredicates.isLessThan("10")))
+    );
+
+    List<String> authors = JsonReader.readWith(getClass().getResourceAsStream("/store.json"), filter)
+        .complete()
+        .weave()
+        .visit(lens("$[*]").gettingAll(Projections.asString));
+
+    assertThat(authors, contains("Nigel Rees", "Herman Melville"));
   }
 }

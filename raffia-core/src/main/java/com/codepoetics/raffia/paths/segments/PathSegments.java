@@ -3,7 +3,10 @@ package com.codepoetics.raffia.paths.segments;
 import com.codepoetics.raffia.api.PathSegment;
 import com.codepoetics.raffia.api.Visitor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public final class PathSegments {
 

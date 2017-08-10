@@ -2,14 +2,9 @@ package com.codepoetics.raffia.paths.segments;
 
 import com.codepoetics.raffia.api.*;
 import com.codepoetics.raffia.baskets.Baskets;
-import com.codepoetics.raffia.predicates.Predicates;
-import com.codepoetics.raffia.projections.Projections;
-import com.codepoetics.raffia.visitors.Visitors;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 final class DeepScanToObjectKeyPathSegment extends BasePathSegment {
 

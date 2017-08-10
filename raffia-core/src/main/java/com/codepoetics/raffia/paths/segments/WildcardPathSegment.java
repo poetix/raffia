@@ -2,13 +2,8 @@ package com.codepoetics.raffia.paths.segments;
 
 import com.codepoetics.raffia.api.*;
 import com.codepoetics.raffia.baskets.Baskets;
-import com.codepoetics.raffia.predicates.Predicates;
-import com.codepoetics.raffia.projections.Projections;
-import com.codepoetics.raffia.visitors.Visitors;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 class WildcardPathSegment extends BasePathSegment {
