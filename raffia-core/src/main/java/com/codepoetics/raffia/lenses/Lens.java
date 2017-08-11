@@ -135,7 +135,19 @@ public class Lens {
   }
 
   public Visitor<Boolean> matchingString(Mapper<String, Boolean> matcher) {
-    return gettingOne(Projections.map(Projections.asString, matcher));
+    return gettingOne(
+        Projections.branch(
+            Predicates.isString,
+            Projections.map(Projections.asString, matcher),
+            Projections.constant(false)));
+  }
+
+  public Visitor<Boolean> isTrue() {
+    return gettingOne(
+        Projections.branch(
+            Predicates.isBoolean,
+            Projections.asBoolean,
+            Projections.constant(false)));
   }
 
   public Visitor<Boolean> matching(BigDecimal value) {
@@ -143,6 +155,10 @@ public class Lens {
   }
 
   public Visitor<Boolean> matchingNumber(Mapper<BigDecimal, Boolean> matcher) {
-    return gettingOne(Projections.map(Projections.asNumber, matcher));
+    return gettingOne(
+        Projections.branch(
+            Predicates.isNumber,
+            Projections.map(Projections.asNumber, matcher),
+            Projections.constant(false)));
   }
 }

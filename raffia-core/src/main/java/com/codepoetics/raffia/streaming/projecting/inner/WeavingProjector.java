@@ -98,11 +98,7 @@ abstract class WeavingProjector<T extends BasketWriter<T>> extends FilteringWrit
 
     @Override
     public FilteringWriter<T> end() {
-      Basket woven = weaver.weave();
-
-      System.out.println("Projecting from " + woven);
-      List<Basket> projected = woven.visit(projector);
-      System.out.println("Projected: " + projected);
+      List<Basket> projected = weaver.weave().visit(projector);
 
       T newTarget = getTarget();
       for (Basket basket : projected) {

@@ -68,6 +68,25 @@ public class FilteringWriterRewritingTest {
   }
 
   @Test
+  public void rewriteAllNestedKeys() {
+    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.rewriting(
+        lens("$.*.*"),
+        Writers.weaving(),
+        Setters.toString("Rewritten"));
+
+    Basket result = writer.beginObject()
+        .key("foo").add("Unrewritten")
+        .key("nested").beginObject()
+        .key("foo").add("Unrewritten")
+        .key("bar").add("Unrewritten")
+        .end()
+        .end()
+        .complete().weave();
+
+    assertThat(lens("$..foo").getAll(asString, result), contains("Unrewritten", "Rewritten"));
+  }
+
+  @Test
   public void rewriteSecondItem() {
     FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.rewriting(
         lens("$[1]"),
@@ -210,7 +229,7 @@ public class FilteringWriterRewritingTest {
     Visitor<Boolean> isFlaggedForRewrite = Projections.atKey("rewrite", Projections.asBoolean);
 
     FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.rewriting(
-        lens("$[?].value", isFlaggedForRewrite),
+        lens("$[?]..value", isFlaggedForRewrite),
         Writers.weaving(),
         Setters.toString("Rewritten"));
 
@@ -221,7 +240,9 @@ public class FilteringWriterRewritingTest {
         .end()
         .beginObject()
           .key("rewrite").add(true)
-          .key("value").add("Unrewritten")
+          .key("nested").beginObject()
+            .key("value").add("Unrewritten")
+          .end()
         .end()
         .beginObject()
           .key("rewrite").add(false)

@@ -7,7 +7,7 @@ public final class Raffia {
   private Raffia() {
   }
 
-  public static BasketBuilder builder() {
+  public static BasketBuilder weaver() {
     return BasketBuilder.empty();
   }
 

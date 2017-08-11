@@ -66,34 +66,34 @@ abstract class IndexSeekingInnerProjector<T extends BasketWriter<T>> extends Inn
     throw new IllegalStateException("key() called while writing array");
   }
 
-  protected boolean indexIsBound() {
-    return indexMatches().equals(PathSegmentMatchResult.MATCHED_BOUND);
+  protected boolean isMatchingLeaf() {
+    return indexMatches().equals(PathSegmentMatchResult.MATCHED_BOUND) && path.tail().isEmpty();
   }
 
   @Override
   public FilteringWriter<T> add(String value) {
-    return indexIsBound()
+    return isMatchingLeaf()
       ? advance(getTarget().add(value))
       : ignore();
   }
 
   @Override
   public FilteringWriter<T> add(BigDecimal value) {
-    return indexIsBound()
+    return isMatchingLeaf()
         ? advance(getTarget().add(value))
         : ignore();
   }
 
   @Override
   public FilteringWriter<T> add(boolean value) {
-    return indexIsBound()
+    return isMatchingLeaf()
         ? advance(getTarget().add(value))
         : ignore();
   }
 
   @Override
   public FilteringWriter<T> addNull() {
-    return indexIsBound()
+    return isMatchingLeaf()
         ? advance(getTarget().addNull())
         : ignore();
   }

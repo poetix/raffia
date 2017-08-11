@@ -17,15 +17,15 @@ public final class JsonReader {
   private static final JsonFactory FACTORY = new JsonFactory();
 
   public static Basket readBasket(String json) {
-    return readWith(json, Raffia.builder()).weave();
+    return readWith(json, Raffia.weaver()).weave();
   }
 
   public static Basket readBasket(InputStream inputStream) throws IOException {
-    return readWith(inputStream, Raffia.builder()).weave();
+    return readWith(inputStream, Raffia.weaver()).weave();
   }
 
   public static Basket readBasket(Reader reader) throws IOException {
-    return readWith(reader, Raffia.builder()).weave();
+    return readWith(reader, Raffia.weaver()).weave();
   }
 
   public static <T extends BasketWriter<T>> T readWith(String json, T writer) {

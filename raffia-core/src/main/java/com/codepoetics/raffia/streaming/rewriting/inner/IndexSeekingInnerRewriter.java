@@ -69,8 +69,8 @@ abstract class IndexSeekingInnerRewriter<T extends BasketWriter<T>> extends Inne
     throw new IllegalStateException("key() called while writing array");
   }
 
-  protected boolean indexIsBound() {
-    return indexMatches().equals(PathSegmentMatchResult.MATCHED_BOUND);
+  protected boolean isBoundLeaf() {
+    return indexMatches().equals(PathSegmentMatchResult.MATCHED_BOUND) && path.tail().isEmpty();
   }
 
   private FilteringWriter<T> update(Basket value) {
@@ -79,28 +79,28 @@ abstract class IndexSeekingInnerRewriter<T extends BasketWriter<T>> extends Inne
 
   @Override
   public FilteringWriter<T> add(String value) {
-    return indexIsBound()
+    return isBoundLeaf()
       ? update(updater.visitString(value))
       : advance(getTarget().add(value));
   }
 
   @Override
   public FilteringWriter<T> add(BigDecimal value) {
-    return indexIsBound()
+    return isBoundLeaf()
         ? update(updater.visitNumber(value))
         : advance(getTarget().add(value));
   }
 
   @Override
   public FilteringWriter<T> add(boolean value) {
-    return indexIsBound()
+    return isBoundLeaf()
         ? update(updater.visitBoolean(value))
         : advance(getTarget().add(value));
   }
 
   @Override
   public FilteringWriter<T> addNull() {
-    return indexIsBound()
+    return isBoundLeaf()
         ? update(updater.visitNull())
         : advance(getTarget().addNull());
   }
