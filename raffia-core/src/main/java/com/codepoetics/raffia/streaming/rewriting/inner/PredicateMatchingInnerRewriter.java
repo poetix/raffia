@@ -1,35 +1,35 @@
-package com.codepoetics.raffia.indexes.inner;
+package com.codepoetics.raffia.streaming.rewriting.inner;
 
 import com.codepoetics.raffia.api.Basket;
 import com.codepoetics.raffia.api.BasketWriter;
 import com.codepoetics.raffia.api.Visitor;
-import com.codepoetics.raffia.indexes.FilteringWriter;
-import com.codepoetics.raffia.indexes.MatchSeekingUpdater;
+import com.codepoetics.raffia.streaming.FilteringWriter;
+import com.codepoetics.raffia.streaming.rewriting.StreamingRewriter;
 
 import java.math.BigDecimal;
 
-final class PredicateMatchingInner<T extends BasketWriter<T>> extends Inner<T> {
+final class PredicateMatchingInnerRewriter<T extends BasketWriter<T>> extends InnerRewriter<T> {
 
   private final Visitor<Basket> itemUpdater;
 
-  PredicateMatchingInner(T target, MatchSeekingUpdater<T> parent, Visitor<Basket> itemUpdater) {
+  PredicateMatchingInnerRewriter(T target, StreamingRewriter<T> parent, Visitor<Basket> itemUpdater) {
     super(target, parent);
     this.itemUpdater = itemUpdater;
   }
 
   @Override
   public FilteringWriter<T> advance(T newTarget) {
-    return new PredicateMatchingInner<>(newTarget, parent, itemUpdater);
+    return new PredicateMatchingInnerRewriter<>(newTarget, parent, itemUpdater);
   }
 
   @Override
   public FilteringWriter<T> beginObject() {
-    return Inner.matchedObject(getTarget(), this, itemUpdater);
+    return InnerRewriter.matchedObject(getTarget(), this, itemUpdater);
   }
 
   @Override
   public FilteringWriter<T> beginArray() {
-    return Inner.matchedArray(getTarget(), this, itemUpdater);
+    return InnerRewriter.matchedArray(getTarget(), this, itemUpdater);
   }
 
   @Override

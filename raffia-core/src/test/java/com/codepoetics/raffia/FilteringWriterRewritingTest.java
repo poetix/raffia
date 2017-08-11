@@ -4,14 +4,10 @@ import com.codepoetics.raffia.api.Basket;
 import com.codepoetics.raffia.api.BasketWeavingWriter;
 import com.codepoetics.raffia.api.Mapper;
 import com.codepoetics.raffia.api.Visitor;
-import com.codepoetics.raffia.baskets.Baskets;
-import com.codepoetics.raffia.indexes.FilteringWriter;
-import com.codepoetics.raffia.predicates.Predicates;
-import com.codepoetics.raffia.predicates.StringPredicates;
+import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.setters.Setters;
 import com.codepoetics.raffia.updaters.Updaters;
-import com.codepoetics.raffia.visitors.Visitors;
 import com.codepoetics.raffia.writers.Writers;
 import org.junit.Test;
 

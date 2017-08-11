@@ -8,7 +8,7 @@ public interface PathSegment {
   Visitor<Basket> createItemUpdater(Path tail, Visitor<Basket> updater);
 
   <T> Visitor<List<T>> createProjector(Path tail, Visitor<List<T>> projector);
-  Visitor<List<Basket>> createConditionalProjector(Path tail);
+  Visitor<List<Basket>> createItemProjector(Path tail);
 
   PathSegmentMatchResult matchesIndex(int index);
 

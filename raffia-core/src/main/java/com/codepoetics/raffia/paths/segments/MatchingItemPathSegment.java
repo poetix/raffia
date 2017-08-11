@@ -34,7 +34,7 @@ final class MatchingItemPathSegment extends BasePathSegment {
   }
 
   @Override
-  public Visitor<List<Basket>> createConditionalProjector(Path tail) {
+  public Visitor<List<Basket>> createItemProjector(Path tail) {
     return Projections.branch(
         predicate,
         tail.isEmpty()

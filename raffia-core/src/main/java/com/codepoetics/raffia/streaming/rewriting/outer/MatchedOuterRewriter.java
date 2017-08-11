@@ -1,27 +1,27 @@
-package com.codepoetics.raffia.indexes.outer;
+package com.codepoetics.raffia.streaming.rewriting.outer;
 
 import com.codepoetics.raffia.api.Basket;
 import com.codepoetics.raffia.api.BasketWriter;
 import com.codepoetics.raffia.api.Visitor;
-import com.codepoetics.raffia.indexes.FilteringWriter;
-import com.codepoetics.raffia.indexes.inner.Inner;
+import com.codepoetics.raffia.streaming.FilteringWriter;
+import com.codepoetics.raffia.streaming.rewriting.inner.InnerRewriter;
 
 import java.math.BigDecimal;
 
-final class MatchedOuter<T extends BasketWriter<T>> extends Outer<T> {
+final class MatchedOuterRewriter<T extends BasketWriter<T>> extends OuterRewriter<T> {
 
-  MatchedOuter(T target, Visitor<Basket> updater) {
+  MatchedOuterRewriter(T target, Visitor<Basket> updater) {
     super(target, updater);
   }
 
   @Override
   public FilteringWriter<T> beginObject() {
-    return Inner.matchedObject(getTarget(), this, updater);
+    return InnerRewriter.matchedObject(getTarget(), this, updater);
   }
 
   @Override
   public FilteringWriter<T> beginArray() {
-    return Inner.matchedArray(getTarget(), this, updater);
+    return InnerRewriter.matchedArray(getTarget(), this, updater);
   }
 
   @Override

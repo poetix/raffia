@@ -1,20 +1,22 @@
-package com.codepoetics.raffia.indexes;
+package com.codepoetics.raffia.streaming;
 
 import com.codepoetics.raffia.api.Basket;
 import com.codepoetics.raffia.api.BasketWeavingWriter;
 import com.codepoetics.raffia.api.BasketWriter;
 import com.codepoetics.raffia.api.Visitor;
 import com.codepoetics.raffia.lenses.Lens;
+import com.codepoetics.raffia.streaming.projecting.StreamingProjector;
+import com.codepoetics.raffia.streaming.rewriting.StreamingRewriter;
 import com.codepoetics.raffia.writers.Writers;
 
 public abstract class FilteringWriter<T extends BasketWriter<T>> implements BasketWriter<FilteringWriter<T>> {
 
   public static <T extends BasketWriter<T>> FilteringWriter<T> rewriting(Lens lens, T target, Visitor<Basket> transformer) {
-    return MatchSeekingUpdater.start(target, lens.getPath(), transformer);
+    return StreamingRewriter.start(target, lens.getPath(), transformer);
   }
 
   public static <T extends BasketWriter<T>> FilteringWriter<T> filtering(Lens lens, T target) {
-    throw new UnsupportedOperationException();
+    return StreamingProjector.start(target, lens.getPath());
   }
 
   public static FilteringWriter<BasketWeavingWriter> projecting(Lens lens) {

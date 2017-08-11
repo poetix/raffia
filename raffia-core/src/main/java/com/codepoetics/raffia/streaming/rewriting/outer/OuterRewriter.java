@@ -1,13 +1,13 @@
-package com.codepoetics.raffia.indexes.outer;
+package com.codepoetics.raffia.streaming.rewriting.outer;
 
 import com.codepoetics.raffia.api.Basket;
 import com.codepoetics.raffia.api.BasketWriter;
 import com.codepoetics.raffia.api.Path;
 import com.codepoetics.raffia.api.Visitor;
-import com.codepoetics.raffia.indexes.FilteringWriter;
-import com.codepoetics.raffia.indexes.MatchSeekingUpdater;
+import com.codepoetics.raffia.streaming.FilteringWriter;
+import com.codepoetics.raffia.streaming.rewriting.StreamingRewriter;
 
-public abstract class Outer<T extends BasketWriter<T>> extends MatchSeekingUpdater<T> {
+public abstract class OuterRewriter<T extends BasketWriter<T>> extends StreamingRewriter<T> {
 
   public static <T extends BasketWriter<T>> FilteringWriter<T> create(T target, Path path, Visitor<Basket> updater) {
     if (path.isEmpty()) {
@@ -22,27 +22,27 @@ public abstract class Outer<T extends BasketWriter<T>> extends MatchSeekingUpdat
   }
 
   private static <T extends BasketWriter<T>> FilteringWriter<T> indexSeeking(T target, Path path, Visitor<Basket> updater) {
-    return new IndexSeekingOuter<>(target, path, updater);
+    return new IndexSeekingOuterRewriter<>(target, path, updater);
   }
 
   private static <T extends BasketWriter<T>> FilteringWriter<T> predicateMatching(T target, Visitor<Basket> updater) {
-    return new PredicateMatchingOuter<>(target, updater);
+    return new PredicateMatchingOuterRewriter<>(target, updater);
   }
 
   private static <T extends BasketWriter<T>> FilteringWriter<T> matched(T target, Visitor<Basket> updater) {
-    return new MatchedOuter<>(target, updater);
+    return new MatchedOuterRewriter<>(target, updater);
   }
 
   protected final Visitor<Basket> updater;
 
-  protected Outer(T target, Visitor<Basket> updater) {
+  protected OuterRewriter(T target, Visitor<Basket> updater) {
     super(target);
     this.updater = updater;
   }
 
   @Override
   public FilteringWriter<T> advance(T newTarget) {
-    return new EndOfLine<>(newTarget);
+    return new EndOfLineRewriter<>(newTarget);
   }
 
   @Override

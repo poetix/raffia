@@ -25,7 +25,7 @@ abstract class BasePathSegment implements PathSegment {
   }
 
   @Override
-  public Visitor<List<Basket>> createConditionalProjector(Path tail) {
+  public Visitor<List<Basket>> createItemProjector(Path tail) {
     throw new UnsupportedOperationException("Cannot create conditional projector for non-conditional path segment");
   }
 

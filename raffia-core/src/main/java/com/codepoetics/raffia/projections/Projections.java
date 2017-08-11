@@ -103,38 +103,38 @@ public final class Projections {
       this.expected = expected;
     }
 
-    private T unexpected(String actual) {
-      throw new IllegalArgumentException("Tried to project " + expected + " but basket contained " + actual);
+    private T unexpected(String actual, Object contents) {
+      throw new IllegalArgumentException("Tried to project " + expected + " but basket contained " + actual + ": " + contents);
     }
 
     @Override
     public T visitString(String value) {
-      return unexpected("a string");
+      return unexpected("a string", value);
     }
 
     @Override
     public T visitBoolean(boolean value) {
-      return unexpected("a boolean");
+      return unexpected("a boolean", value);
     }
 
     @Override
     public T visitNumber(BigDecimal value) {
-      return unexpected("a number");
+      return unexpected("a number", value);
     }
 
     @Override
     public T visitNull() {
-      return unexpected("null");
+      return unexpected("null", null);
     }
 
     @Override
     public T visitArray(ArrayContents items) {
-      return unexpected("an array");
+      return unexpected("an array", items);
     }
 
     @Override
     public T visitObject(PropertySet properties) {
-      return unexpected("an object");
+      return unexpected("an object", properties);
     }
   }
 

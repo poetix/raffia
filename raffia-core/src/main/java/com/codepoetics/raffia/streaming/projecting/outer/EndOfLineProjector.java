@@ -1,14 +1,14 @@
-package com.codepoetics.raffia.indexes.outer;
+package com.codepoetics.raffia.streaming.projecting.outer;
 
 import com.codepoetics.raffia.api.BasketWriter;
-import com.codepoetics.raffia.indexes.FilteringWriter;
-import com.codepoetics.raffia.indexes.MatchSeekingUpdater;
+import com.codepoetics.raffia.streaming.FilteringWriter;
+import com.codepoetics.raffia.streaming.rewriting.StreamingRewriter;
 
 import java.math.BigDecimal;
 
-public final class EndOfLine<T extends BasketWriter<T>> extends MatchSeekingUpdater<T> {
+public final class EndOfLineProjector<T extends BasketWriter<T>> extends StreamingRewriter<T> {
 
-  EndOfLine(T target) {
+  EndOfLineProjector(T target) {
     super(target);
   }
 

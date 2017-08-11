@@ -4,7 +4,7 @@ import com.codepoetics.raffia.api.Basket;
 import com.codepoetics.raffia.api.BasketWeavingWriter;
 import com.codepoetics.raffia.api.Mapper;
 import com.codepoetics.raffia.api.Visitor;
-import com.codepoetics.raffia.indexes.FilteringWriter;
+import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.predicates.NumberPredicates;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.updaters.Updaters;
@@ -89,16 +89,19 @@ public class RoundtripTest {
     assertThat(stringWriter.toString(), containsString("The Lord of the Rings"));
   }
 
-  @Ignore
   @Test
   public void projectAuthorsOfCheapBooks() throws IOException {
     FilteringWriter<BasketWeavingWriter> filter = FilteringWriter.projecting(
         lens("$.store.book[?].author", lens("@.price").matchingNumber(NumberPredicates.isLessThan("10")))
     );
 
-    List<String> authors = JsonReader.readWith(getClass().getResourceAsStream("/store.json"), filter)
+    Basket result = JsonReader.readWith(getClass().getResourceAsStream("/store.json"), filter)
         .complete()
-        .weave()
+        .weave();
+
+    System.out.println(result);
+
+    List<String> authors = result
         .visit(lens("$[*]").gettingAll(Projections.asString));
 
     assertThat(authors, contains("Nigel Rees", "Herman Melville"));

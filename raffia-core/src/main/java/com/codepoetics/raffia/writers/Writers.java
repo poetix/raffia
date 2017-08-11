@@ -57,7 +57,7 @@ public final class Writers {
     @Override
     public PersistentBasketWeavingWriter add(Basket basket) {
       if (value != null) {
-        throw new IllegalStateException("plus called when writing value, but value already set");
+        throw new IllegalStateException("add() called when writing value, but value already set");
       }
       return new ValueBasketWeavingWriter(basket);
     }

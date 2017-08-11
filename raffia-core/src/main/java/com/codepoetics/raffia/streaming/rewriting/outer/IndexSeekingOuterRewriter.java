@@ -1,19 +1,16 @@
-package com.codepoetics.raffia.indexes.outer;
+package com.codepoetics.raffia.streaming.rewriting.outer;
 
 import com.codepoetics.raffia.api.Basket;
 import com.codepoetics.raffia.api.BasketWriter;
 import com.codepoetics.raffia.api.Path;
 import com.codepoetics.raffia.api.Visitor;
-import com.codepoetics.raffia.indexes.FilteringWriter;
-import com.codepoetics.raffia.indexes.MatchSeekingUpdater;
+import com.codepoetics.raffia.streaming.FilteringWriter;
 
-import java.math.BigDecimal;
-
-public final class IndexSeekingOuter<T extends BasketWriter<T>> extends UnmatchedOuter<T> {
+public final class IndexSeekingOuterRewriter<T extends BasketWriter<T>> extends UnmatchedOuterRewriter<T> {
 
   private final Path path;
 
-  IndexSeekingOuter(T target, Path path, Visitor<Basket> updater) {
+  IndexSeekingOuterRewriter(T target, Path path, Visitor<Basket> updater) {
     super(target, updater);
 
     this.path = path;

@@ -1,33 +1,33 @@
-package com.codepoetics.raffia.indexes.inner;
+package com.codepoetics.raffia.streaming.rewriting.inner;
 
 import com.codepoetics.raffia.api.*;
-import com.codepoetics.raffia.indexes.FilteringWriter;
-import com.codepoetics.raffia.indexes.MatchSeekingUpdater;
+import com.codepoetics.raffia.streaming.FilteringWriter;
+import com.codepoetics.raffia.streaming.rewriting.StreamingRewriter;
 import com.codepoetics.raffia.visitors.Visitors;
 
 import java.math.BigDecimal;
 
-abstract class IndexSeekingInner<T extends BasketWriter<T>> extends Inner<T> {
+abstract class IndexSeekingInnerRewriter<T extends BasketWriter<T>> extends InnerRewriter<T> {
 
-  static <T extends BasketWriter<T>> MatchSeekingUpdater<T> seekingArrayIndex(T target, Path path, MatchSeekingUpdater<T> parent, Visitor<Basket> updater) {
-    return new ArrayIndexSeekingInner<>(target, path, parent, updater, 0);
+  static <T extends BasketWriter<T>> StreamingRewriter<T> seekingArrayIndex(T target, Path path, StreamingRewriter<T> parent, Visitor<Basket> updater) {
+    return new ArrayIndexSeekingInnerRewriter<>(target, path, parent, updater, 0);
   }
 
-  static <T extends BasketWriter<T>> MatchSeekingUpdater<T> seekingObjectKey(T target, Path path, MatchSeekingUpdater<T> parent, Visitor<Basket> updater) {
-    return new ObjectKeySeekingInner<>(target, path, parent, updater, null);
+  static <T extends BasketWriter<T>> StreamingRewriter<T> seekingObjectKey(T target, Path path, StreamingRewriter<T> parent, Visitor<Basket> updater) {
+    return new ObjectKeySeekingInnerRewriter<>(target, path, parent, updater, null);
   }
 
   protected final Path path;
   protected final Visitor<Basket> updater;
 
-  protected IndexSeekingInner(T target, Path path, MatchSeekingUpdater<T> parent, Visitor<Basket> updater) {
+  protected IndexSeekingInnerRewriter(T target, Path path, StreamingRewriter<T> parent, Visitor<Basket> updater) {
     super(target, parent);
     this.path = path;
     this.updater = updater;
   }
 
   private FilteringWriter<T> passThrough(T newTarget) {
-    return new PassThroughContentsUpdater<>(newTarget, this);
+    return new PassThroughContentsRewriter<>(newTarget, this);
   }
 
   @Override
@@ -105,18 +105,18 @@ abstract class IndexSeekingInner<T extends BasketWriter<T>> extends Inner<T> {
         : advance(getTarget().addNull());
   }
 
-  private static final class ObjectKeySeekingInner<T extends BasketWriter<T>> extends IndexSeekingInner<T> {
+  private static final class ObjectKeySeekingInnerRewriter<T extends BasketWriter<T>> extends IndexSeekingInnerRewriter<T> {
 
     private final String key;
 
-    ObjectKeySeekingInner(T target, Path path, MatchSeekingUpdater<T> parent, Visitor<Basket> updater, String key) {
+    ObjectKeySeekingInnerRewriter(T target, Path path, StreamingRewriter<T> parent, Visitor<Basket> updater, String key) {
       super(target, path, parent, updater);
       this.key = key;
     }
 
     @Override
     public FilteringWriter<T> advance(T newTarget) {
-      return new ObjectKeySeekingInner<>(newTarget, path, parent, updater, null);
+      return new ObjectKeySeekingInnerRewriter<>(newTarget, path, parent, updater, null);
     }
 
     @Override
@@ -129,23 +129,23 @@ abstract class IndexSeekingInner<T extends BasketWriter<T>> extends Inner<T> {
       if (key != null) {
         throw new IllegalStateException("key() called twice");
       }
-      return new ObjectKeySeekingInner<>(getTarget().key(newKey), path, parent, updater, newKey);
+      return new ObjectKeySeekingInnerRewriter<>(getTarget().key(newKey), path, parent, updater, newKey);
     }
 
   }
 
-  private static final class ArrayIndexSeekingInner<T extends BasketWriter<T>> extends IndexSeekingInner<T> {
+  private static final class ArrayIndexSeekingInnerRewriter<T extends BasketWriter<T>> extends IndexSeekingInnerRewriter<T> {
 
     private final int index;
 
-    ArrayIndexSeekingInner(T target, Path path, MatchSeekingUpdater<T> parent, Visitor<Basket> updater, int index) {
+    ArrayIndexSeekingInnerRewriter(T target, Path path, StreamingRewriter<T> parent, Visitor<Basket> updater, int index) {
       super(target, path, parent, updater);
       this.index = index;
     }
 
     @Override
     public FilteringWriter<T> advance(T newTarget) {
-      return new ArrayIndexSeekingInner<>(newTarget, path, parent, updater, index + 1);
+      return new ArrayIndexSeekingInnerRewriter<>(newTarget, path, parent, updater, index + 1);
     }
 
     @Override

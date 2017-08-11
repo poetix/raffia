@@ -1,24 +1,24 @@
-package com.codepoetics.raffia.indexes.inner;
+package com.codepoetics.raffia.streaming.rewriting.inner;
 
 import com.codepoetics.raffia.api.BasketWriter;
-import com.codepoetics.raffia.indexes.FilteringWriter;
-import com.codepoetics.raffia.indexes.MatchSeekingUpdater;
+import com.codepoetics.raffia.streaming.FilteringWriter;
+import com.codepoetics.raffia.streaming.rewriting.StreamingRewriter;
 
 import java.math.BigDecimal;
 
-final class PassThroughContentsUpdater<T extends BasketWriter<T>> extends Inner<T> {
+final class PassThroughContentsRewriter<T extends BasketWriter<T>> extends InnerRewriter<T> {
 
-  PassThroughContentsUpdater(T target, MatchSeekingUpdater<T> parent) {
+  PassThroughContentsRewriter(T target, StreamingRewriter<T> parent) {
     super(target, parent);
   }
 
   @Override
   public FilteringWriter<T> advance(T newTarget) {
-    return new PassThroughContentsUpdater<>(newTarget, parent);
+    return new PassThroughContentsRewriter<>(newTarget, parent);
   }
 
   private FilteringWriter<T> enter(T newTarget) {
-    return new PassThroughContentsUpdater<>(newTarget, this);
+    return new PassThroughContentsRewriter<>(newTarget, this);
   }
 
   @Override
