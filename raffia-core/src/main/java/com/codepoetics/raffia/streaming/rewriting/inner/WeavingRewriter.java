@@ -81,7 +81,7 @@ abstract class WeavingRewriter<T extends BasketWriter<T>> extends FilteringWrite
     }
 
     private FilteringWriter<T> enter(BasketWeavingWriter newWeaver) {
-      return new Contents<T>(getTarget(), this, newWeaver);
+      return new Contents<>(getTarget(), this, newWeaver);
     }
 
     @Override
@@ -117,12 +117,12 @@ abstract class WeavingRewriter<T extends BasketWriter<T>> extends FilteringWrite
 
     @Override
     public FilteringWriter<T> beginObject() {
-      return new Contents<T>(getTarget(), this, weaver.beginObject());
+      return new Contents<>(getTarget(), this, weaver.beginObject());
     }
 
     @Override
     public FilteringWriter<T> beginArray() {
-      return new Contents<T>(getTarget(), this, weaver.beginArray());
+      return new Contents<>(getTarget(), this, weaver.beginArray());
     }
 
     @Override

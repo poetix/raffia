@@ -6,7 +6,6 @@ import com.codepoetics.raffia.api.BasketWriter;
 import com.codepoetics.raffia.api.Visitor;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.streaming.projecting.StreamingProjector;
-import com.codepoetics.raffia.streaming.rewriting.StreamingRewriter;
 import com.codepoetics.raffia.visitors.Visitors;
 import com.codepoetics.raffia.writers.Writers;
 
@@ -83,7 +82,7 @@ abstract class WeavingProjector<T extends BasketWriter<T>> extends FilteringWrit
     }
 
     private FilteringWriter<T> enter(BasketWeavingWriter newWeaver) {
-      return new Contents<T>(getTarget(), this, newWeaver);
+      return new Contents<>(getTarget(), this, newWeaver);
     }
 
     @Override
@@ -124,12 +123,12 @@ abstract class WeavingProjector<T extends BasketWriter<T>> extends FilteringWrit
 
     @Override
     public FilteringWriter<T> beginObject() {
-      return new Contents<T>(getTarget(), this, weaver.beginObject());
+      return new Contents<>(getTarget(), this, weaver.beginObject());
     }
 
     @Override
     public FilteringWriter<T> beginArray() {
-      return new Contents<T>(getTarget(), this, weaver.beginArray());
+      return new Contents<>(getTarget(), this, weaver.beginArray());
     }
 
     @Override

@@ -108,8 +108,8 @@ final class PathParser {
 
   private static PathSegment toKeys(String[] indices) {
     Collection<String> keys = new ArrayList<>(indices.length);
-    for (int i = 0; i < indices.length; i++) {
-      String keyExpr = indices[i].trim();
+    for (String index : indices) {
+      String keyExpr = index.trim();
       keys.add(keyExpr.substring(1, keyExpr.length() - 1).trim());
     }
     return PathSegments.ofObjectKeys(keys);

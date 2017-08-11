@@ -16,7 +16,7 @@ import java.util.List;
 
 public final class BasketBuilder implements BasketWriter<BasketBuilder> {
 
-  public BasketBuilder(BasketWeavingWriter writer) {
+  private BasketBuilder(BasketWeavingWriter writer) {
     this.writer = writer;
   }
 

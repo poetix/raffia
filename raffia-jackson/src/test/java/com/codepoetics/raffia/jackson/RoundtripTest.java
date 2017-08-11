@@ -9,7 +9,6 @@ import com.codepoetics.raffia.predicates.NumberPredicates;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.updaters.Updaters;
 import com.codepoetics.raffia.writers.PassThroughWriter;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;

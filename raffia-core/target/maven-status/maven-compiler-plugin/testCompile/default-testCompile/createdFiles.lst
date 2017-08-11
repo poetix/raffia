@@ -1,11 +1,13 @@
-com/codepoetics/raffia/PathSegmentsTests.class
 com/codepoetics/raffia/Updating$1.class
 com/codepoetics/raffia/Updating$3.class
 com/codepoetics/raffia/FilteringWriterRewritingTest$2.class
 com/codepoetics/raffia/StoreExample.class
-com/codepoetics/raffia/JsonPathExamples$1.class
 com/codepoetics/raffia/Updating.class
 com/codepoetics/raffia/FilteringWriterRewritingTest.class
-com/codepoetics/raffia/JsonPathExamples.class
+com/codepoetics/raffia/FilteringWriterProjectingTest$1.class
 com/codepoetics/raffia/Updating$2.class
 com/codepoetics/raffia/FilteringWriterRewritingTest$1.class
+com/codepoetics/raffia/PathSegmentsTests.class
+com/codepoetics/raffia/JsonPathExamples$1.class
+com/codepoetics/raffia/FilteringWriterProjectingTest.class
+com/codepoetics/raffia/JsonPathExamples.class

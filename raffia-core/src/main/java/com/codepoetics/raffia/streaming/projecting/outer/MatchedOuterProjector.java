@@ -1,14 +1,10 @@
 package com.codepoetics.raffia.streaming.projecting.outer;
 
-import com.codepoetics.raffia.api.Basket;
 import com.codepoetics.raffia.api.BasketWriter;
-import com.codepoetics.raffia.api.Visitor;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.streaming.projecting.inner.InnerProjector;
-import com.codepoetics.raffia.streaming.rewriting.inner.InnerRewriter;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 final class MatchedOuterProjector<T extends BasketWriter<T>> extends OuterProjector<T> {
 

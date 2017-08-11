@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 final class NumberBasket extends BaseBasket<BigDecimal> {
 
-  protected NumberBasket(BigDecimal value) {
+  NumberBasket(BigDecimal value) {
     super(value);
   }
 

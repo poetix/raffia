@@ -16,7 +16,7 @@ final class IgnoreAllProjector<T extends BasketWriter<T>> extends StreamingProje
   }
 
   private FilteringWriter<T> enter() {
-    return new IgnoreAllProjector<T>(getTarget(), this);
+    return new IgnoreAllProjector<>(getTarget(), this);
   }
 
   @Override

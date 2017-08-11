@@ -5,7 +5,7 @@ import com.codepoetics.raffia.api.Visitor;
 
 final class StringBasket extends BaseBasket<String> {
 
-  protected StringBasket(String value) {
+  StringBasket(String value) {
     super(value);
   }
 

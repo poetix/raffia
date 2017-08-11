@@ -28,7 +28,7 @@ public class PropertySet implements Iterable<ObjectEntry> {
   private final PVector<String> keys;
   private final PMap<String, Basket> properties;
 
-  public PropertySet(PVector<String> keys, PMap<String, Basket> properties) {
+  private PropertySet(PVector<String> keys, PMap<String, Basket> properties) {
     this.keys = keys;
     this.properties = properties;
   }

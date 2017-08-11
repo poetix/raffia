@@ -6,7 +6,7 @@ abstract class BaseBasket<T> implements Basket {
 
   protected final T value;
 
-  protected BaseBasket(T value) {
+  BaseBasket(T value) {
     this.value = value;
   }
 

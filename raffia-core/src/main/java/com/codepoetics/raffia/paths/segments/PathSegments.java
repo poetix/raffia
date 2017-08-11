@@ -49,9 +49,7 @@ public final class PathSegments {
   public static PathSegment ofObjectKeys(String first, String...remaining) {
     List<String> keys = new ArrayList<>(remaining.length + 1);
     keys.add(first);
-    for (String key : remaining) {
-      keys.add(key);
-    }
+    Collections.addAll(keys, remaining);
     return ofObjectKeys(keys);
   }
 

@@ -12,12 +12,8 @@ public final class Paths {
 
   private static final Path EMPTY = new EmptyPath();
 
-  public static Path empty() {
-    return EMPTY;
-  }
-
   public static Path create(List<PathSegment> segments) {
-    Path result = empty();
+    Path result = EMPTY;
     for (int i = segments.size() - 1; i >=0; i--) {
       result = result.prepend(segments.get(i));
     }

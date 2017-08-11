@@ -20,7 +20,7 @@ public final class Writers {
 
     protected final PersistentBasketWeavingWriter parent;
 
-    protected PersistentBasketWeavingWriter(PersistentBasketWeavingWriter parent) {
+    PersistentBasketWeavingWriter(PersistentBasketWeavingWriter parent) {
       this.parent = parent;
     }
 
