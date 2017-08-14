@@ -1,6 +1,7 @@
 package com.codepoetics.raffia.streaming.projecting.inner;
 
 import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.operations.Projector;
 import com.codepoetics.raffia.writers.BasketWriter;
 import com.codepoetics.raffia.paths.Path;
 import com.codepoetics.raffia.baskets.Visitor;
@@ -26,15 +27,15 @@ public abstract class InnerProjector<T extends BasketWriter<T>> extends Streamin
     return new MatchedInnerProjector<>(target.beginObject(), parent);
   }
 
-  public static <T extends BasketWriter<T>> FilteringWriter<T> matchedArray(T target, StreamingProjector<T> parent, Visitor<List<Basket>> projector) {
+  public static <T extends BasketWriter<T>> FilteringWriter<T> matchedArray(T target, StreamingProjector<T> parent, Projector<Basket> projector) {
     return WeavingProjector.weavingArray(target, parent, projector);
   }
 
-  public static <T extends BasketWriter<T>> FilteringWriter<T> matchedObject(T target, StreamingProjector<T> parent, Visitor<List<Basket>> projector) {
+  public static <T extends BasketWriter<T>> FilteringWriter<T> matchedObject(T target, StreamingProjector<T> parent, Projector<Basket> projector) {
     return WeavingProjector.weavingObject(target, parent, projector);
   }
 
-  public static <T extends BasketWriter<T>> FilteringWriter<T> predicateMatching(T target, StreamingProjector<T> parent, Visitor<List<Basket>> projector) {
+  public static <T extends BasketWriter<T>> FilteringWriter<T> predicateMatching(T target, StreamingProjector<T> parent, Projector<Basket> projector) {
     return new PredicateMatchingInnerProjector<>(target, parent, projector);
   }
 

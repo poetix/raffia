@@ -1,10 +1,12 @@
 package com.codepoetics.raffia.paths.segments;
 
 import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.baskets.ArrayContents;
 import com.codepoetics.raffia.baskets.ObjectEntry;
 import com.codepoetics.raffia.baskets.PropertySet;
+import com.codepoetics.raffia.operations.ProjectionResult;
+import com.codepoetics.raffia.operations.Projector;
+import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.paths.PathSegmentMatchResult;
 
 import java.util.ArrayList;
@@ -19,21 +21,21 @@ final class DeepScanToObjectKeyPathSegment extends BasePathSegment {
   }
 
   @Override
-  protected Visitor<Basket> createUpdater(final Visitor<Basket> continuation) {
+  protected Updater createUpdater(final Updater continuation) {
     return new StructUpdater() {
       @Override
-      public Basket visitArray(ArrayContents items) {
+      public Basket updateArray(ArrayContents items) {
         List<Basket> updated = new ArrayList<>();
 
         for (Basket basket : items) {
-          updated.add(basket.visit(this));
+          updated.add(update(basket));
         }
 
         return Basket.ofArray(updated);
       }
 
       @Override
-      public Basket visitObject(PropertySet properties) {
+      public Basket updateObject(PropertySet properties) {
         List<ObjectEntry> entries = new ArrayList<>(properties.size());
 
         for (ObjectEntry entry : properties) {
@@ -47,35 +49,35 @@ final class DeepScanToObjectKeyPathSegment extends BasePathSegment {
         return Basket.ofObject(entries);
       }
 
-      private ObjectEntry updateWith(ObjectEntry entry, Visitor<Basket> updater) {
-        return ObjectEntry.of(entry.getKey(), entry.getValue().visit(updater));
+      private ObjectEntry updateWith(ObjectEntry entry, Updater updater) {
+        return ObjectEntry.of(entry.getKey(), updater.update(entry.getValue()));
       }
     };
   }
 
   @Override
-  protected <T> Visitor<List<T>> createProjector(final Visitor<List<T>> continuation) {
-    return new StructProjector<T>() {
+  protected Projector<Basket> createProjector(final Projector<Basket> continuation) {
+    return new StructProjector<Basket>() {
       @Override
-      public List<T> visitArray(ArrayContents items) {
-        List<T> results = new ArrayList<>();
+      public ProjectionResult<Basket> projectArray(ArrayContents items) {
+        ProjectionResult<Basket> result = ProjectionResult.empty();
         for (Basket basket : items) {
-          results.addAll(basket.visit(this));
+          result = result.add(project(basket));
         }
-        return results;
+        return result;
       }
 
       @Override
-      public List<T> visitObject(PropertySet properties) {
-        List<T> results = new ArrayList<>();
+      public ProjectionResult<Basket> projectObject(PropertySet properties) {
+        ProjectionResult<Basket> result = ProjectionResult.empty();
         for (ObjectEntry entry : properties) {
           if (entry.getKey().equals(key)) {
-            results.addAll(entry.getValue().visit(continuation));
+            result = result.add(continuation.project(entry.getValue()));
           } else {
-            results.addAll(entry.getValue().visit(this));
+            result = result.add(project(entry.getValue()));
           }
         }
-        return results;
+        return result;
       }
     };
   }

@@ -1,15 +1,13 @@
 package com.codepoetics.raffia.paths.segments;
 
 import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.baskets.ArrayContents;
-import com.codepoetics.raffia.baskets.PropertySet;
+import com.codepoetics.raffia.operations.ProjectionResult;
+import com.codepoetics.raffia.operations.Projector;
+import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.paths.PathSegmentMatchResult;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 final class ArrayIndexPathSegment extends BasePathSegment {
 
@@ -20,45 +18,50 @@ final class ArrayIndexPathSegment extends BasePathSegment {
   }
 
   @Override
-  protected Visitor<Basket> createUpdater(final Visitor<Basket> continuation) {
-    return new StructUpdater() {
+  protected Updater createUpdater(final Updater continuation) {
+    return new Updater() {
       @Override
-      public Basket visitArray(ArrayContents items) {
+      public Basket update(Basket basket) {
+        if (basket.isArray()) {
+          return updateArray(basket.asArray());
+        }
+
+        return basket;
+      }
+
+      private Basket updateArray(ArrayContents items) {
         ArrayContents updated = items;
         for (int index : indices) {
           int actual = index < 0 ? items.size() + index : index;
           if (actual < items.size()) {
-            updated = updated.with(actual, updated.get(actual).visit(continuation));
+            updated = updated.with(actual, continuation.update(updated.get(actual)));
           }
         }
         return Basket.ofArray(updated);
-      }
-
-      @Override
-      public Basket visitObject(PropertySet properties) {
-        return Basket.ofObject(properties);
       }
     };
   }
 
   @Override
-  protected <T> Visitor<List<T>> createProjector(final Visitor<List<T>> continuation) {
-    return new StructProjector<T>() {
+  protected Projector<Basket> createProjector(final Projector<Basket> continuation) {
+    return new Projector<Basket>() {
       @Override
-      public List<T> visitArray(ArrayContents items) {
-        List<T> results = new ArrayList<>();
-        for (int index : indices) {
-          int actual = index < 0 ? items.size() + index : index;
-          if (actual < items.size()) {
-            results.addAll(items.get(actual).visit(continuation));
-          }
+      public ProjectionResult<Basket> project(Basket basket) {
+        if (basket.isArray()) {
+          return projectArray(basket.asArray());
         }
-        return results;
+        return ProjectionResult.empty();
       }
 
-      @Override
-      public List<T> visitObject(PropertySet properties) {
-        return Collections.emptyList();
+      private ProjectionResult<Basket> projectArray(ArrayContents items) {
+        ProjectionResult<Basket> result = ProjectionResult.empty();
+        for (int index : indices) {
+          int actual = index < 0 ? items.size() + index : index;
+          if (actual >= 0 && actual < items.size()) {
+            result = result.add(continuation.project(items.get(actual)));
+          }
+        }
+        return result;
       }
     };
   }

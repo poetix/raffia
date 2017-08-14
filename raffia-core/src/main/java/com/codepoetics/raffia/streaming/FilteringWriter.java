@@ -1,6 +1,7 @@
 package com.codepoetics.raffia.streaming;
 
 import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.writers.BasketWeavingWriter;
 import com.codepoetics.raffia.writers.BasketWriter;
 import com.codepoetics.raffia.baskets.Visitor;
@@ -11,8 +12,8 @@ import com.codepoetics.raffia.writers.Writers;
 
 public abstract class FilteringWriter<T extends BasketWriter<T>> implements BasketWriter<FilteringWriter<T>> {
 
-  public static <T extends BasketWriter<T>> FilteringWriter<T> rewriting(Lens lens, T target, Visitor<Basket> transformer) {
-    return StreamingRewriter.start(target, lens.getPath(), transformer);
+  public static <T extends BasketWriter<T>> FilteringWriter<T> rewriting(Lens lens, T target, Updater updater) {
+    return StreamingRewriter.start(target, lens.getPath(), updater);
   }
 
   public static <T extends BasketWriter<T>> FilteringWriter<T> filtering(Lens lens, T target) {

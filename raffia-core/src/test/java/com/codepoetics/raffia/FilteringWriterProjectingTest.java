@@ -1,8 +1,11 @@
 package com.codepoetics.raffia;
 
 import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.operations.BasketPredicate;
+import com.codepoetics.raffia.operations.ValuePredicate;
+import com.codepoetics.raffia.predicates.BasketPredicates;
 import com.codepoetics.raffia.writers.BasketWeavingWriter;
-import com.codepoetics.raffia.api.Mapper;
+import com.codepoetics.raffia.mappers.Mapper;
 import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.setters.Setters;
@@ -24,7 +27,7 @@ public class FilteringWriterProjectingTest {
 
     Basket result = writer.add("Value").complete().weave();
 
-    assertThat(lens("$[*]").getAll(asString, result), contains("Value"));
+    assertThat(result.asListOfString(), contains("Value"));
   }
 
   @Test
@@ -43,7 +46,7 @@ public class FilteringWriterProjectingTest {
         .end()
         .complete().weave();
 
-    assertThat(lens("$[*]").getAll(asString, result), contains("foo value"));
+    assertThat(result.asListOfString(), contains("foo value"));
   }
 
   @Test
@@ -57,7 +60,7 @@ public class FilteringWriterProjectingTest {
         .end()
         .complete().weave();
 
-    assertThat(lens("$[*]").getAll(asString, result), contains("foo value", "bar value"));
+    assertThat(result.asListOfString(), contains("foo value", "bar value"));
   }
 
   @Test
@@ -74,7 +77,7 @@ public class FilteringWriterProjectingTest {
         .end()
         .complete().weave();
 
-    assertThat(lens("$[*]").getAll(asString, result), contains("nested foo value", "nested bar value"));
+    assertThat(result.asListOfString(), contains("nested foo value", "nested bar value"));
   }
 
   @Test
@@ -89,7 +92,7 @@ public class FilteringWriterProjectingTest {
         .end()
         .complete().weave();
 
-    assertThat(lens("$[*]").getAll(asString, result), contains("second"));
+    assertThat(result.asListOfString(), contains("second"));
   }
 
   @Test
@@ -104,7 +107,7 @@ public class FilteringWriterProjectingTest {
         .end()
         .complete().weave();
 
-    assertThat(lens("$[*]").getAll(asString, result), contains("second", "third"));
+    assertThat(result.asListOfString(), contains("second", "third"));
   }
 
   @Test
@@ -119,15 +122,15 @@ public class FilteringWriterProjectingTest {
         .end()
         .complete().weave();
 
-    assertThat(lens("$[*]").getAll(asString, result), contains("first", "second", "third"));
+    assertThat(result.asListOfString(), contains("first", "second", "third"));
   }
 
   @Test
   public void projectMatchingStrings() {
-    Visitor<Boolean> shouldBeRewritten = Projections.map(asString, new Mapper<String, Boolean>() {
+    BasketPredicate shouldBeRewritten = BasketPredicates.isString(new ValuePredicate<String>() {
       @Override
-      public Boolean map(String input) {
-        return input.contains("project me");
+      public boolean test(String value) {
+        return value.contains("project me");
       }
     });
 
@@ -141,7 +144,7 @@ public class FilteringWriterProjectingTest {
         .end()
         .complete().weave();
 
-    assertThat(lens("$[*]").getAll(asString, result), contains("a (project me)", "c (project me)"));
+    assertThat(result.asListOfString(), contains("a (project me)", "c (project me)"));
   }
 
   @Test
@@ -173,12 +176,12 @@ public class FilteringWriterProjectingTest {
       .end()
       .complete().weave();
 
-    assertThat(lens("$[*]").getAll(asString, result), contains("bar 1", "bar 2", "bar 3"));
+    assertThat(result.asListOfString(), contains("bar 1", "bar 2", "bar 3"));
   }
 
   @Test
-  public void rewriteDeepScannedMatchingStrings() {
-    Visitor<Boolean> isFlaggedForRewrite = lens("@.project").isTrue();
+  public void projectDeepScannedMatchingStrings() {
+    BasketPredicate isFlaggedForRewrite = lens("@.project").isTrue();
 
     FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.projecting(
         lens("$..nested[?].value", isFlaggedForRewrite));
@@ -213,37 +216,35 @@ public class FilteringWriterProjectingTest {
         .end()
         .complete().weave();
 
-    assertThat(lens("$[*]").getAll(asString, result), contains("project me", "and me"));
+    assertThat(result.asListOfString(), contains("project me", "and me"));
   }
 
   @Test
-  public void rewriteMatchingObjects() {
-    Visitor<Boolean> isFlaggedForRewrite = Projections.atKey("rewrite", Projections.asBoolean);
+  public void projectMatchingObjects() {
+    BasketPredicate isFlaggedForRewrite = lens("@.match").isTrue();
 
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.rewriting(
-        lens("$[?]..value", isFlaggedForRewrite),
-        Writers.weaving(),
-        Setters.toString("Rewritten"));
+    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.projecting(
+        lens("$[?]..value", isFlaggedForRewrite));
 
     Basket result = writer.beginArray()
         .beginObject()
-          .key("rewrite").add(true)
-          .key("value").add("Unrewritten")
+          .key("match").add(true)
+          .key("value").add("a")
         .end()
         .beginObject()
-          .key("rewrite").add(true)
+          .key("match").add(true)
           .key("nested").beginObject()
-            .key("value").add("Unrewritten")
+            .key("value").add("b")
           .end()
         .end()
         .beginObject()
-          .key("rewrite").add(false)
-          .key("value").add("Unrewritten")
+          .key("match").add(false)
+          .key("value").add("c")
         .end()
         .end()
         .complete().weave();
 
-    assertThat(lens("$..value").getAll(asString, result), contains("Rewritten", "Rewritten", "Unrewritten"));
+    assertThat(result.asListOfString(), contains("a", "b"));
   }
 
 }

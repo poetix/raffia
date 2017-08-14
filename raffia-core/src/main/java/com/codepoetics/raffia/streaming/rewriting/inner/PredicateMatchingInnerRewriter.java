@@ -1,6 +1,7 @@
 package com.codepoetics.raffia.streaming.rewriting.inner;
 
 import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.writers.BasketWriter;
 import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.streaming.FilteringWriter;
@@ -10,9 +11,9 @@ import java.math.BigDecimal;
 
 final class PredicateMatchingInnerRewriter<T extends BasketWriter<T>> extends InnerRewriter<T> {
 
-  private final Visitor<Basket> itemUpdater;
+  private final Updater itemUpdater;
 
-  PredicateMatchingInnerRewriter(T target, StreamingRewriter<T> parent, Visitor<Basket> itemUpdater) {
+  PredicateMatchingInnerRewriter(T target, StreamingRewriter<T> parent, Updater itemUpdater) {
     super(target, parent);
     this.itemUpdater = itemUpdater;
   }
@@ -39,21 +40,21 @@ final class PredicateMatchingInnerRewriter<T extends BasketWriter<T>> extends In
 
   @Override
   public FilteringWriter<T> add(String value) {
-    return updated(itemUpdater.visitString(value));
+    return updated(itemUpdater.update(Basket.ofString(value)));
   }
 
   @Override
   public FilteringWriter<T> add(BigDecimal value) {
-    return updated(itemUpdater.visitNumber(value));
+    return updated(Basket.ofNumber(value));
   }
 
   @Override
   public FilteringWriter<T> add(boolean value) {
-    return updated(itemUpdater.visitBoolean(value));
+    return updated(Basket.ofBoolean(value));
   }
 
   @Override
   public FilteringWriter<T> addNull() {
-    return updated(itemUpdater.visitNull());
+    return updated(Basket.ofNull());
   }
 }

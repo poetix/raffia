@@ -1,17 +1,16 @@
 package com.codepoetics.raffia.paths;
 
 import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.baskets.Visitor;
-
-import java.util.List;
+import com.codepoetics.raffia.operations.Projector;
+import com.codepoetics.raffia.operations.Updater;
 
 public interface PathSegment {
 
-  Visitor<Basket> createUpdater(Path path, Visitor<Basket> updater);
-  Visitor<Basket> createItemUpdater(Path tail, Visitor<Basket> updater);
+  Updater createUpdater(Path tail, Updater updater);
+  Updater createItemUpdater(Path tail, Updater updater);
 
-  <T> Visitor<List<T>> createProjector(Path tail, Visitor<List<T>> projector);
-  Visitor<List<Basket>> createItemProjector(Path tail);
+  Projector<Basket> createProjector(Path tail);
+  Projector<Basket> createItemProjector(Path tail);
 
   PathSegmentMatchResult matchesIndex(int index);
 

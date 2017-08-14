@@ -1,6 +1,7 @@
 package com.codepoetics.raffia.streaming.rewriting.outer;
 
 import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.writers.BasketWriter;
 import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.streaming.FilteringWriter;
@@ -10,7 +11,7 @@ import java.math.BigDecimal;
 
 final class MatchedOuterRewriter<T extends BasketWriter<T>> extends OuterRewriter<T> {
 
-  MatchedOuterRewriter(T target, Visitor<Basket> updater) {
+  MatchedOuterRewriter(T target, Updater updater) {
     super(target, updater);
   }
 
@@ -26,22 +27,22 @@ final class MatchedOuterRewriter<T extends BasketWriter<T>> extends OuterRewrite
 
   @Override
   public FilteringWriter<T> add(String value) {
-    return updated(updater.visitString(value));
+    return updated(updater.update(Basket.ofString(value)));
   }
 
   @Override
   public FilteringWriter<T> add(BigDecimal value) {
-    return updated(updater.visitNumber(value));
+    return updated(updater.update(Basket.ofNumber(value)));
   }
 
   @Override
   public FilteringWriter<T> add(boolean value) {
-    return updated(updater.visitBoolean(value));
+    return updated(updater.update(Basket.ofBoolean(value)));
   }
 
   @Override
   public FilteringWriter<T> addNull() {
-    return updated(updater.visitNull());
+    return updated(updater.update(Basket.ofNull()));
   }
 
 }

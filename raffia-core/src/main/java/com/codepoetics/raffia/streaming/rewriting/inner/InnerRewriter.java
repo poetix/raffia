@@ -1,6 +1,7 @@
 package com.codepoetics.raffia.streaming.rewriting.inner;
 
 import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.writers.BasketWriter;
 import com.codepoetics.raffia.paths.Path;
 import com.codepoetics.raffia.baskets.Visitor;
@@ -16,23 +17,23 @@ public abstract class InnerRewriter<T extends BasketWriter<T>> extends Streaming
     this.parent = parent;
   }
 
-  public static <T extends BasketWriter<T>> FilteringWriter<T> matchedArray(T target, StreamingRewriter<T> parent, Visitor<Basket> updater) {
+  public static <T extends BasketWriter<T>> FilteringWriter<T> matchedArray(T target, StreamingRewriter<T> parent, Updater updater) {
     return WeavingRewriter.weavingArray(target, parent, updater);
   }
 
-  public static <T extends BasketWriter<T>> FilteringWriter<T> matchedObject(T target, StreamingRewriter<T> parent, Visitor<Basket> updater) {
+  public static <T extends BasketWriter<T>> FilteringWriter<T> matchedObject(T target, StreamingRewriter<T> parent, Updater updater) {
     return WeavingRewriter.weavingObject(target, parent, updater);
   }
 
-  public static <T extends BasketWriter<T>> FilteringWriter<T> predicateMatching(T target, StreamingRewriter<T> parent, Visitor<Basket> itemUpdater) {
+  public static <T extends BasketWriter<T>> FilteringWriter<T> predicateMatching(T target, StreamingRewriter<T> parent, Updater itemUpdater) {
     return new PredicateMatchingInnerRewriter<>(target, parent, itemUpdater);
   }
 
-  public static <T extends BasketWriter<T>> FilteringWriter<T> arrayIndexSeeking(T target, Path path, StreamingRewriter<T> parent, Visitor<Basket> updater) {
+  public static <T extends BasketWriter<T>> FilteringWriter<T> arrayIndexSeeking(T target, Path path, StreamingRewriter<T> parent, Updater updater) {
     return IndexSeekingInnerRewriter.seekingArrayIndex(target, path, parent, updater);
   }
 
-  public static <T extends BasketWriter<T>> FilteringWriter<T> objectKeySeeking(T target, Path path, StreamingRewriter<T> parent, Visitor<Basket> updater) {
+  public static <T extends BasketWriter<T>> FilteringWriter<T> objectKeySeeking(T target, Path path, StreamingRewriter<T> parent, Updater updater) {
     return IndexSeekingInnerRewriter.seekingObjectKey(target, path, parent, updater);
   }
 

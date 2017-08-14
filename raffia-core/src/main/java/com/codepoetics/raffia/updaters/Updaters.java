@@ -1,11 +1,12 @@
 package com.codepoetics.raffia.updaters;
 
-import com.codepoetics.raffia.api.*;
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.baskets.ArrayContents;
 import com.codepoetics.raffia.baskets.PropertySet;
 import com.codepoetics.raffia.lenses.Lens;
+import com.codepoetics.raffia.mappers.Mapper;
+import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.projections.Projections;
 
 import java.math.BigDecimal;
@@ -18,31 +19,52 @@ public final class Updaters {
   private Updaters() {
   }
 
-  public static <I, O> Visitor<Basket> from(Visitor<I> projection, Mapper<I, O> mapper, Mapper<O, Basket> injection) {
-    return Projections.map(projection, compose(mapper, injection));
+  public static Updater ofString(final Mapper<String, String> stringMapper) {
+    return new Updater() {
+      @Override
+      public Basket update(Basket basket) {
+        return basket.isString() ? Basket.ofString(stringMapper.map(basket.asString())) : basket;
+      }
+    };
   }
 
-  public static Visitor<Basket> ofString(Mapper<String, String> stringMapper) {
-    return from(Projections.asString, stringMapper, fromString);
+  public static Updater ofNumber(final Mapper<BigDecimal, BigDecimal> numberMapper) {
+    return new Updater() {
+      @Override
+      public Basket update(Basket basket) {
+        return basket.isNumber() ? Basket.ofNumber(numberMapper.map(basket.asNumber())) : basket;
+      }
+    };
   }
 
-  public static Visitor<Basket> ofNumber(Mapper<BigDecimal, BigDecimal> numberMapper) {
-    return from(Projections.asNumber, numberMapper, fromNumber);
+  public static Updater ofBoolean(final Mapper<Boolean, Boolean> booleanMapper) {
+    return new Updater() {
+      @Override
+      public Basket update(Basket basket) {
+        return basket.isBoolean() ? Basket.ofBoolean(booleanMapper.map(basket.asBoolean())) : basket;
+      }
+    };
   }
 
-  public static Visitor<Basket> ofBoolean(Mapper<Boolean, Boolean> booleanMapper) {
-    return from(Projections.asBoolean, booleanMapper, fromBoolean);
+  public static Updater ofArray(final Mapper<ArrayContents, ArrayContents> arrayContentsMapper) {
+    return new Updater() {
+      @Override
+      public Basket update(Basket basket) {
+        return basket.mapArray(arrayContentsMapper);
+      }
+    };
   }
 
-  public static Visitor<Basket> ofArray(Mapper<ArrayContents, ArrayContents> arrayContentsMapper) {
-    return from(Projections.asArray, arrayContentsMapper, fromArrayContents);
+  public static Updater ofObject(final Mapper<PropertySet, PropertySet> propertySetMapper) {
+    return new Updater() {
+      @Override
+      public Basket update(Basket basket) {
+        return basket.mapObject(propertySetMapper);
+      }
+    };
   }
 
-  public static Visitor<Basket> ofObject(Mapper<PropertySet, PropertySet> propertySetMapper) {
-    return from(Projections.asObject, propertySetMapper, fromPropertySet);
-  }
-
-  public static Visitor<Basket> appending(final Basket arrayItem) {
+  public static Updater appending(final Basket arrayItem) {
     return ofArray(new Mapper<ArrayContents, ArrayContents>() {
       @Override
       public ArrayContents map(ArrayContents input) {
@@ -51,7 +73,7 @@ public final class Updaters {
     });
   }
 
-  public static Visitor<Basket> inserting(final int index, final Basket arrayItem) {
+  public static Updater inserting(final int index, final Basket arrayItem) {
     return ofArray(new Mapper<ArrayContents, ArrayContents>() {
       @Override
       public ArrayContents map(ArrayContents input) {
@@ -60,7 +82,7 @@ public final class Updaters {
     });
   }
 
-  public static Visitor<Basket> replacing(final int index, final Basket arrayItem) {
+  public static Updater replacing(final int index, final Basket arrayItem) {
     return ofArray(new Mapper<ArrayContents, ArrayContents>() {
       @Override
       public ArrayContents map(ArrayContents input) {
@@ -69,7 +91,7 @@ public final class Updaters {
     });
   }
 
-  public static Visitor<Basket> inserting(final String key, final Basket value) {
+  public static Updater inserting(final String key, final Basket value) {
     return ofObject(new Mapper<PropertySet, PropertySet>() {
       @Override
       public PropertySet map(PropertySet input) {
@@ -78,7 +100,7 @@ public final class Updaters {
     });
   }
 
-  public static Visitor<Basket> removing(final int index) {
+  public static Updater removing(final int index) {
     return ofArray(new Mapper<ArrayContents, ArrayContents>() {
       @Override
       public ArrayContents map(ArrayContents input) {
@@ -87,7 +109,7 @@ public final class Updaters {
     });
   }
 
-  public static Visitor<Basket> removing(final String key) {
+  public static Updater removing(final String key) {
     return ofObject(new Mapper<PropertySet, PropertySet>() {
       @Override
       public PropertySet map(PropertySet input) {
@@ -96,12 +118,26 @@ public final class Updaters {
     });
   }
 
-  public static Visitor<Basket> updating(final int index, final Visitor<Basket> itemUpdater) {
-    return Lens.lens().to(index).updating(itemUpdater);
+  public static Updater updating(final int index, final Updater itemUpdater) {
+    return ofArray(new Mapper<ArrayContents, ArrayContents>() {
+      @Override
+      public ArrayContents map(ArrayContents input) {
+        if (index >= input.size()) {
+          return input;
+        }
+        int actual = index < 0 ? input.size() + index : index;
+        return input.with(actual, itemUpdater.update(input.get(actual)));
+      }
+    });
   }
 
-  public static Visitor<Basket> updating(String key, Visitor<Basket> itemUpdater) {
-    return Lens.lens().to(key).updating(itemUpdater);
+  public static Updater updating(final String key, final Updater valueUpdater) {
+    return ofObject(new Mapper<PropertySet, PropertySet>() {
+      @Override
+      public PropertySet map(PropertySet input) {
+        return input.containsKey(key) ? input.with(key, valueUpdater.update(input.get(key))) : input;
+      }
+    });
   }
 
 }

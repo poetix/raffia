@@ -1,6 +1,7 @@
 package com.codepoetics.raffia.lenses;
 
 import com.codepoetics.raffia.baskets.Visitor;
+import com.codepoetics.raffia.operations.BasketPredicate;
 import com.codepoetics.raffia.paths.PathSegment;
 import com.codepoetics.raffia.paths.segments.PathSegments;
 import org.pcollections.PVector;
@@ -22,7 +23,7 @@ final class PathParser {
   private static final Pattern indexExpr = Pattern.compile("^\\[([^]]+)]");
   private static final Pattern integerExpr = Pattern.compile("^-?[0-9]+$");
 
-  static PVector<PathSegment> parse(String pathString, PVector<Visitor<Boolean>> predicates) {
+  static PVector<PathSegment> parse(String pathString, PVector<BasketPredicate> predicates) {
     String trimmed = pathString.trim();
     if (!trimmed.startsWith("$") &! trimmed.startsWith("@")) {
       throw new IllegalArgumentException("Path string must begin with $ or @");
@@ -30,7 +31,7 @@ final class PathParser {
     return parseRemaining(TreePVector.<PathSegment>empty(), trimmed.substring(1), predicates);
   }
 
-  private static PVector<PathSegment> parseRemaining(PVector<PathSegment> parsed, String remaining, PVector<Visitor<Boolean>> predicates) {
+  private static PVector<PathSegment> parseRemaining(PVector<PathSegment> parsed, String remaining, PVector<BasketPredicate> predicates) {
     if (remaining.isEmpty()) {
       if (!predicates.isEmpty()) {
         throw new IllegalArgumentException("Unmatched predicate");

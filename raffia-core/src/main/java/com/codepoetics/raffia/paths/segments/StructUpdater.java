@@ -1,28 +1,25 @@
 package com.codepoetics.raffia.paths.segments;
 
+import com.codepoetics.raffia.baskets.ArrayContents;
 import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.baskets.Visitor;
+import com.codepoetics.raffia.baskets.PropertySet;
+import com.codepoetics.raffia.operations.Updater;
 
-import java.math.BigDecimal;
-
-abstract class StructUpdater implements Visitor<Basket> {
+abstract class StructUpdater implements Updater {
   @Override
-  public Basket visitString(String value) {
-    return Basket.ofString(value);
+  public Basket update(Basket basket) {
+    if (basket.isArray()) {
+      return updateArray(basket.asArray());
+    }
+
+    if (basket.isObject()) {
+      return updateObject(basket.asObject());
+    }
+
+    return basket;
   }
 
-  @Override
-  public Basket visitBoolean(boolean value) {
-    return Basket.ofBoolean(value);
-  }
+  protected abstract Basket updateArray(ArrayContents contents);
 
-  @Override
-  public Basket visitNumber(BigDecimal value) {
-    return Basket.ofNumber(value);
-  }
-
-  @Override
-  public Basket visitNull() {
-    return Basket.ofNull();
-  }
+  protected abstract Basket updateObject(PropertySet properties);
 }

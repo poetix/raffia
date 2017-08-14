@@ -1,8 +1,9 @@
 package com.codepoetics.raffia.jackson;
 
 import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.writers.BasketWeavingWriter;
-import com.codepoetics.raffia.api.Mapper;
+import com.codepoetics.raffia.mappers.Mapper;
 import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.predicates.NumberPredicates;
@@ -26,7 +27,7 @@ public class RoundtripTest {
   public void readBasket() throws IOException {
     Basket basket = JsonReader.readBasket(getClass().getResourceAsStream("/store.json"));
 
-    assertThat(lens().toAny("author").getAll(Projections.asString, basket),
+    assertThat(lens().toAny("author").getAllStrings(basket),
         contains("Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien"));
 
     String repr = JsonWriter.writeBasketAsString(basket);
@@ -63,14 +64,14 @@ public class RoundtripTest {
 
   @Test
   public void rewritePathMatchedStrings() throws IOException {
-    Visitor<Basket> toUppercase = Updaters.ofString(new Mapper<String, String>() {
+    Updater toUppercase = Updaters.ofString(new Mapper<String, String>() {
       @Override
       public String map(String input) {
         return input.toUpperCase();
       }
     });
 
-    Visitor<Basket> uppercaseTitle = Updaters.updating("title", toUppercase);
+    Updater uppercaseTitle = Updaters.updating("title", toUppercase);
 
     StringWriter stringWriter = new StringWriter();
 
@@ -100,8 +101,7 @@ public class RoundtripTest {
 
     System.out.println(result);
 
-    List<String> authors = result
-        .visit(lens("$[*]").gettingAll(Projections.asString));
+    List<String> authors = result.asListOfString();
 
     assertThat(authors, contains("Nigel Rees", "Herman Melville"));
   }

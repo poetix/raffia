@@ -91,6 +91,11 @@ public class ArrayBasketTest {
   }
 
   @Test
+  public void getItem() {
+    assertEquals(Basket.ofBoolean(true), unit.getItem(2));
+  }
+
+  @Test
   public void iterateOverItems() {
     assertThat(unit.items(), contains(
         Basket.ofString("value"),

@@ -1,31 +1,27 @@
 package com.codepoetics.raffia.paths.segments;
 
-import com.codepoetics.raffia.baskets.Visitor;
+import com.codepoetics.raffia.baskets.ArrayContents;
+import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.baskets.PropertySet;
+import com.codepoetics.raffia.operations.ProjectionResult;
+import com.codepoetics.raffia.operations.Projector;
 
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-
-abstract class StructProjector<T> implements Visitor<List<T>> {
-
-  @Override
-  public List<T> visitString(String value) {
-    return Collections.emptyList();
-  }
+abstract class StructProjector<T> implements Projector<T> {
 
   @Override
-  public List<T> visitBoolean(boolean value) {
-    return Collections.emptyList();
+  public ProjectionResult<T> project(Basket basket) {
+    if (basket.isArray()) {
+      return projectArray(basket.asArray());
+    }
+
+    if (basket.isObject()) {
+      return projectObject(basket.asObject());
+    }
+
+    return ProjectionResult.empty();
   }
 
-  @Override
-  public List<T> visitNumber(BigDecimal value) {
-    return Collections.emptyList();
-  }
+  protected abstract ProjectionResult<T> projectObject(PropertySet objectEntries);
 
-  @Override
-  public List<T> visitNull() {
-    return Collections.emptyList();
-  }
-
+  protected abstract ProjectionResult<T> projectArray(ArrayContents baskets);
 }

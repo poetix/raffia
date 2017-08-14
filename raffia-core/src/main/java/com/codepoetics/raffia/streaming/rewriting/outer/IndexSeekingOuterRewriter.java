@@ -1,6 +1,7 @@
 package com.codepoetics.raffia.streaming.rewriting.outer;
 
 import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.writers.BasketWriter;
 import com.codepoetics.raffia.paths.Path;
 import com.codepoetics.raffia.baskets.Visitor;
@@ -10,7 +11,7 @@ public final class IndexSeekingOuterRewriter<T extends BasketWriter<T>> extends 
 
   private final Path path;
 
-  IndexSeekingOuterRewriter(T target, Path path, Visitor<Basket> updater) {
+  IndexSeekingOuterRewriter(T target, Path path, Updater updater) {
     super(target, updater);
 
     this.path = path;

@@ -1,6 +1,7 @@
 package com.codepoetics.raffia.streaming.projecting;
 
 import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.operations.Projector;
 import com.codepoetics.raffia.writers.BasketWriter;
 import com.codepoetics.raffia.paths.Path;
 import com.codepoetics.raffia.baskets.Visitor;
@@ -16,7 +17,7 @@ public abstract class StreamingProjector<T extends BasketWriter<T>> extends Filt
     return OuterProjector.create(target.beginArray(), path);
   }
 
-  private Visitor<List<Basket>> makeConditionalProjector(Path path) {
+  private Projector<Basket> makeConditionalProjector(Path path) {
     return path.head().createItemProjector(path.tail());
   }
 

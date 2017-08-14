@@ -18,9 +18,9 @@ com/codepoetics/raffia/Updating$3.class
 com/codepoetics/raffia/FilteringWriterRewritingTest$2.class
 com/codepoetics/raffia/baskets/BooleanBasketTest.class
 com/codepoetics/raffia/FilteringWriterProjectingTest$1.class
+com/codepoetics/raffia/ProjectionResultsTest.class
 com/codepoetics/raffia/baskets/StringBasketTest$2.class
 com/codepoetics/raffia/PathSegmentsTests.class
 com/codepoetics/raffia/baskets/ObjectBasketTest$3.class
-com/codepoetics/raffia/JsonPathExamples$1.class
 com/codepoetics/raffia/baskets/NumberBasketTest$2.class
 com/codepoetics/raffia/FilteringWriterProjectingTest.class

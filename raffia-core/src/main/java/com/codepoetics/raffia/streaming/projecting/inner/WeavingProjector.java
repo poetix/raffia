@@ -1,6 +1,8 @@
 package com.codepoetics.raffia.streaming.projecting.inner;
 
 import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.operations.ProjectionResult;
+import com.codepoetics.raffia.operations.Projector;
 import com.codepoetics.raffia.writers.BasketWeavingWriter;
 import com.codepoetics.raffia.writers.BasketWriter;
 import com.codepoetics.raffia.baskets.Visitor;
@@ -14,15 +16,15 @@ import java.util.List;
 
 abstract class WeavingProjector<T extends BasketWriter<T>> extends FilteringWriter<T> {
 
-  static <T extends BasketWriter<T>> WeavingProjector<T> weavingObject(T target, StreamingProjector<T> parent, Visitor<List<Basket>> projector) {
+  static <T extends BasketWriter<T>> WeavingProjector<T> weavingObject(T target, StreamingProjector<T> parent, Projector<Basket> projector) {
     return weaving(target, parent, projector, Writers.weaving().beginObject());
   }
 
-  static <T extends BasketWriter<T>> WeavingProjector<T> weavingArray(T target, StreamingProjector<T> parent, Visitor<List<Basket>> projector) {
+  static <T extends BasketWriter<T>> WeavingProjector<T> weavingArray(T target, StreamingProjector<T> parent, Projector<Basket> projector) {
     return weaving(target, parent, projector, Writers.weaving().beginArray());
   }
 
-  private static <T extends BasketWriter<T>> WeavingProjector<T> weaving(T target, StreamingProjector<T> parent, Visitor<List<Basket>> projector, BasketWeavingWriter weaver) {
+  private static <T extends BasketWriter<T>> WeavingProjector<T> weaving(T target, StreamingProjector<T> parent, Projector<Basket> projector, BasketWeavingWriter weaver) {
     return new Container<>(target, parent, projector, weaver);
   }
 
@@ -67,10 +69,10 @@ abstract class WeavingProjector<T extends BasketWriter<T>> extends FilteringWrit
 
   private static final class Container<T extends BasketWriter<T>> extends WeavingProjector<T> {
 
-    private final Visitor<List<Basket>> projector;
+    private final Projector<Basket> projector;
     private final StreamingProjector<T> parent;
 
-    Container(T target, StreamingProjector<T> parent, Visitor<List<Basket>> projector, BasketWeavingWriter weaver) {
+    Container(T target, StreamingProjector<T> parent, Projector<Basket> projector, BasketWeavingWriter weaver) {
       super(target, weaver);
       this.parent = parent;
       this.projector = projector;
@@ -97,7 +99,7 @@ abstract class WeavingProjector<T extends BasketWriter<T>> extends FilteringWrit
 
     @Override
     public FilteringWriter<T> end() {
-      List<Basket> projected = weaver.weave().visit(projector);
+      ProjectionResult<Basket> projected = projector.project(weaver.weave());
 
       T newTarget = getTarget();
       for (Basket basket : projected) {

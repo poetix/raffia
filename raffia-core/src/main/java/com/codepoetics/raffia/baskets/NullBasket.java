@@ -22,6 +22,11 @@ final class NullBasket extends Basket {
   }
 
   @Override
+  public Void asNull() {
+    return null;
+  }
+
+  @Override
   public <T> T visit(Visitor<T> visitor) {
     return visitor.visitNull();
   }

@@ -5,6 +5,9 @@ import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.baskets.ArrayContents;
 import com.codepoetics.raffia.baskets.ObjectEntry;
 import com.codepoetics.raffia.baskets.PropertySet;
+import com.codepoetics.raffia.operations.ProjectionResult;
+import com.codepoetics.raffia.operations.Projector;
+import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.paths.PathSegmentMatchResult;
 
 import java.util.ArrayList;
@@ -16,25 +19,25 @@ class WildcardPathSegment extends BasePathSegment {
   }
 
   @Override
-  public Visitor<Basket> createUpdater(final Visitor<Basket> continuation) {
+  public Updater createUpdater(final Updater continuation) {
     return new StructUpdater() {
       @Override
-      public Basket visitArray(ArrayContents items) {
+      public Basket updateArray(ArrayContents items) {
         List<Basket> updated = new ArrayList<>(items.size());
 
         for (Basket basket : items) {
-          updated.add(basket.visit(continuation));
+          updated.add(continuation.update(basket));
         }
 
         return Basket.ofArray(updated);
       }
 
       @Override
-      public Basket visitObject(PropertySet properties) {
+      public Basket updateObject(PropertySet properties) {
         List<ObjectEntry> entries = new ArrayList<>(properties.size());
 
         for (ObjectEntry entry : properties) {
-          entries.add(ObjectEntry.of(entry.getKey(), entry.getValue().visit(continuation)));
+          entries.add(ObjectEntry.of(entry.getKey(), continuation.update(entry.getValue())));
         }
 
         return Basket.ofObject(entries);
@@ -43,24 +46,24 @@ class WildcardPathSegment extends BasePathSegment {
   }
 
   @Override
-  public <T> Visitor<List<T>> createProjector(final Visitor<List<T>> continuation) {
-    return new StructProjector<T>() {
+  public Projector<Basket> createProjector(final Projector<Basket> continuation) {
+    return new StructProjector<Basket>() {
       @Override
-      public List<T> visitArray(ArrayContents items) {
-        List<T> results = new ArrayList<>();
+      public ProjectionResult<Basket> projectArray(ArrayContents items) {
+        ProjectionResult<Basket> result = ProjectionResult.empty();
         for (Basket basket : items) {
-          results.addAll(basket.visit(continuation));
+          result = result.add(continuation.project(basket));
         }
-        return results;
+        return result;
       }
 
       @Override
-      public List<T> visitObject(PropertySet properties) {
-        List<T> results = new ArrayList<>();
+      public ProjectionResult<Basket> projectObject(PropertySet properties) {
+        ProjectionResult<Basket> result = ProjectionResult.empty();
         for (ObjectEntry entry : properties) {
-          results.addAll(entry.getValue().visit(continuation));
+          result = result.add(continuation.project(entry.getValue()));
         }
-        return results;
+        return result;
       }
     };
   }

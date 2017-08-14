@@ -1,6 +1,6 @@
 package com.codepoetics.raffia.baskets;
 
-import com.codepoetics.raffia.api.*;
+import com.codepoetics.raffia.mappers.Mapper;
 import com.codepoetics.raffia.visitors.Visitors;
 import org.junit.Test;
 
@@ -60,6 +60,11 @@ public class ObjectBasketTest {
     assertEquals("result", unit.visit(visitor));
 
     verify(visitor).visitObject(properties);;
+  }
+
+  @Test
+  public void getProperty() {
+    assertEquals(Basket.ofString("value"), unit.getProperty("string"));
   }
 
   @Test

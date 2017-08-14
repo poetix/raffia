@@ -1,6 +1,7 @@
 package com.codepoetics.raffia.streaming.rewriting.outer;
 
 import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.writers.BasketWriter;
 import com.codepoetics.raffia.paths.Path;
 import com.codepoetics.raffia.baskets.Visitor;
@@ -9,7 +10,7 @@ import com.codepoetics.raffia.streaming.rewriting.StreamingRewriter;
 
 public abstract class OuterRewriter<T extends BasketWriter<T>> extends StreamingRewriter<T> {
 
-  public static <T extends BasketWriter<T>> FilteringWriter<T> create(T target, Path path, Visitor<Basket> updater) {
+  public static <T extends BasketWriter<T>> FilteringWriter<T> create(T target, Path path, Updater updater) {
     if (path.isEmpty()) {
       return matched(target, updater);
     }
@@ -21,21 +22,21 @@ public abstract class OuterRewriter<T extends BasketWriter<T>> extends Streaming
     return indexSeeking(target, path, updater);
   }
 
-  private static <T extends BasketWriter<T>> FilteringWriter<T> indexSeeking(T target, Path path, Visitor<Basket> updater) {
+  private static <T extends BasketWriter<T>> FilteringWriter<T> indexSeeking(T target, Path path, Updater updater) {
     return new IndexSeekingOuterRewriter<>(target, path, updater);
   }
 
-  private static <T extends BasketWriter<T>> FilteringWriter<T> predicateMatching(T target, Visitor<Basket> updater) {
+  private static <T extends BasketWriter<T>> FilteringWriter<T> predicateMatching(T target, Updater updater) {
     return new PredicateMatchingOuterRewriter<>(target, updater);
   }
 
-  private static <T extends BasketWriter<T>> FilteringWriter<T> matched(T target, Visitor<Basket> updater) {
+  private static <T extends BasketWriter<T>> FilteringWriter<T> matched(T target, Updater updater) {
     return new MatchedOuterRewriter<>(target, updater);
   }
 
-  protected final Visitor<Basket> updater;
+  protected final Updater updater;
 
-  protected OuterRewriter(T target, Visitor<Basket> updater) {
+  protected OuterRewriter(T target, Updater updater) {
     super(target);
     this.updater = updater;
   }

@@ -2,6 +2,7 @@ package com.codepoetics.raffia.streaming.rewriting;
 
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.baskets.Visitor;
+import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.paths.Path;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.streaming.rewriting.inner.InnerRewriter;
@@ -15,15 +16,15 @@ public abstract class StreamingRewriter<T extends BasketWriter<T>> extends Filte
     super(target);
   }
 
-  public static <T extends BasketWriter<T>> FilteringWriter<T> start(T target, Path path, Visitor<Basket> updater) {
+  public static <T extends BasketWriter<T>> FilteringWriter<T> start(T target, Path path, Updater updater) {
     return OuterRewriter.create(target, path, updater);
   }
 
-  private static Visitor<Basket> makeConditionalUpdater(Path path, Visitor<Basket> updater) {
+  private static Updater makeConditionalUpdater(Path path, Updater updater) {
     return path.head().createItemUpdater(path.tail(), updater);
   }
 
-  protected FilteringWriter<T> startArray(T target, Path path, StreamingRewriter<T> parent, Visitor<Basket> updater) {
+  protected FilteringWriter<T> startArray(T target, Path path, StreamingRewriter<T> parent, Updater updater) {
     if (path.isEmpty()) {
       return InnerRewriter.matchedArray(target, parent, updater);
     }
@@ -35,7 +36,7 @@ public abstract class StreamingRewriter<T extends BasketWriter<T>> extends Filte
     return InnerRewriter.arrayIndexSeeking(target.beginArray(), path, parent, updater);
   }
 
-  protected FilteringWriter<T> startObject(T target, Path path, StreamingRewriter<T> parent, Visitor<Basket> updater) {
+  protected FilteringWriter<T> startObject(T target, Path path, StreamingRewriter<T> parent, Updater updater) {
     if (path.isEmpty()) {
       return InnerRewriter.matchedObject(target, parent, updater);
     }

@@ -1,16 +1,16 @@
 package com.codepoetics.raffia.predicates;
 
-import com.codepoetics.raffia.api.Mapper;
+import com.codepoetics.raffia.operations.ValuePredicate;
 
 public final class StringPredicates {
 
   private StringPredicates() {
   }
 
-  public static Mapper<String, Boolean> isEqualTo(final String other) {
-    return new Mapper<String, Boolean>() {
+  public static ValuePredicate<String> isEqualTo(final String other) {
+    return new ValuePredicate<String>() {
       @Override
-      public Boolean map(String input) {
+      public boolean test(String input) {
         return input.equals(other);
       }
     };

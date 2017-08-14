@@ -1,5 +1,6 @@
 package com.codepoetics.raffia.paths.segments;
 
+import com.codepoetics.raffia.operations.BasketPredicate;
 import com.codepoetics.raffia.paths.PathSegment;
 import com.codepoetics.raffia.baskets.Visitor;
 
@@ -42,7 +43,7 @@ public final class PathSegments {
     return new DeepScanToObjectKeyPathSegment(objectKey);
   }
 
-  public static PathSegment itemMatching(String representation, Visitor<Boolean> predicate) {
+  public static PathSegment itemMatching(String representation, BasketPredicate predicate) {
     return new MatchingItemPathSegment(representation, predicate);
   }
 

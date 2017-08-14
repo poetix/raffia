@@ -1,10 +1,11 @@
 package com.codepoetics.raffia.visitors;
 
-import com.codepoetics.raffia.api.*;
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.baskets.ArrayContents;
 import com.codepoetics.raffia.baskets.PropertySet;
+import com.codepoetics.raffia.mappers.Mapper;
+import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.writers.BasketWriter;
 
 import java.math.BigDecimal;
@@ -16,6 +17,24 @@ public final class Visitors {
 
   public static final Visitor<Basket> copy = new CopyVisitor();
   public static final Visitor<Object> object = new ObjectVisitor();
+
+  public static <O> Mapper<Basket, O> toMapper(final Visitor<O> visitor) {
+    return new Mapper<Basket, O>() {
+      @Override
+      public O map(Basket input) {
+        return input.visit(visitor);
+      }
+    };
+  }
+
+  public static Updater toUpdater(final Visitor<Basket> visitor) {
+    return new Updater() {
+      @Override
+      public Basket update(Basket basket) {
+        return basket.visit(visitor);
+      }
+    };
+  }
 
   public static <T> Visitor<T> constant(final T constant) {
     return new Visitor<T>() {

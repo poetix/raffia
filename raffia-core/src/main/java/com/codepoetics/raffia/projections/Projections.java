@@ -1,9 +1,12 @@
 package com.codepoetics.raffia.projections;
 
 import com.codepoetics.raffia.baskets.ArrayContents;
-import com.codepoetics.raffia.api.Mapper;
+import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.mappers.Mapper;
 import com.codepoetics.raffia.baskets.PropertySet;
 import com.codepoetics.raffia.baskets.Visitor;
+import com.codepoetics.raffia.operations.ProjectionResult;
+import com.codepoetics.raffia.operations.Projector;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -14,248 +17,82 @@ public final class Projections {
   private Projections() {
   }
 
-  public static <T> Visitor<T> constant(final T constant) {
-    return new Visitor<T>() {
-      @Override
-      public T visitString(String value) {
-        return constant;
-      }
+  public static final Projector<String> asString = new Projector<String>() {
+    @Override
+    public ProjectionResult<String> project(Basket basket) {
+      return basket.isString() ? ProjectionResult.ofSingle(basket.asString()) : ProjectionResult.<String>empty();
+    }
+  };
 
-      @Override
-      public T visitBoolean(boolean value) {
-        return constant;
-      }
+  public static final Projector<Boolean> asBoolean = new Projector<Boolean>() {
+    @Override
+    public ProjectionResult<Boolean> project(Basket basket) {
+      return basket.isBoolean() ? ProjectionResult.ofSingle(basket.asBoolean()) : ProjectionResult.<Boolean>empty();
+    }
+  };
 
-      @Override
-      public T visitNumber(BigDecimal value) {
-        return constant;
-      }
+  public static final Projector<BigDecimal> asNumber = new Projector<BigDecimal>() {
+    @Override
+    public ProjectionResult<BigDecimal> project(Basket basket) {
+      return basket.isNumber() ? ProjectionResult.ofSingle(basket.asNumber()) : ProjectionResult.<BigDecimal>empty();
+    }
+  };
 
-      @Override
-      public T visitNull() {
-        return constant;
-      }
+  public static final Projector<Void> asNull = new Projector<Void>() {
+    @Override
+    public ProjectionResult<Void> project(Basket basket) {
+      return basket.isNull() ? ProjectionResult.ofSingle(basket.asNull()) : ProjectionResult.<Void>empty();
+    }
+  };
 
-      @Override
-      public T visitArray(ArrayContents items) {
-        return constant;
-      }
+  public static final Projector<ArrayContents> asArray = new Projector<ArrayContents>() {
+    @Override
+    public ProjectionResult<ArrayContents> project(Basket basket) {
+      return basket.isArray() ? ProjectionResult.ofSingle(basket.asArray()) : ProjectionResult.<ArrayContents>empty();
+    }
+  };
 
+  public static final Projector<PropertySet> asObject = new Projector<PropertySet>() {
+    @Override
+    public ProjectionResult<PropertySet> project(Basket basket) {
+      return basket.isObject() ? ProjectionResult.ofSingle(basket.asObject()) : ProjectionResult.<PropertySet>empty();
+    }
+  };
+
+  public static <T> Projector<T> atIndex(final int index, final Projector<T> itemProjection) {
+    return new Projector<T>() {
       @Override
-      public T visitObject(PropertySet properties) {
-        return constant;
+      public ProjectionResult<T> project(Basket basket) {
+        if (!basket.isArray()) {
+          return ProjectionResult.empty();
+        }
+
+        ArrayContents contents = basket.asArray();
+        int actual = index < 0 ? contents.size() - index : index;
+        if (actual < 0 || actual >= contents.size()) {
+          return ProjectionResult.empty();
+        }
+        return itemProjection.project(contents.get(actual));
       }
     };
   }
 
-  public static <T> Visitor<T> branch(final Visitor<Boolean> predicate, final Visitor<T> ifTrue, final Visitor<T> ifFalse) {
-    return new Visitor<T>() {
-
+  public static <T> Projector<T> atKey(final String key, final Projector<T> itemProjection) {
+    return new Projector<T>() {
       @Override
-      public T visitString(String value) {
-        return predicate.visitString(value)
-            ? ifTrue.visitString(value)
-            : ifFalse.visitString(value);
-      }
+      public ProjectionResult<T> project(Basket basket) {
+        if (basket.isObject()) {
+          return ProjectionResult.empty();
+        }
 
-      @Override
-      public T visitBoolean(boolean value) {
-        return predicate.visitBoolean(value)
-            ? ifTrue.visitBoolean(value)
-            : ifFalse.visitBoolean(value);
-      }
+        PropertySet properties = basket.asObject();
+        if (!properties.containsKey(key)) {
+          return ProjectionResult.empty();
+        }
 
-      @Override
-      public T visitNumber(BigDecimal value) {
-        return predicate.visitNumber(value)
-            ? ifTrue.visitNumber(value)
-            : ifFalse.visitNumber(value);
-      }
-
-      @Override
-      public T visitNull() {
-        return predicate.visitNull()
-            ? ifTrue.visitNull()
-            : ifFalse.visitNull();
-      }
-
-      @Override
-      public T visitArray(ArrayContents items) {
-        return predicate.visitArray(items)
-            ? ifTrue.visitArray(items)
-            : ifFalse.visitArray(items);
-      }
-
-      @Override
-      public T visitObject(PropertySet properties) {
-        return predicate.visitObject(properties)
-            ? ifTrue.visitObject(properties)
-            : ifFalse.visitObject(properties);
+        return itemProjection.project(properties.get(key));
       }
     };
   }
 
-  private static abstract class VisitorProjection<T> implements Visitor<T> {
-
-    private final String expected;
-
-    protected VisitorProjection(String expected) {
-      this.expected = expected;
-    }
-
-    private T unexpected(String actual, Object contents) {
-      throw new IllegalArgumentException("Tried to project " + expected + " but basket contained " + actual + ": " + contents);
-    }
-
-    @Override
-    public T visitString(String value) {
-      return unexpected("a string", value);
-    }
-
-    @Override
-    public T visitBoolean(boolean value) {
-      return unexpected("a boolean", value);
-    }
-
-    @Override
-    public T visitNumber(BigDecimal value) {
-      return unexpected("a number", value);
-    }
-
-    @Override
-    public T visitNull() {
-      return unexpected("null", null);
-    }
-
-    @Override
-    public T visitArray(ArrayContents items) {
-      return unexpected("an array", items);
-    }
-
-    @Override
-    public T visitObject(PropertySet properties) {
-      return unexpected("an object", properties);
-    }
-  }
-
-  public static final Visitor<String> asString = new VisitorProjection<String>("a string") {
-    @Override
-    public String visitString(String value) {
-      return value;
-    }
-  };
-
-  public static final Visitor<Boolean> asBoolean = new VisitorProjection<Boolean>("a boolean") {
-    @Override
-    public Boolean visitBoolean(boolean value) {
-      return value;
-    }
-  };
-
-  public static final Visitor<BigDecimal> asNumber = new VisitorProjection<BigDecimal>("a number") {
-    @Override
-    public BigDecimal visitNumber(BigDecimal value) {
-      return value;
-    }
-  };
-
-  public static final Visitor<Void> asNull = new VisitorProjection<Void>("null") {
-    @Override
-    public Void visitNull() {
-      return null;
-    }
-  };
-
-  public static final Visitor<ArrayContents> asArray = new VisitorProjection<ArrayContents>("an array") {
-    @Override
-    public ArrayContents visitArray(ArrayContents items) {
-      return items;
-    }
-  };
-
-  public static final Visitor<PropertySet> asObject = new VisitorProjection<PropertySet>("an object") {
-    @Override
-    public PropertySet visitObject(PropertySet properties) {
-      return properties;
-    }
-  };
-
-  public static <T> Visitor<T> atIndex(final int index, final Visitor<T> itemProjection) {
-    return new VisitorProjection<T>("an array") {
-      @Override
-      public T visitArray(ArrayContents items) {
-        return items.get(index).visit(itemProjection);
-      }
-    };
-  }
-
-  public static <T> Visitor<T> atKey(final String key, final Visitor<T> itemProjection) {
-    return new VisitorProjection<T>("an object") {
-      @Override
-      public T visitObject(PropertySet properties) {
-        return properties.get(key).visit(itemProjection);
-      }
-    };
-  }
-
-  public static <T, V> Visitor<V> map(final Visitor<T> visitor, final Mapper<T, V> mapper) {
-    return new Visitor<V>() {
-      @Override
-      public V visitString(String value) {
-        return mapper.map(visitor.visitString(value));
-      }
-
-      @Override
-      public V visitBoolean(boolean value) {
-        return mapper.map(visitor.visitBoolean(value));
-      }
-
-      @Override
-      public V visitNumber(BigDecimal value) {
-        return mapper.map(visitor.visitNumber(value));
-      }
-
-      @Override
-      public V visitNull() {
-        return mapper.map(visitor.visitNull());
-      }
-
-      @Override
-      public V visitArray(ArrayContents items) {
-        return mapper.map(visitor.visitArray(items));
-      }
-
-      @Override
-      public V visitObject(PropertySet properties) {
-        return mapper.map(visitor.visitObject(properties));
-      }
-    };
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <T> Visitor<List<T>> listOf(Visitor<T> projection) {
-    return map(projection, toListMapper);
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <T> Visitor<T> firstOf(Visitor<List<T>> projection) {
-    return map(projection, (Mapper) toFirstItemMapper);
-  }
-
-  private static final Mapper toListMapper = new Mapper() {
-    @Override
-    public Object map(Object input) {
-      return Collections.singletonList(input);
-    }
-  };
-
-  private static final Mapper<List, Object> toFirstItemMapper = new Mapper<List, Object>() {
-    @Override
-    public Object map(List input) {
-      if (input.size() == 0) {
-        throw new IllegalArgumentException("Tried to project first element of empty list");
-      }
-      return input.get(0);
-    }
-  };
 }

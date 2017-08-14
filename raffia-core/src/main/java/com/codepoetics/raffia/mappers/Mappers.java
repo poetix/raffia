@@ -1,7 +1,5 @@
 package com.codepoetics.raffia.mappers;
 
-import com.codepoetics.raffia.api.Mapper;
-
 public final class Mappers {
 
   private Mappers() {
@@ -36,5 +34,7 @@ public final class Mappers {
       }
     };
   }
+
+
 
 }

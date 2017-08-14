@@ -1,18 +1,18 @@
 package com.codepoetics.raffia.paths.segments;
 
 import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.operations.Projector;
+import com.codepoetics.raffia.operations.Projectors;
+import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.paths.Path;
 import com.codepoetics.raffia.paths.PathSegment;
-import com.codepoetics.raffia.baskets.Visitor;
-
-import java.util.List;
 
 abstract class BasePathSegment implements PathSegment {
 
   @Override
-  public Visitor<Basket> createUpdater(Path path, Visitor<Basket> updater) {
+  public Updater createUpdater(Path path, Updater updater) {
     final Path subPath = path.tail();
-    final Visitor<Basket> continuation = subPath.isEmpty()
+    final Updater continuation = subPath.isEmpty()
         ? updater
         : subPath.head().createUpdater(subPath, updater);
 
@@ -20,25 +20,23 @@ abstract class BasePathSegment implements PathSegment {
   }
 
   @Override
-  public Visitor<Basket> createItemUpdater(Path tail, Visitor<Basket> updater) {
+  public Updater createItemUpdater(Path tail, Updater updater) {
     throw new UnsupportedOperationException("Cannot create item updater for non-conditional path segment");
   }
 
   @Override
-  public Visitor<List<Basket>> createItemProjector(Path tail) {
-    throw new UnsupportedOperationException("Cannot create conditional projector for non-conditional path segment");
+  public Projector<Basket> createItemProjector(Path tail) {
+    throw new UnsupportedOperationException("Cannot create item projector for non-conditional path segment");
   }
 
-  protected abstract Visitor<Basket> createUpdater(Visitor<Basket> continuation);
+  protected abstract Updater createUpdater(Updater continuation);
 
   @Override
-  public <T> Visitor<List<T>> createProjector(Path path, Visitor<List<T>> projector) {
+  public Projector<Basket> createProjector(Path path) {
     final Path subPath = path.tail();
-    final Visitor<List<T>> continuation = subPath.isEmpty()
-        ? projector
-        : subPath.head().createProjector(subPath, projector);
-
-    return createProjector(continuation);
+    return subPath.isEmpty()
+        ? createProjector(Projectors.id())
+        : createProjector(subPath.head().createProjector(subPath));
   }
 
   @Override
@@ -46,6 +44,6 @@ abstract class BasePathSegment implements PathSegment {
     return false;
   }
 
-  protected abstract <T> Visitor<List<T>> createProjector(Visitor<List<T>> continuation);
+  protected abstract Projector<Basket> createProjector(Projector<Basket> continuation);
 
 }

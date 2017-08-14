@@ -1,6 +1,6 @@
 package com.codepoetics.raffia.baskets;
 
-import com.codepoetics.raffia.api.Mapper;
+import com.codepoetics.raffia.mappers.Mapper;
 import org.pcollections.PVector;
 import org.pcollections.TreePVector;
 

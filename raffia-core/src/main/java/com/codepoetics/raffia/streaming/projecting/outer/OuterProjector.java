@@ -1,6 +1,7 @@
 package com.codepoetics.raffia.streaming.projecting.outer;
 
 import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.operations.Projector;
 import com.codepoetics.raffia.writers.BasketWriter;
 import com.codepoetics.raffia.paths.Path;
 import com.codepoetics.raffia.baskets.Visitor;
@@ -27,7 +28,7 @@ public abstract class OuterProjector<T extends BasketWriter<T>> extends Streamin
     return new IndexSeekingOuterProjector<>(target, path);
   }
 
-  private static <T extends BasketWriter<T>> FilteringWriter<T> predicateMatching(T target, Visitor<List<Basket>> itemProjector) {
+  private static <T extends BasketWriter<T>> FilteringWriter<T> predicateMatching(T target, Projector<Basket> itemProjector) {
     return new PredicateMatchingOuterProjector<>(target, itemProjector);
   }
 

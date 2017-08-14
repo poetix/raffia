@@ -1,6 +1,6 @@
 package com.codepoetics.raffia.baskets;
 
-import com.codepoetics.raffia.api.*;
+import com.codepoetics.raffia.mappers.Mapper;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -8,14 +8,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static com.codepoetics.raffia.defences.Defences.notNull;
+
 public abstract class Basket {
 
   public static Basket ofString(String value) {
-    return new StringBasket(value);
+    return new StringBasket(notNull("value", value));
   }
 
   public static Basket ofNumber(BigDecimal value) {
-    return new NumberBasket(value);
+    return new NumberBasket(notNull("value", value));
   }
 
   public static Basket ofBoolean(boolean value) {
@@ -35,7 +37,7 @@ public abstract class Basket {
   }
 
   public static Basket ofArray(ArrayContents entries) {
-    return new ArrayBasket(entries);
+    return new ArrayBasket(notNull("entries", entries));
   }
 
   public static Basket ofObject(ObjectEntry...entries) {
@@ -51,7 +53,7 @@ public abstract class Basket {
   }
 
   public static Basket ofObject(PropertySet properties) {
-    return new ObjectBasket(properties);
+    return new ObjectBasket(notNull("properties", properties));
   }
 
   public boolean isString() {
@@ -112,6 +114,10 @@ public abstract class Basket {
 
   public boolean isNull() {
     return false;
+  }
+
+  public Void asNull() {
+    return wrongType(BasketType.NULL);
   }
 
   public boolean isObject() {

@@ -1,161 +1,163 @@
 package com.codepoetics.raffia.builders;
 
 import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.writers.BasketWeavingWriter;
+import com.codepoetics.raffia.visitors.Visitors;
 import com.codepoetics.raffia.writers.BasketWriter;
-import com.codepoetics.raffia.api.Mapper;
-import com.codepoetics.raffia.injections.Injections;
-import com.codepoetics.raffia.mappers.Mappers;
-import com.codepoetics.raffia.writers.Writers;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
-public final class BasketBuilder implements BasketWriter<BasketBuilder> {
+public class BasketBuilder<T extends BasketWriter<T>> implements BasketWriter<BasketBuilder<T>> {
 
-  private BasketBuilder(BasketWeavingWriter writer) {
+  public <T extends BasketWriter<T>> BasketBuilder<T> writingTo(T writer) {
+    return new BasketBuilder<T>(writer);
+  }
+
+  protected BasketBuilder(T writer) {
     this.writer = writer;
   }
 
-  public static BasketBuilder empty() {
-    return new BasketBuilder(Writers.weaving());
+  private final T writer;
+
+  public T getWriter() {
+    return writer;
   }
 
-  private final BasketWeavingWriter writer;
-
-  public Basket weave() {
-    return writer.weave();
-  }
-
-  private BasketBuilder with(BasketWeavingWriter writer) {
-    return new BasketBuilder(writer);
+  protected BasketBuilder<T> with(T writer) {
+    return new BasketBuilder<>(writer);
   }
 
   @Override
-  public BasketBuilder beginObject() {
+  public BasketBuilder<T> beginObject() {
     return with(writer.beginObject());
   }
 
   @Override
-  public BasketBuilder end() {
+  public BasketBuilder<T> end() {
     return with(writer.end());
   }
 
-  public BasketBuilder array() {
+  public BasketBuilder<T> array() {
     return array(Collections.<Basket>emptyList());
   }
 
-  public BasketBuilder array(Basket firstItem, Basket...subsequentItems) {
-    return array(asList(firstItem, subsequentItems, Mappers.<Basket>id()));
-  }
-
-  public BasketBuilder array(String firstItem, String...subsequentItems) {
-    return array(asList(firstItem, subsequentItems, Injections.fromString));
-  }
-
-  public BasketBuilder array(BigDecimal firstItem, BigDecimal...subsequentItems) {
-    return array(asList(firstItem, subsequentItems, Injections.fromNumber));
-  }
-
-  public BasketBuilder array(boolean firstItem, Boolean...subsequentItems) {
-    return array(asList(firstItem, subsequentItems, Injections.fromBoolean));
-  }
-
-  private <T> List<Basket> asList(T first, T[] subsequent, Mapper<T, Basket> mapper) {
-    List<Basket> result = new ArrayList<>(subsequent.length + 1);
-    result.add(mapper.map(first));
-    for (T item : subsequent) {
-      result.add(mapper.map(item));
+  public BasketBuilder<T> array(Basket firstItem, Basket...subsequentItems) {
+    T state = firstItem.visit(Visitors.writingTo(writer.beginArray()));
+    for (Basket item : subsequentItems) {
+      state = item.visit(Visitors.writingTo(state));
     }
-    return result;
+    return with(state.end());
   }
 
-  public BasketBuilder array(Collection<Basket> items) {
-    BasketBuilder state = beginArray();
+  public BasketBuilder<T> array(String firstItem, String...subsequentItems) {
+    T state = writer.beginArray().add(firstItem);
+    for (String item : subsequentItems) {
+      state = state.add(item);
+    }
+    return with(state.end());
+  }
+
+  public BasketBuilder<T> array(BigDecimal firstItem, BigDecimal...subsequentItems) {
+    T state = writer.beginArray().add(firstItem);
+    for (BigDecimal item : subsequentItems) {
+      state = state.add(item);
+    }
+    return with(state.end());
+  }
+
+  public BasketBuilder<T> array(boolean firstItem, Boolean...subsequentItems) {
+    T state = writer.beginArray().add(firstItem);
+    for (boolean item : subsequentItems) {
+      state = state.add(item);
+    }
+    return with(state.end());
+  }
+
+  public BasketBuilder<T> array(Collection<Basket> items) {
+    T state = writer.beginArray();
     for (Basket basket : items) {
-      state = state.add(basket);
+      state = basket.visit(Visitors.writingTo(state));
     }
-    return state.end();
-  }
-
-  public BasketBuilder add(Basket basket) {
-    return with(writer.add(basket));
+    return with(state.end());
   }
 
   @Override
-  public BasketBuilder beginArray() {
+  public BasketBuilder<T> beginArray() {
     return with(writer.beginArray());
   }
 
-  public BasketBuilder add(BasketBuilder builder) {
-    return add(builder.weave());
-  }
-
   @Override
-  public BasketBuilder key(String key) {
+  public BasketBuilder<T> key(String key) {
     return with(writer.key(key));
   }
 
-  public BasketBuilder add(String key, String value) {
+  public BasketBuilder<T> add(String key, String value) {
     return key(key).add(value);
   }
 
-  public BasketBuilder add(String key, BigDecimal value) {
+  public BasketBuilder<T> add(String key, BigDecimal value) {
     return key(key).add(value);
   }
 
-  public BasketBuilder add(String key, boolean value) {
+  public BasketBuilder<T> add(String key, boolean value) {
     return key(key).add(value);
   }
 
-  public BasketBuilder add(String key, Basket value) {
+  public BasketBuilder<T> add(String key, Basket value) {
     return key(key).add(value);
   }
 
-  public BasketBuilder addArray(String key) {
+  public BasketBuilder<T> addArray(String key) {
     return key(key).array();
   }
 
-  public BasketBuilder addArray(String key, Basket firstItem, Basket...subsequent) {
+  public BasketBuilder<T> addArray(String key, Basket firstItem, Basket...subsequent) {
     return key(key).array(firstItem, subsequent);
   }
 
-  public BasketBuilder addArray(String key, String firstItem, String...subsequent) {
+  public BasketBuilder<T> addArray(String key, String firstItem, String...subsequent) {
     return key(key).array(firstItem, subsequent);
   }
 
-  public BasketBuilder addArray(String key, BigDecimal firstItem, BigDecimal...subsequent) {
+  public BasketBuilder<T> addArray(String key, BigDecimal firstItem, BigDecimal...subsequent) {
     return key(key).array(firstItem, subsequent);
   }
 
-  public BasketBuilder addArray(String key, boolean firstItem, Boolean...subsequent) {
+  public BasketBuilder<T> addArray(String key, boolean firstItem, Boolean...subsequent) {
     return key(key).array(firstItem, subsequent);
   }
 
-  public BasketBuilder addNull(String key) {
+  public BasketBuilder<T> addNull(String key) {
     return key(key).addNull();
   }
 
+  public BasketBuilder<T> add(Basket value) {
+    return with(value.visit(Visitors.writingTo(writer)));
+  }
+
   @Override
-  public BasketBuilder add(String value) {
+  public BasketBuilder<T> add(String value) {
     return with(writer.add(value));
   }
 
   @Override
-  public BasketBuilder add(BigDecimal value) {
+  public BasketBuilder<T> add(BigDecimal value) {
     return with(writer.add(value));
   }
 
   @Override
-  public BasketBuilder add(boolean value) {
+  public BasketBuilder<T> add(boolean value) {
     return with(writer.add(value));
   }
 
   @Override
-  public BasketBuilder addNull() {
+  public BasketBuilder<T> addNull() {
     return with(writer.addNull());
+  }
+
+  @Override
+  public String toString() {
+    return "Basket builder with state: " + writer;
   }
 }

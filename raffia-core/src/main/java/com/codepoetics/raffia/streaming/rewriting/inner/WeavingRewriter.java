@@ -1,6 +1,7 @@
 package com.codepoetics.raffia.streaming.rewriting.inner;
 
 import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.writers.BasketWeavingWriter;
 import com.codepoetics.raffia.writers.BasketWriter;
 import com.codepoetics.raffia.baskets.Visitor;
@@ -13,15 +14,15 @@ import java.math.BigDecimal;
 
 abstract class WeavingRewriter<T extends BasketWriter<T>> extends FilteringWriter<T> {
 
-  static <T extends BasketWriter<T>> WeavingRewriter<T> weavingObject(T target, StreamingRewriter<T> parent, Visitor<Basket> updater) {
+  static <T extends BasketWriter<T>> WeavingRewriter<T> weavingObject(T target, StreamingRewriter<T> parent, Updater updater) {
     return weaving(target, parent, updater, Writers.weaving().beginObject());
   }
 
-  static <T extends BasketWriter<T>> WeavingRewriter<T> weavingArray(T target, StreamingRewriter<T> parent, Visitor<Basket> updater) {
+  static <T extends BasketWriter<T>> WeavingRewriter<T> weavingArray(T target, StreamingRewriter<T> parent, Updater updater) {
     return weaving(target, parent, updater, Writers.weaving().beginArray());
   }
 
-  private static <T extends BasketWriter<T>> WeavingRewriter<T> weaving(T target, StreamingRewriter<T> parent, Visitor<Basket> updater, BasketWeavingWriter weaver) {
+  private static <T extends BasketWriter<T>> WeavingRewriter<T> weaving(T target, StreamingRewriter<T> parent, Updater updater, BasketWeavingWriter weaver) {
     return new Container<>(target, parent, updater, weaver);
   }
 
@@ -66,10 +67,10 @@ abstract class WeavingRewriter<T extends BasketWriter<T>> extends FilteringWrite
 
   private static final class Container<T extends BasketWriter<T>> extends WeavingRewriter<T> {
 
-    private final Visitor<Basket> updater;
+    private final Updater updater;
     private final StreamingRewriter<T> parent;
 
-    Container(T target, StreamingRewriter<T> parent, Visitor<Basket> updater, BasketWeavingWriter weaver) {
+    Container(T target, StreamingRewriter<T> parent, Updater updater, BasketWeavingWriter weaver) {
       super(target, weaver);
       this.parent = parent;
       this.updater = updater;
@@ -97,7 +98,7 @@ abstract class WeavingRewriter<T extends BasketWriter<T>> extends FilteringWrite
     @Override
     public FilteringWriter<T> end() {
       return parent.advance(
-          weaver.weave().visit(updater).visit(Visitors.writingTo(getTarget())));
+          updater.update(weaver.weave()).visit(Visitors.writingTo(getTarget())));
     }
   }
 

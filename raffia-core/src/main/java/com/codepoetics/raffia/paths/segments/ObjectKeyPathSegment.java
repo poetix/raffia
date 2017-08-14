@@ -1,18 +1,13 @@
 package com.codepoetics.raffia.paths.segments;
 
-import com.codepoetics.raffia.api.*;
 import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.baskets.PropertySet;
+import com.codepoetics.raffia.operations.ProjectionResult;
+import com.codepoetics.raffia.operations.Projector;
+import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.paths.PathSegmentMatchResult;
-import com.codepoetics.raffia.predicates.Predicates;
-import com.codepoetics.raffia.projections.Projections;
-import com.codepoetics.raffia.visitors.Visitors;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 final class ObjectKeyPathSegment extends BasePathSegment {
 
@@ -23,32 +18,24 @@ final class ObjectKeyPathSegment extends BasePathSegment {
   }
 
   @Override
-  protected Visitor<Basket> createUpdater(Visitor<Basket> continuation) {
-    return Projections.branch(
-        Predicates.isObject,
-        Projections.map(Projections.asObject, getUpdateMapper(continuation)),
-        Visitors.copy
-    );
-  }
+  protected Updater createUpdater(final Updater continuation) {
+    return new Updater() {
 
-  @Override
-  protected <T> Visitor<List<T>> createProjector(Visitor<List<T>> continuation) {
-    return Projections.branch(
-        Predicates.isObject,
-        Projections.map(Projections.asObject, getProjectionMapper(continuation)),
-        Projections.constant(Collections.<T>emptyList())
-    );
-  }
-
-  private Mapper<PropertySet, Basket> getUpdateMapper(final Visitor<Basket> continuation) {
-    return new Mapper<PropertySet, Basket>() {
       @Override
-      public Basket map(PropertySet input) {
-        PropertySet updated = input;
+      public Basket update(Basket basket) {
+        if (!basket.isObject()) {
+          return basket;
+        }
+
+        return updateProperties(basket.asObject());
+      }
+
+      private Basket updateProperties(PropertySet properties) {
+        PropertySet updated = properties;
         for (String key : keys) {
           Basket atKey = updated.get(key);
           if (atKey != null) {
-            updated = updated.with(key, atKey.visit(continuation));
+            updated = updated.with(key, continuation.update(atKey));
           }
         }
         return Basket.ofObject(updated);
@@ -56,18 +43,28 @@ final class ObjectKeyPathSegment extends BasePathSegment {
     };
   }
 
-  private <V> Mapper<PropertySet, List<V>> getProjectionMapper(final Visitor<List<V>> continuation) {
-    return new Mapper<PropertySet, List<V>>() {
+  @Override
+  protected Projector<Basket> createProjector(final Projector<Basket> continuation) {
+    return new Projector<Basket>() {
+
       @Override
-      public List<V> map(PropertySet properties) {
-        List<V> results = new ArrayList<>();
+      public ProjectionResult<Basket> project(Basket basket) {
+        if (!basket.isObject()) {
+          return ProjectionResult.empty();
+        }
+
+        return projectProperties(basket.asObject());
+      }
+
+      private ProjectionResult<Basket> projectProperties(PropertySet properties) {
+        ProjectionResult<Basket> result = ProjectionResult.empty();
         for (String key : keys) {
           Basket atKey = properties.get(key);
           if (atKey != null) {
-            results.addAll(atKey.visit(continuation));
+            result = result.add(continuation.project(atKey));
           }
         }
-        return results;
+        return result;
       }
     };
   }

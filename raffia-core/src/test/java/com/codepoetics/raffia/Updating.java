@@ -1,9 +1,11 @@
 package com.codepoetics.raffia;
 
 import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.api.Mapper;
+import com.codepoetics.raffia.mappers.Mapper;
 import com.codepoetics.raffia.baskets.PropertySet;
 import com.codepoetics.raffia.baskets.Visitor;
+import com.codepoetics.raffia.operations.BasketPredicate;
+import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.setters.Setters;
 import com.codepoetics.raffia.updaters.Updaters;
@@ -21,29 +23,30 @@ import static org.hamcrest.Matchers.*;
 
 public class Updating {
 
-  private static final Visitor<Basket> capitaliseString = Updaters.ofString(new Mapper<String, String>() {
+  private static final Updater capitaliseString = Updaters.ofString(new Mapper<String, String>() {
     @Override
     public String map(String input) {
       return input.toUpperCase();
     }
   });
 
-  private static final Visitor<Basket> priceToString = Updaters.from(asNumber, new Mapper<BigDecimal, String>() {
+  private static final Updater priceToString = new Updater() {
     @Override
-    public String map(BigDecimal input) {
-      return input.toString();
+    public Basket update(Basket basket) {
+      System.out.println(basket);
+      return Basket.ofString(basket.asNumber().toString());
     }
-  }, fromString);
+  };
 
-  private static final Visitor<Basket> addDescription = Updaters.ofObject(new Mapper<PropertySet, PropertySet>() {
+  private static final Updater addDescription = Updaters.ofObject(new Mapper<PropertySet, PropertySet>() {
     @Override
     public PropertySet map(PropertySet input) {
       return input.with("description",
           Basket.ofString(
               "\""
-                  + input.get("title").visit(asString)
+                  + input.get("title").asString()
                   + "\", by "
-                  + input.get("author").visit(asString)));
+                  + input.get("author").asString()));
     }
   });
 
@@ -52,7 +55,7 @@ public class Updating {
     Basket updated = lens("$..author").update(capitaliseString, store);
 
     assertThat(
-        lens("$..author").getAll(asString, updated),
+        lens("$..author").getAllStrings(updated),
         contains("NIGEL REES", "EVELYN WAUGH", "HERMAN MELVILLE", "J. R. R. TOLKIEN"));
   }
 
@@ -60,8 +63,9 @@ public class Updating {
   public void convertPricesToStrings() {
     Basket updated = lens("$..price").update(priceToString, store);
 
+    System.out.println(updated);
     assertThat(
-        lens("$..price").getAll(asString, updated),
+        lens("$..price").getAllStrings(updated),
         contains("8.95", "12.99", "8.99", "22.99", "19.95"));
   }
 
@@ -70,20 +74,20 @@ public class Updating {
     Basket updated = lens("$..book").toAll().update(addDescription, store);
 
     assertThat(
-        lens().toAny("description").getAll(asString, updated),
+        lens().toAny("description").getAllStrings(updated),
         hasItem("\"Sayings of the Century\", by Nigel Rees")
     );
   }
 
   @Test
   public void rewritingAValue() {
-    Visitor<Boolean> authorIsNigel = lens("$..author").matching("Nigel Rees");
+    BasketPredicate authorIsNigel = lens("$..author").matching("Nigel Rees");
 
     Basket updated = lens("$..book[?].title", authorIsNigel)
         .update(Setters.toString("Hallucinogenic Adventures vol. 13"), store);
 
     assertThat(
-        lens("$..book").toMatching(authorIsNigel).to("title").getOne(Projections.asString, updated),
+        lens("$..book").toMatching(authorIsNigel).to("title").getOne(updated).asString(),
         equalTo("Hallucinogenic Adventures vol. 13"));
   }
 

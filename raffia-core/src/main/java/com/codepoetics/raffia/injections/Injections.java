@@ -2,7 +2,7 @@ package com.codepoetics.raffia.injections;
 
 import com.codepoetics.raffia.baskets.ArrayContents;
 import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.api.Mapper;
+import com.codepoetics.raffia.mappers.Mapper;
 import com.codepoetics.raffia.baskets.PropertySet;
 
 import java.math.BigDecimal;

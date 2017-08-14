@@ -2,6 +2,7 @@ package com.codepoetics.raffia;
 
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.builders.BasketBuilder;
+import com.codepoetics.raffia.builders.BasketWeaver;
 
 import java.math.BigDecimal;
 
@@ -28,22 +29,22 @@ public class StoreExample {
       .end()
       .weave();
 
-  private static BasketBuilder withCommon(String category, String author, String title, BasketBuilder builder) {
+  private static BasketWeaver withCommon(String category, String author, String title, BasketWeaver builder) {
     return builder
         .add("category", category)
         .add("author", author)
         .add("title", title);
   }
 
-  private static BasketBuilder withIsbn(String isbn, BasketBuilder writer) {
+  private static BasketWeaver withIsbn(String isbn, BasketWeaver writer) {
     return writer.add("isbn", isbn);
   }
 
-  private static BasketBuilder withPrice(String price, BasketBuilder writer) {
+  private static BasketWeaver withPrice(String price, BasketWeaver writer) {
     return writer.add("price", new BigDecimal(price));
   }
 
-  private static Basket object(BasketBuilder basketBuilder) {
+  private static Basket object(BasketWeaver basketBuilder) {
     return basketBuilder.end().weave();
   }
 
