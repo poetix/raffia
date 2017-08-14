@@ -1,5 +1,6 @@
-package com.codepoetics.raffia.api;
+package com.codepoetics.raffia.baskets;
 
+import com.codepoetics.raffia.api.Mapper;
 import org.pcollections.PVector;
 import org.pcollections.TreePVector;
 
@@ -65,12 +66,32 @@ public final class ArrayContents implements Iterable<Basket> {
     return result;
   }
 
+  public <T> List<T> map(Mapper<Basket, T> mapper) {
+    List<T> result = new ArrayList<>(contents.size());
+    for (Basket item : contents) {
+      result.add(mapper.map(item));
+    }
+    return result;
+  }
+
   public <T> List<T> flatMap(Visitor<List<T>> visitor) {
     List<T> result = new ArrayList<>();
     for (Basket item : contents) {
       result.addAll(item.visit(visitor));
     }
     return result;
+  }
+
+  public <T> List<T> flatMap(Mapper<Basket, List<T>> itemFlatMapper) {
+    List<T> result = new ArrayList<>();
+    for (Basket item : contents) {
+      result.addAll(itemFlatMapper.map(item));
+    }
+    return result;
+  }
+
+  public boolean isEmpty() {
+    return contents.isEmpty();
   }
 
   @Override

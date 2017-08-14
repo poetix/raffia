@@ -1,7 +1,10 @@
 package com.codepoetics.raffia.paths.segments;
 
 import com.codepoetics.raffia.api.*;
-import com.codepoetics.raffia.baskets.Baskets;
+import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.baskets.Visitor;
+import com.codepoetics.raffia.baskets.PropertySet;
+import com.codepoetics.raffia.paths.PathSegmentMatchResult;
 import com.codepoetics.raffia.predicates.Predicates;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.visitors.Visitors;
@@ -48,7 +51,7 @@ final class ObjectKeyPathSegment extends BasePathSegment {
             updated = updated.with(key, atKey.visit(continuation));
           }
         }
-        return Baskets.ofObject(updated);
+        return Basket.ofObject(updated);
       }
     };
   }

@@ -1,4 +1,7 @@
-package com.codepoetics.raffia.api;
+package com.codepoetics.raffia.paths;
+
+import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.baskets.Visitor;
 
 import java.util.List;
 

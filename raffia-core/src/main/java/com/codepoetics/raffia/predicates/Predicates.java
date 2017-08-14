@@ -1,8 +1,8 @@
 package com.codepoetics.raffia.predicates;
 
-import com.codepoetics.raffia.api.ArrayContents;
-import com.codepoetics.raffia.api.PropertySet;
-import com.codepoetics.raffia.api.Visitor;
+import com.codepoetics.raffia.baskets.ArrayContents;
+import com.codepoetics.raffia.baskets.PropertySet;
+import com.codepoetics.raffia.baskets.Visitor;
 
 import java.math.BigDecimal;
 

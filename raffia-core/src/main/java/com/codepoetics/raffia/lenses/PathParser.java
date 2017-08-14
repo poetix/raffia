@@ -1,7 +1,7 @@
 package com.codepoetics.raffia.lenses;
 
-import com.codepoetics.raffia.api.PathSegment;
-import com.codepoetics.raffia.api.Visitor;
+import com.codepoetics.raffia.baskets.Visitor;
+import com.codepoetics.raffia.paths.PathSegment;
 import com.codepoetics.raffia.paths.segments.PathSegments;
 import org.pcollections.PVector;
 import org.pcollections.TreePVector;

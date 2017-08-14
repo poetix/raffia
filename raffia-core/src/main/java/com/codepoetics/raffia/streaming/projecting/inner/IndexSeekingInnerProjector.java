@@ -1,8 +1,11 @@
 package com.codepoetics.raffia.streaming.projecting.inner;
 
-import com.codepoetics.raffia.api.*;
+import com.codepoetics.raffia.paths.Path;
+import com.codepoetics.raffia.paths.PathSegment;
+import com.codepoetics.raffia.paths.PathSegmentMatchResult;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.streaming.projecting.StreamingProjector;
+import com.codepoetics.raffia.writers.BasketWriter;
 
 import java.math.BigDecimal;
 

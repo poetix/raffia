@@ -1,8 +1,8 @@
 package com.codepoetics.raffia.streaming.rewriting.outer;
 
-import com.codepoetics.raffia.api.Basket;
-import com.codepoetics.raffia.api.BasketWriter;
-import com.codepoetics.raffia.api.Visitor;
+import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.writers.BasketWriter;
+import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 
 import java.math.BigDecimal;

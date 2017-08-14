@@ -1,10 +1,9 @@
 package com.codepoetics.raffia;
 
-import com.codepoetics.raffia.api.Basket;
+import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.api.Mapper;
-import com.codepoetics.raffia.api.PropertySet;
-import com.codepoetics.raffia.api.Visitor;
-import com.codepoetics.raffia.baskets.Baskets;
+import com.codepoetics.raffia.baskets.PropertySet;
+import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.setters.Setters;
 import com.codepoetics.raffia.updaters.Updaters;
@@ -40,7 +39,7 @@ public class Updating {
     @Override
     public PropertySet map(PropertySet input) {
       return input.with("description",
-          Baskets.ofString(
+          Basket.ofString(
               "\""
                   + input.get("title").visit(asString)
                   + "\", by "

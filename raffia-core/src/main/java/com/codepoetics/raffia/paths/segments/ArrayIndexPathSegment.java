@@ -1,7 +1,10 @@
 package com.codepoetics.raffia.paths.segments;
 
-import com.codepoetics.raffia.api.*;
-import com.codepoetics.raffia.baskets.Baskets;
+import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.baskets.Visitor;
+import com.codepoetics.raffia.baskets.ArrayContents;
+import com.codepoetics.raffia.baskets.PropertySet;
+import com.codepoetics.raffia.paths.PathSegmentMatchResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,12 +31,12 @@ final class ArrayIndexPathSegment extends BasePathSegment {
             updated = updated.with(actual, updated.get(actual).visit(continuation));
           }
         }
-        return Baskets.ofArray(updated);
+        return Basket.ofArray(updated);
       }
 
       @Override
       public Basket visitObject(PropertySet properties) {
-        return Baskets.ofObject(properties);
+        return Basket.ofObject(properties);
       }
     };
   }

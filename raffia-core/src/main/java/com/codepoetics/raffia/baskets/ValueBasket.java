@@ -1,20 +1,23 @@
 package com.codepoetics.raffia.baskets;
 
-import com.codepoetics.raffia.api.Basket;
-
-abstract class BaseBasket<T> implements Basket {
+abstract class ValueBasket<T> extends Basket {
 
   protected final T value;
 
-  BaseBasket(T value) {
+  protected ValueBasket(T value) {
     this.value = value;
+  }
+
+  @Override
+  public <V> V getValue() {
+    return (V) value;
   }
 
   @Override
   public boolean equals(Object other) {
     return this == other
-        || (other instanceof BaseBasket
-        & BaseBasket.class.cast(other).value.equals(value));
+        || (other instanceof ValueBasket
+        & ValueBasket.class.cast(other).value.equals(value));
   }
 
   @Override

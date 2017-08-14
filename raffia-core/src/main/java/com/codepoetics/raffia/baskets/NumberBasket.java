@@ -1,14 +1,27 @@
 package com.codepoetics.raffia.baskets;
 
-import com.codepoetics.raffia.api.Visitor;
-
 import java.math.BigDecimal;
 
 
-final class NumberBasket extends BaseBasket<BigDecimal> {
+final class NumberBasket extends ValueBasket<BigDecimal> {
 
   NumberBasket(BigDecimal value) {
     super(value);
+  }
+
+  @Override
+  public BasketType getType() {
+    return BasketType.NUMBER;
+  }
+
+  @Override
+  public boolean isNumber() {
+    return true;
+  }
+
+  @Override
+  public BigDecimal asNumber() {
+    return value;
   }
 
   @Override

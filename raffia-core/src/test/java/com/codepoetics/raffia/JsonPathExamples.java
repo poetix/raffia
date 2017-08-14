@@ -1,8 +1,8 @@
 package com.codepoetics.raffia;
 
-import com.codepoetics.raffia.api.Basket;
+import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.api.Mapper;
-import com.codepoetics.raffia.api.Visitor;
+import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.visitors.Visitors;
 import org.junit.Test;
 

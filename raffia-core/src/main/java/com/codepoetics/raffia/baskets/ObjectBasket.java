@@ -1,12 +1,24 @@
 package com.codepoetics.raffia.baskets;
 
-import com.codepoetics.raffia.api.PropertySet;
-import com.codepoetics.raffia.api.Visitor;
-
-final class ObjectBasket extends BaseBasket<PropertySet> {
+final class ObjectBasket extends ValueBasket<PropertySet> {
 
   ObjectBasket(PropertySet value) {
     super(value);
+  }
+
+  @Override
+  public BasketType getType() {
+    return BasketType.OBJECT;
+  }
+
+  @Override
+  public boolean isObject() {
+    return true;
+  }
+
+  @Override
+  public PropertySet asObject() {
+    return value;
   }
 
   @Override

@@ -1,6 +1,6 @@
 package com.codepoetics.raffia.streaming.projecting.inner;
 
-import com.codepoetics.raffia.api.BasketWriter;
+import com.codepoetics.raffia.writers.BasketWriter;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.streaming.projecting.StreamingProjector;
 

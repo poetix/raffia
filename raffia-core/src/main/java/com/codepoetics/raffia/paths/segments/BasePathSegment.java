@@ -1,9 +1,9 @@
 package com.codepoetics.raffia.paths.segments;
 
-import com.codepoetics.raffia.api.Basket;
-import com.codepoetics.raffia.api.Path;
-import com.codepoetics.raffia.api.PathSegment;
-import com.codepoetics.raffia.api.Visitor;
+import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.paths.Path;
+import com.codepoetics.raffia.paths.PathSegment;
+import com.codepoetics.raffia.baskets.Visitor;
 
 import java.util.List;
 

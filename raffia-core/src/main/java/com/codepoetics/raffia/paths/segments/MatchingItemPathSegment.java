@@ -1,7 +1,12 @@
 package com.codepoetics.raffia.paths.segments;
 
-import com.codepoetics.raffia.api.*;
-import com.codepoetics.raffia.baskets.Baskets;
+import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.baskets.Visitor;
+import com.codepoetics.raffia.baskets.ArrayContents;
+import com.codepoetics.raffia.baskets.ObjectEntry;
+import com.codepoetics.raffia.baskets.PropertySet;
+import com.codepoetics.raffia.paths.Path;
+import com.codepoetics.raffia.paths.PathSegmentMatchResult;
 import com.codepoetics.raffia.projections.Projections;
 import com.codepoetics.raffia.visitors.Visitors;
 
@@ -56,7 +61,7 @@ final class MatchingItemPathSegment extends BasePathSegment {
             updated = updated.with(i, item.visit(continuation));
           }
         }
-        return Baskets.ofArray(updated);
+        return Basket.ofArray(updated);
       }
 
       @Override
@@ -67,7 +72,7 @@ final class MatchingItemPathSegment extends BasePathSegment {
             updated = updated.with(entry.getKey(), entry.getValue().visit(continuation));
           }
         }
-        return Baskets.ofObject(updated);
+        return Basket.ofObject(updated);
       }
     };
   }

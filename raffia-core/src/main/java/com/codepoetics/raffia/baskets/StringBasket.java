@@ -1,12 +1,25 @@
 package com.codepoetics.raffia.baskets;
 
-import com.codepoetics.raffia.api.Visitor;
 
-
-final class StringBasket extends BaseBasket<String> {
+final class StringBasket extends ValueBasket<String> {
 
   StringBasket(String value) {
     super(value);
+  }
+
+  @Override
+  public BasketType getType() {
+    return BasketType.STRING;
+  }
+
+  @Override
+  public boolean isString() {
+    return true;
+  }
+
+  @Override
+  public String asString() {
+    return value;
   }
 
   @Override

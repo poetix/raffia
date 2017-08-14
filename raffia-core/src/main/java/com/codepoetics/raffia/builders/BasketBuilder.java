@@ -1,8 +1,8 @@
 package com.codepoetics.raffia.builders;
 
-import com.codepoetics.raffia.api.Basket;
-import com.codepoetics.raffia.api.BasketWeavingWriter;
-import com.codepoetics.raffia.api.BasketWriter;
+import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.writers.BasketWeavingWriter;
+import com.codepoetics.raffia.writers.BasketWriter;
 import com.codepoetics.raffia.api.Mapper;
 import com.codepoetics.raffia.injections.Injections;
 import com.codepoetics.raffia.mappers.Mappers;

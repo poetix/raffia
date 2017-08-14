@@ -1,6 +1,10 @@
 package com.codepoetics.raffia.updaters;
 
 import com.codepoetics.raffia.api.*;
+import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.baskets.Visitor;
+import com.codepoetics.raffia.baskets.ArrayContents;
+import com.codepoetics.raffia.baskets.PropertySet;
 import com.codepoetics.raffia.lenses.Lens;
 import com.codepoetics.raffia.projections.Projections;
 

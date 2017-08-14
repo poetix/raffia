@@ -1,10 +1,13 @@
 package com.codepoetics.raffia.streaming.rewriting;
 
-import com.codepoetics.raffia.api.*;
+import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.baskets.Visitor;
+import com.codepoetics.raffia.paths.Path;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.streaming.rewriting.inner.InnerRewriter;
 import com.codepoetics.raffia.streaming.rewriting.outer.OuterRewriter;
 import com.codepoetics.raffia.visitors.Visitors;
+import com.codepoetics.raffia.writers.BasketWriter;
 
 public abstract class StreamingRewriter<T extends BasketWriter<T>> extends FilteringWriter<T> {
 

@@ -1,6 +1,11 @@
 package com.codepoetics.raffia.visitors;
 
-import com.codepoetics.raffia.api.*;
+import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.baskets.Visitor;
+import com.codepoetics.raffia.baskets.ArrayContents;
+import com.codepoetics.raffia.baskets.ObjectEntry;
+import com.codepoetics.raffia.baskets.PropertySet;
+import com.codepoetics.raffia.writers.BasketWriter;
 
 import java.math.BigDecimal;
 

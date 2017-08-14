@@ -1,8 +1,8 @@
 package com.codepoetics.raffia.jackson;
 
 import com.codepoetics.raffia.Raffia;
-import com.codepoetics.raffia.api.Basket;
-import com.codepoetics.raffia.api.BasketWriter;
+import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.writers.BasketWriter;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;

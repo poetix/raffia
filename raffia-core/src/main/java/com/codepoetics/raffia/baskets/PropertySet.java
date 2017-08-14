@@ -1,5 +1,6 @@
-package com.codepoetics.raffia.api;
+package com.codepoetics.raffia.baskets;
 
+import com.codepoetics.raffia.api.Mapper;
 import org.pcollections.HashTreePMap;
 import org.pcollections.PMap;
 import org.pcollections.PVector;
@@ -63,6 +64,10 @@ public class PropertySet implements Iterable<ObjectEntry> {
     return result;
   }
 
+  public boolean isEmpty() {
+    return properties.isEmpty();
+  }
+
   @Override
   public boolean equals(Object other) {
     return this == other
@@ -101,5 +106,31 @@ public class PropertySet implements Iterable<ObjectEntry> {
         return ObjectEntry.of(key, properties.get(key));
       }
     };
+  }
+
+  public PropertySet mapValues(Mapper<Basket, Basket> valueMapper) {
+    ObjectEntry[] mapped = new ObjectEntry[size()];
+    int i = 0;
+    for (ObjectEntry entry : this) {
+      mapped[i++] = ObjectEntry.of(entry.getKey(), valueMapper.map(entry.getValue()));
+    }
+    return PropertySet.of(mapped);
+  }
+
+  public PropertySet mapValues(Visitor<Basket> valueMapper) {
+    ObjectEntry[] mapped = new ObjectEntry[size()];
+    int i = 0;
+    for (ObjectEntry entry : this) {
+      mapped[i++] = ObjectEntry.of(entry.getKey(), entry.getValue().visit(valueMapper));
+    }
+    return PropertySet.of(mapped);
+  }
+
+  public PropertySet mapEntries(Mapper<ObjectEntry, List<ObjectEntry>> entryMapper) {
+    List<ObjectEntry> mapped = new ArrayList<>();
+    for (ObjectEntry entry : this) {
+      mapped.addAll(entryMapper.map(entry));
+    }
+    return PropertySet.of(mapped);
   }
 }

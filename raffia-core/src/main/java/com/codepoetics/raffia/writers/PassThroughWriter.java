@@ -1,7 +1,5 @@
 package com.codepoetics.raffia.writers;
 
-import com.codepoetics.raffia.api.BasketWriter;
-
 import java.math.BigDecimal;
 
 public abstract class PassThroughWriter<T extends BasketWriter<T>, S extends PassThroughWriter<T, S>> implements BasketWriter<S> {

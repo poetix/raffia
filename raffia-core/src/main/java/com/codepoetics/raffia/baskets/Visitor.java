@@ -1,4 +1,4 @@
-package com.codepoetics.raffia.api;
+package com.codepoetics.raffia.baskets;
 
 import java.math.BigDecimal;
 

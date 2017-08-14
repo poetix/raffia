@@ -1,13 +1,24 @@
 package com.codepoetics.raffia.baskets;
 
-import com.codepoetics.raffia.api.Basket;
-import com.codepoetics.raffia.api.Visitor;
-
-final class NullBasket implements Basket {
+final class NullBasket extends Basket {
 
   static final Basket INSTANCE = new NullBasket();
 
-  private NullBasket() {
+  private NullBasket() { }
+
+  @Override
+  public BasketType getType() {
+    return BasketType.NULL;
+  }
+
+  @Override
+  public <T> T getValue() {
+    return null;
+  }
+
+  @Override
+  public boolean isNull() {
+    return true;
   }
 
   @Override
@@ -17,7 +28,7 @@ final class NullBasket implements Basket {
 
   @Override
   public boolean equals(Object other) {
-    return this == other || other instanceof NullBasket;
+    return this == other;
   }
 
   @Override
@@ -27,7 +38,7 @@ final class NullBasket implements Basket {
 
   @Override
   public String toString() {
-    return "";
+    return "<null>";
   }
 
 }

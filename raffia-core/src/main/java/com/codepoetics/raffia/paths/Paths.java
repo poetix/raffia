@@ -1,8 +1,5 @@
 package com.codepoetics.raffia.paths;
 
-import com.codepoetics.raffia.api.Path;
-import com.codepoetics.raffia.api.PathSegment;
-
 import java.util.List;
 
 public final class Paths {

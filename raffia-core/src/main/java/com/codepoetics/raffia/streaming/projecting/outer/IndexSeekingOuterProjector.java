@@ -1,7 +1,7 @@
 package com.codepoetics.raffia.streaming.projecting.outer;
 
-import com.codepoetics.raffia.api.BasketWriter;
-import com.codepoetics.raffia.api.Path;
+import com.codepoetics.raffia.writers.BasketWriter;
+import com.codepoetics.raffia.paths.Path;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 
 public final class IndexSeekingOuterProjector<T extends BasketWriter<T>> extends UnmatchedOuterProjector<T> {

@@ -1,9 +1,9 @@
 package com.codepoetics.raffia.projections;
 
-import com.codepoetics.raffia.api.ArrayContents;
+import com.codepoetics.raffia.baskets.ArrayContents;
 import com.codepoetics.raffia.api.Mapper;
-import com.codepoetics.raffia.api.PropertySet;
-import com.codepoetics.raffia.api.Visitor;
+import com.codepoetics.raffia.baskets.PropertySet;
+import com.codepoetics.raffia.baskets.Visitor;
 
 import java.math.BigDecimal;
 import java.util.Collections;

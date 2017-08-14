@@ -1,7 +1,9 @@
 package com.codepoetics.raffia.writers;
 
-import com.codepoetics.raffia.api.*;
-import com.codepoetics.raffia.baskets.Baskets;
+import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.baskets.ArrayContents;
+import com.codepoetics.raffia.baskets.ObjectEntry;
+import com.codepoetics.raffia.baskets.PropertySet;
 import org.pcollections.PVector;
 import org.pcollections.TreePVector;
 
@@ -26,22 +28,22 @@ public final class Writers {
 
     @Override
     public BasketWeavingWriter add(String value) {
-      return add(Baskets.ofString(value));
+      return add(Basket.ofString(value));
     }
 
     @Override
     public BasketWeavingWriter add(BigDecimal value) {
-      return add(Baskets.ofNumber(value));
+      return add(Basket.ofNumber(value));
     }
 
     @Override
     public BasketWeavingWriter add(boolean value) {
-      return add(Baskets.ofBoolean(value));
+      return add(Basket.ofBoolean(value));
     }
 
     @Override
     public BasketWeavingWriter addNull() {
-      return add(Baskets.ofNull());
+      return add(Basket.ofNull());
     }
   }
 
@@ -107,7 +109,7 @@ public final class Writers {
 
     @Override
     public Basket weave() {
-      return Baskets.ofArray(contents);
+      return Basket.ofArray(contents);
     }
 
     @Override
@@ -152,7 +154,7 @@ public final class Writers {
 
     @Override
     public Basket weave() {
-      return Baskets.ofObject(PropertySet.of(contents));
+      return Basket.ofObject(PropertySet.of(contents));
     }
 
     @Override

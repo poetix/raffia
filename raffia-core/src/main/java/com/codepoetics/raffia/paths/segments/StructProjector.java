@@ -1,6 +1,6 @@
 package com.codepoetics.raffia.paths.segments;
 
-import com.codepoetics.raffia.api.Visitor;
+import com.codepoetics.raffia.baskets.Visitor;
 
 import java.math.BigDecimal;
 import java.util.Collections;

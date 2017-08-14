@@ -1,7 +1,11 @@
 package com.codepoetics.raffia.paths.segments;
 
-import com.codepoetics.raffia.api.*;
-import com.codepoetics.raffia.baskets.Baskets;
+import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.baskets.Visitor;
+import com.codepoetics.raffia.baskets.ArrayContents;
+import com.codepoetics.raffia.baskets.ObjectEntry;
+import com.codepoetics.raffia.baskets.PropertySet;
+import com.codepoetics.raffia.paths.PathSegmentMatchResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +29,7 @@ final class DeepScanToObjectKeyPathSegment extends BasePathSegment {
           updated.add(basket.visit(this));
         }
 
-        return Baskets.ofArray(updated);
+        return Basket.ofArray(updated);
       }
 
       @Override
@@ -40,7 +44,7 @@ final class DeepScanToObjectKeyPathSegment extends BasePathSegment {
           }
         }
 
-        return Baskets.ofObject(entries);
+        return Basket.ofObject(entries);
       }
 
       private ObjectEntry updateWith(ObjectEntry entry, Visitor<Basket> updater) {
