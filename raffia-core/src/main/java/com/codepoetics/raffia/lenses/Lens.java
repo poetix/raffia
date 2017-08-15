@@ -22,21 +22,33 @@ import java.util.List;
 public class Lens implements Projector<Basket> {
 
   public static Lens lens(String path, BasketPredicate...predicates) {
-    return new Lens(PathParser.parse(path, TreePVector.from(Arrays.asList(predicates))));
+    return lens(PathParser.parse(path, TreePVector.from(Arrays.asList(predicates))));
   }
 
   public static Lens lens() {
-    return new Lens(TreePVector.<PathSegment>empty());
+    return lens(TreePVector.<PathSegment>empty());
+  }
+
+  private static Lens lens(PVector<PathSegment> pathSegments) {
+    Path path = Paths.create(pathSegments);
+    Projector<Basket> projector = path.isEmpty()
+        ? Projectors.id()
+        : path.head().createProjector(path);
+    return new Lens(pathSegments, path, projector);
   }
 
   private final PVector<PathSegment> segments;
+  private final Path path;
+  private final Projector<Basket> projector;
 
-  private Lens(PVector<PathSegment> segments) {
+  private Lens(PVector<PathSegment> segments, Path path, Projector<Basket> projector) {
     this.segments = segments;
+    this.path = path;
+    this.projector = projector;
   }
 
   public Lens plus(PathSegment segment) {
-    return new Lens(segments.plus(segment));
+    return lens(segments.plus(segment));
   }
 
   public Lens to(int arrayIndex) {
@@ -76,11 +88,10 @@ public class Lens implements Projector<Basket> {
   }
 
   public Path getPath() {
-    return Paths.create(segments);
+    return path;
   }
 
   public Updater updating(Updater updater) {
-    Path path = getPath();
     return path.isEmpty()
         ? updater
         : path.head().createUpdater(path, updater);
@@ -88,6 +99,46 @@ public class Lens implements Projector<Basket> {
 
   public Basket update(Updater updater, Basket target) {
     return updating(updater).update(target);
+  }
+
+  public Updater setting(Basket value) {
+    return updating(Setters.toBasket(value));
+  }
+
+  public Updater setting(String value) {
+    return updating(Setters.toString(value));
+  }
+
+  public Updater setting(BigDecimal value) {
+    return updating(Setters.toNumber(value));
+  }
+
+  public Updater setting(boolean value) {
+    return updating(Setters.toBoolean(value));
+  }
+
+  public Updater settingNull() {
+    return updating(Setters.toNull());
+  }
+
+  public Basket set(Basket value, Basket target) {
+    return setting(value).update(target);
+  }
+
+  public Basket set(String value, Basket target) {
+    return setting(value).update(target);
+  }
+
+  public Basket set(BigDecimal value, Basket target) {
+    return setting(value).update(target);
+  }
+
+  public Basket set(boolean value, Basket target) {
+    return setting(value).update(target);
+  }
+
+  public Basket setNull(Basket target) {
+    return settingNull().update(target);
   }
 
   public Basket getOne(Basket basket) {
@@ -132,7 +183,6 @@ public class Lens implements Projector<Basket> {
     return matching(true);
   }
 
-
   public BasketPredicate isFalse() {
     return matching(false);
   }
@@ -159,12 +209,18 @@ public class Lens implements Projector<Basket> {
     };
   }
 
+  public BasketPredicate exists() {
+    return new BasketPredicate() {
+      @Override
+      public boolean test(Basket basket) {
+        return !project(basket).isEmpty();
+      }
+    };
+  }
+
   @Override
   public ProjectionResult<Basket> project(Basket basket) {
-    Path path = getPath();
-    return path.isEmpty()
-        ? ProjectionResult.ofSingle(basket)
-        : path.head().createProjector(path).project(basket);
+    return projector.project(basket);
   }
 
   private final Mapper<Basket, String> asString = new Mapper<Basket, String>() {
@@ -240,5 +296,18 @@ public class Lens implements Projector<Basket> {
 
   public PropertySet getOneObject(Basket basket) {
     return getOne(asObject, basket);
+  }
+
+  public <T> Projector<T> flatMap(Projector<T> next) {
+    return Projectors.flatMap(this, next);
+  }
+
+  public<T> Projector<T> feedback(Mapper<Basket, Projector<T>> next) {
+    return Projectors.feedback(this, next);
+  }
+
+  @Override
+  public String toString() {
+    return path.toString();
   }
 }

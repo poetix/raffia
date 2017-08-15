@@ -10,6 +10,7 @@
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/paths/segments/StructProjector.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/streaming/rewriting/outer/EndOfLineRewriter.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/builders/BasketBuilder.java
+/Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/paths/segments/ArraySlicePathSegment.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/streaming/rewriting/outer/MatchedOuterRewriter.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/visitors/ObjectVisitor.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/baskets/PropertySet.java

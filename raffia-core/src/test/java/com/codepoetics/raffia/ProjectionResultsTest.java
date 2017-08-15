@@ -7,47 +7,114 @@ import org.junit.Test;
 import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.Assert.assertTrue;
 
 public class ProjectionResultsTest {
 
+  private ProjectionResult<String> empty() {
+    return ProjectionResult.empty();
+  }
+
+  private ProjectionResult<String> singleton(String value) {
+    return ProjectionResult.ofSingle(value);
+  }
+
+  private ProjectionResult<String> multiple(String first, String second) {
+    return singleton(first).add(singleton(second));
+  }
+
+  private ProjectionResult<String> nested(String first, String second, String third, String fourth) {
+    return multiple(first, second).add(multiple(third, fourth));
+  }
+
   @Test
   public void emptyAndEmptyIsEmpty() {
-    assertThat(ProjectionResult.empty().add(ProjectionResult.empty()).toList(), Matchers.hasSize(0));
+    assertTrue(empty().add(empty()).isEmpty());
   }
 
   @Test
   public void emptyAndSingletonIsSingleton() {
-    assertEquals("a", ProjectionResult.<String>empty().add(ProjectionResult.ofSingle("a")).getSingle());
-
-    assertThat(ProjectionResult.<String>empty().add(ProjectionResult.ofSingle("a")), Matchers.contains("a"));
+    assertThat(empty().add(singleton("a")), Matchers.contains("a"));
   }
 
   @Test
   public void singletonAndEmptyIsSingleton() {
-    assertEquals("a", ProjectionResult.ofSingle("a").add(ProjectionResult.<String>empty()).getSingle());
-    assertThat(ProjectionResult.ofSingle("a").add(ProjectionResult.<String>empty()), Matchers.contains("a"));
+    assertThat(singleton("a").add(empty()), Matchers.contains("a"));
   }
 
   @Test
   public void singletonAndSingletonIsMultiple() {
-    assertThat(ProjectionResult.ofSingle("a").add(ProjectionResult.ofSingle("b")), Matchers.contains("a", "b"));
+    assertThat(singleton("a").add(singleton("b")), Matchers.contains("a", "b"));
   }
 
   @Test
+  public void multipleAndEmptyIsMultiple() {
+    assertThat(multiple("a", "b").add(empty()), contains("a", "b"));
+  }
+  @Test
   public void singletonAndMultipleIsMultiple() {
-    assertThat(ProjectionResult.ofSingle("a").add((ProjectionResult.ofSingle("b").add(ProjectionResult.ofSingle("c")))), Matchers.contains("a", "b", "c"));
+    assertThat(singleton("a").add(multiple("b", "c")), Matchers.contains("a", "b", "c"));
   }
 
   @Test
   public void multipleAndSingletonIsMultiple() {
-    assertThat(ProjectionResult.ofSingle("a").add(ProjectionResult.ofSingle("b").add(ProjectionResult.ofSingle("c"))), Matchers.contains("a", "b", "c"));
+    assertThat(multiple("a", "b").add(singleton("c")), Matchers.contains("a", "b", "c"));
   }
 
   @Test
-  public void multipleAndMultipleIsMultiple() {
-    assertThat(ProjectionResult.ofSingle("a").add(ProjectionResult.ofSingle("b")
-        .add(ProjectionResult.ofSingle("c").add(ProjectionResult.ofSingle("d")))),
+  public void associativity() {
+    assertEquals(multiple("a", "b").add(singleton("c")), singleton("a").add(multiple("b","c")));
+  }
+
+  @Test
+  public void multipleAndMultipleIsNested() {
+    assertThat(multiple("a", "b").add(multiple("c", "d")),
         contains("a", "b", "c", "d"));
+  }
+
+  @Test
+  public void emptyAndNestedIsNested() {
+    assertThat(empty().add(nested("a", "b", "c", "d")),
+        contains("a", "b", "c", "d"));
+  }
+
+  @Test
+  public void nestedAndEmptyIsNested() {
+    assertThat(nested("a", "b", "c", "d").add(empty()),
+        contains("a", "b", "c", "d"));
+  }
+
+  @Test
+  public void singletonAndNestedIsNested() {
+    assertThat(singleton("a").add(nested("b", "c", "d", "e")),
+        contains("a", "b", "c", "d", "e"));
+  }
+
+  @Test
+  public void nestedAndSingletonIsNested() {
+    assertThat(nested("a","b", "c", "d").add(singleton("e")),
+        contains("a", "b", "c", "d", "e"));
+  }
+
+  @Test
+  public void multipleAndNestedIsNested() {
+    assertThat(multiple("a", "b").add(nested("c", "d", "e", "f")),
+        contains("a", "b", "c", "d", "e", "f"));
+  }
+
+  @Test
+  public void nestedAndMultipleIsNested() {
+    assertThat(nested("a", "b", "c", "d")
+            .add(multiple("e", "f")),
+        contains("a", "b", "c", "d", "e", "f"));
+  }
+
+  @Test
+  public void nestedAndNestedIsNested() {
+    assertThat(nested("a", "b", "c", "d")
+            .add(nested("e", "f", "g", "h")),
+        contains("a", "b", "c", "d", "e", "f", "g", "h"));
   }
 
 

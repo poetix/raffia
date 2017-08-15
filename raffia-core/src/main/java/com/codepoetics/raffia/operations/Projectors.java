@@ -3,6 +3,7 @@ package com.codepoetics.raffia.operations;
 import com.codepoetics.raffia.baskets.ArrayContents;
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.baskets.PropertySet;
+import com.codepoetics.raffia.mappers.Mapper;
 
 import java.math.BigDecimal;
 
@@ -120,6 +121,34 @@ public final class Projectors {
         }
 
         return itemProjection.project(properties.get(key));
+      }
+    };
+  }
+
+  public static <O> Projector<O> flatMap(final Projector<Basket> left, final Projector<O> right) {
+    return new Projector<O>() {
+      @Override
+      public ProjectionResult<O> project(Basket basket) {
+        ProjectionResult<O> result = ProjectionResult.empty();
+        for (Basket item : left.project(basket)) {
+          result.add(right.project(item));
+        }
+        return result;
+      }
+    };
+  }
+
+  public static <I, O> Projector<O> feedback(final Projector<I> left, final Mapper<I, Projector<O>> right) {
+    return new Projector<O>() {
+      @Override
+      public ProjectionResult<O> project(Basket basket) {
+        ProjectionResult<O> result = ProjectionResult.empty();
+
+        for (I item : left.project(basket)) {
+          result = result.add(right.map(item).project(basket));
+        }
+
+        return result;
       }
     };
   }

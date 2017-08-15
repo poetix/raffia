@@ -1,6 +1,10 @@
-package com.codepoetics.raffia;
+package com.codepoetics.raffia.projecting;
 
+import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.mappers.Mapper;
 import com.codepoetics.raffia.operations.BasketPredicate;
+import com.codepoetics.raffia.operations.Projector;
+import com.codepoetics.raffia.operations.Projectors;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -40,6 +44,41 @@ public class JsonPathExamples {
     assertThat(
         lens("$.store['book', 'bicycle'][*]").getAll(store),
         contains(REES, WAUGH, MELVILLE, TOLKIEN, RED_BIKE));
+  }
+
+  @Test
+  public void getAllButLastBook() {
+    assertThat(
+        lens("$..book[:-1]").getAll(store),
+      contains(REES, WAUGH, MELVILLE));
+  }
+
+  @Test
+  public void getAllButLastTwoBooks() {
+    assertThat(
+        lens("$..book[0:-2]").getAll(store),
+        contains(REES, WAUGH));
+  }
+
+  @Test
+  public void getLastTwoBooks() {
+    assertThat(
+        lens("$..book[-2:]").getAll(store),
+        contains(MELVILLE, TOLKIEN));
+  }
+
+  @Test
+  public void getMiddleTwoBooks() {
+    assertThat(
+        lens("$..book[1:-1]").getAll(store),
+        contains(WAUGH, MELVILLE));
+  }
+
+  @Test
+  public void getLastThreeBooks() {
+    assertThat(
+        lens("$..book[1:]").getAll(store),
+        contains(WAUGH, MELVILLE, TOLKIEN));
   }
 
   @Test
@@ -129,23 +168,21 @@ public class JsonPathExamples {
         contains(REES, MELVILLE));
   }
 
-  /*
   @Test
   public void getArbitrarilyCheapBooks() {
-    final Mapper<BigDecimal, Projector<Basket>> priceIsLessThan = new Mapper<BigDecimal, Projector<Basket>() {
+    final Mapper<Basket, Projector<Basket>> priceIsLessThan = new Mapper<Basket, Projector<Basket>>() {
       @Override
-      public Projector<Basket> map(final BigDecimal expensive) {
-        BasketPredicate priceIsCheap = lens("$.price").matchingNumber(isLessThan(expensive));
+      public Projector<Basket> map(final Basket expensive) {
+        BasketPredicate priceIsCheap = lens("@.price").matchingNumber(isLessThan(expensive.asNumber()));
 
         return lens("$..book[?]", priceIsCheap);
       }
     };
 
-    Visitor<List<Basket>> arbitrarilyCheapBooks = Visitors.chain(
-        lens("$..expensive").projecting(Projections.asNumber), priceIsLessThan);
+    Projector<Basket> arbitrarilyCheapBooks = Projectors.feedback(
+        lens("$..expensive"), priceIsLessThan);
 
-    assertThat(store.visit(arbitrarilyCheapBooks), contains(REES, MELVILLE));
+    assertThat(arbitrarilyCheapBooks.project(store).toList(), contains(REES, MELVILLE));
   }
-  */
 
 }

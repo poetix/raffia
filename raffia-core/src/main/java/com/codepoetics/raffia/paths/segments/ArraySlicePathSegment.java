@@ -2,21 +2,19 @@ package com.codepoetics.raffia.paths.segments;
 
 import com.codepoetics.raffia.baskets.ArrayContents;
 import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.operations.BasketPredicate;
 import com.codepoetics.raffia.operations.ProjectionResult;
 import com.codepoetics.raffia.operations.Projector;
 import com.codepoetics.raffia.operations.Updater;
-import com.codepoetics.raffia.paths.Path;
 import com.codepoetics.raffia.paths.PathSegmentMatchResult;
 
-import java.util.Collection;
+final class ArraySlicePathSegment extends BasePathSegment {
 
-final class ArrayIndexPathSegment extends BasePathSegment {
+  private final int startIndex;
+  private final int endIndex;
 
-  private final Collection<Integer> indices;
-
-  ArrayIndexPathSegment(Collection<Integer> indices) {
-    this.indices = indices;
+  ArraySlicePathSegment(int startIndex, int endIndex) {
+    this.startIndex = startIndex;
+    this.endIndex = endIndex;
   }
 
   @Override
@@ -33,15 +31,29 @@ final class ArrayIndexPathSegment extends BasePathSegment {
 
       private Basket updateArray(ArrayContents items) {
         ArrayContents updated = items;
-        for (int index : indices) {
-          int actual = index < 0 ? items.size() + index : index;
-          if (actual < items.size()) {
-            updated = updated.with(actual, continuation.update(updated.get(actual)));
-          }
+
+        int actualStart = getActualStart(startIndex, items.size());
+        int actualEnd = getActualEnd(endIndex, items.size());
+
+        for (int i = actualStart; i < actualEnd; i++) {
+          updated = updated.with(i, continuation.update(updated.get(i)));
         }
+
         return Basket.ofArray(updated);
       }
     };
+  }
+
+  private static int getActualStart(int startIndex, int arraySize) {
+    return startIndex == PathSegments.LOWER_UNBOUNDED
+        ? 0
+        : startIndex < 0 ? arraySize + startIndex : startIndex;
+  }
+
+  private static int getActualEnd(int endIndex, int arraySize) {
+    return endIndex == PathSegments.UPPER_UNBOUNDED
+        ? arraySize
+        : endIndex < 0 ? arraySize + endIndex : Math.min(endIndex, arraySize);
   }
 
   @Override
@@ -58,11 +70,12 @@ final class ArrayIndexPathSegment extends BasePathSegment {
 
       private ProjectionResult<Basket> projectArray(ArrayContents items) {
         ProjectionResult<Basket> result = ProjectionResult.empty();
-        for (int index : indices) {
-          int actual = index < 0 ? items.size() + index : index;
-          if (actual >= 0 && actual < items.size()) {
-            result = result.add(continuation.project(items.get(actual)));
-          }
+
+        int actualStart = getActualStart(startIndex, items.size());
+        int actualEnd = getActualEnd(endIndex, items.size());
+
+        for (int i = actualStart; i < actualEnd; i++) {
+            result = result.add(continuation.project(items.get(i)));
         }
         return result;
       }
@@ -71,7 +84,7 @@ final class ArrayIndexPathSegment extends BasePathSegment {
 
   @Override
   public PathSegmentMatchResult matchesIndex(int index) {
-    return indices.contains(index) ? PathSegmentMatchResult.MATCHED_BOUND : PathSegmentMatchResult.UNMATCHED;
+    return index >= startIndex && index < endIndex ? PathSegmentMatchResult.MATCHED_BOUND : PathSegmentMatchResult.UNMATCHED;
   }
 
   @Override
@@ -81,7 +94,17 @@ final class ArrayIndexPathSegment extends BasePathSegment {
 
   @Override
   public String representation() {
-    return indices.toString();
+    StringBuilder sb = new StringBuilder();
+    sb.append("[");
+    if (startIndex != PathSegments.LOWER_UNBOUNDED) {
+      sb.append(startIndex);
+    }
+    sb.append(":");
+    if (endIndex != PathSegments.UPPER_UNBOUNDED) {
+      sb.append(endIndex);
+    }
+    sb.append("]");
+    return sb.toString();
   }
 
 }

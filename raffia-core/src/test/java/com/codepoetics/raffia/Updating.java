@@ -63,7 +63,7 @@ public class Updating {
 
   @Test
   public void addDescriptionStringsToBooks() {
-    Basket updated = lens("$..book").toAll().update(addDescription, store);
+    Basket updated = lens("$..book[*]").update(addDescription, store);
 
     assertThat(
         lens().toAny("description").getAllStrings(updated),

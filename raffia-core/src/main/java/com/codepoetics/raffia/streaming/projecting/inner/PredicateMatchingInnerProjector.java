@@ -34,11 +34,6 @@ final class PredicateMatchingInnerProjector<T extends BasketWriter<T>> extends I
     return InnerProjector.matchedArray(getTarget(), this, projector);
   }
 
-  @Override
-  public FilteringWriter<T> key(String key) {
-    return advance(getTarget().key(key));
-  }
-
   private FilteringWriter<T> projected(ProjectionResult<Basket> projection) {
     T newTarget = getTarget();
     for (Basket basket : projection) {

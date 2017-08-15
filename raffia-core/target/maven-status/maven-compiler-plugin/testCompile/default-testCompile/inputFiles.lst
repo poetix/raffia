@@ -1,13 +1,13 @@
-/Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/JsonPathExamples.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/StoreExample.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/baskets/StringBasketTest.java
+/Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/filtering/FilteringWriterRewritingTest.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/baskets/BooleanBasketTest.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/baskets/NullBasketTest.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/baskets/ArrayBasketTest.java
+/Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/projecting/JsonPathExamples.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/baskets/NumberBasketTest.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/ProjectionResultsTest.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/PathSegmentsTests.java
-/Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/FilteringWriterRewritingTest.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/baskets/ObjectBasketTest.java
-/Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/FilteringWriterProjectingTest.java
+/Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/filtering/FilteringWriterProjectingTest.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/Updating.java

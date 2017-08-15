@@ -1,4 +1,4 @@
-package com.codepoetics.raffia;
+package com.codepoetics.raffia.filtering;
 
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.mappers.Mapper;

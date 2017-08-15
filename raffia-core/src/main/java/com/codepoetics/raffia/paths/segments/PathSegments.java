@@ -10,6 +10,9 @@ import java.util.List;
 
 public final class PathSegments {
 
+  public static final int LOWER_UNBOUNDED = Integer.MIN_VALUE;
+  public static final int UPPER_UNBOUNDED = Integer.MAX_VALUE;
+
   private PathSegments() {
   }
 
@@ -24,6 +27,10 @@ public final class PathSegments {
       indices.add(i);
     }
     return ofArrayIndices(indices);
+  }
+
+  public static PathSegment ofArraySlice(int startIndex, int endIndex) {
+    return new ArraySlicePathSegment(startIndex, endIndex);
   }
 
   public static PathSegment ofArrayIndices(Collection<Integer> arrayIndices) {

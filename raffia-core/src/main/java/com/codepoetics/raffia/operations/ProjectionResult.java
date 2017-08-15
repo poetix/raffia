@@ -21,6 +21,12 @@ public abstract class ProjectionResult<T> implements Iterable<T> {
   public abstract <O> ProjectionResult<O> map(Mapper<T, O> mapper);
   public abstract T getSingle();
 
+  public boolean isEmpty() {
+    return false;
+  }
+
+  public abstract int size();
+
   public boolean allMatch(ValuePredicate<T> matcher) {
     for (T item : this) {
       if (!matcher.test(item)) {
@@ -72,9 +78,12 @@ public abstract class ProjectionResult<T> implements Iterable<T> {
 
   private interface ResultVisitor<T> {
     ProjectionResult<T> visitEmpty();
-    ProjectionResult<T> visitSingleton(T value);
-    ProjectionResult<T> visitMultiple(PVector<T> values);
-    ProjectionResult<T> visitNested(PVector<ProjectionResult<T>> results);
+
+    ProjectionResult<T> visitSingleton(SingletonProjectionResult<T> other);
+
+    ProjectionResult<T> visitMultiple(MultipleProjectionResult<T> other);
+
+    ProjectionResult<T> visitNested(NestedProjectionResult<T> other);
   }
 
   protected abstract ProjectionResult<T> visit(ResultVisitor<T> visitor);
@@ -82,6 +91,16 @@ public abstract class ProjectionResult<T> implements Iterable<T> {
   private static final class EmptyProjectionResult<T> extends ProjectionResult<T> {
 
     private static final EmptyProjectionResult<?> EMPTY = new EmptyProjectionResult<>();
+
+    @Override
+    public boolean isEmpty() {
+      return true;
+    }
+
+    @Override
+    public int size() {
+      return 0;
+    }
 
     @Override
     public Iterator<T> iterator() {
@@ -112,6 +131,7 @@ public abstract class ProjectionResult<T> implements Iterable<T> {
     protected ProjectionResult<T> visit(ResultVisitor<T> visitor) {
       return visitor.visitEmpty();
     }
+
   }
 
   private static final class SingletonProjectionResult<T> extends ProjectionResult<T> {
@@ -156,18 +176,18 @@ public abstract class ProjectionResult<T> implements Iterable<T> {
         }
 
         @Override
-        public ProjectionResult<T> visitSingleton(T value) {
-          return new MultipleProjectionResult<>(TreePVector.singleton(SingletonProjectionResult.this.value).plus(value));
+        public ProjectionResult<T> visitSingleton(SingletonProjectionResult<T> other) {
+          return MultipleProjectionResult.pair(SingletonProjectionResult.this, other);
         }
 
         @Override
-        public ProjectionResult<T> visitMultiple(PVector<T> values) {
-          return new MultipleProjectionResult<>(values.plus(0, SingletonProjectionResult.this.value));
+        public ProjectionResult<T> visitMultiple(MultipleProjectionResult<T> other) {
+          return other.prepend(SingletonProjectionResult.this.value);
         }
 
         @Override
-        public ProjectionResult<T> visitNested(PVector<ProjectionResult<T>> projectionResults) {
-          return new NestedProjectionResult<>(projectionResults.plus(0, SingletonProjectionResult.this));
+        public ProjectionResult<T> visitNested(NestedProjectionResult<T> other) {
+          return other.prepend(SingletonProjectionResult.this);
         }
       });
     }
@@ -188,17 +208,31 @@ public abstract class ProjectionResult<T> implements Iterable<T> {
     }
 
     @Override
-    protected ProjectionResult<T> visit(ResultVisitor visitor) {
-      return visitor.visitSingleton(value);
+    public int size() {
+      return 1;
     }
+
+    @Override
+    protected ProjectionResult<T> visit(ResultVisitor<T> visitor) {
+      return visitor.visitSingleton(this);
+    }
+
   }
 
   private static final class MultipleProjectionResult<T> extends ProjectionResult<T> {
+
+    private static <T> MultipleProjectionResult<T> pair(SingletonProjectionResult<T> first, SingletonProjectionResult<T> second) {
+      return new MultipleProjectionResult<>(TreePVector.singleton(first.value).plus(second.value));
+    }
 
     private final PVector<T> values;
 
     private MultipleProjectionResult(PVector<T> values) {
       this.values = values;
+    }
+
+    private MultipleProjectionResult<T> prepend(T value) {
+      return new MultipleProjectionResult<>(values.plus(0, value));
     }
 
     @Override
@@ -210,19 +244,18 @@ public abstract class ProjectionResult<T> implements Iterable<T> {
         }
 
         @Override
-        public ProjectionResult<T> visitSingleton(T value) {
-          return new MultipleProjectionResult<>(values.plus(value));
+        public ProjectionResult<T> visitSingleton(SingletonProjectionResult<T> other) {
+          return new MultipleProjectionResult<>(values.plus(other.value));
         }
 
         @Override
-        public ProjectionResult<T> visitMultiple(PVector<T> values) {
-          return new NestedProjectionResult<>(TreePVector.<ProjectionResult<T>>singleton(MultipleProjectionResult.this)
-              .plus(new MultipleProjectionResult<>(values)));
+        public ProjectionResult<T> visitMultiple(MultipleProjectionResult<T> other) {
+          return NestedProjectionResult.pair(MultipleProjectionResult.this, other);
         }
 
         @Override
-        public ProjectionResult<T> visitNested(PVector<ProjectionResult<T>> projectionResults) {
-          return new NestedProjectionResult<>(projectionResults.plus(0, MultipleProjectionResult.this));
+        public ProjectionResult<T> visitNested(NestedProjectionResult<T> other) {
+          return other.prepend(MultipleProjectionResult.this);
         }
       });
     }
@@ -247,8 +280,13 @@ public abstract class ProjectionResult<T> implements Iterable<T> {
     }
 
     @Override
+    public int size() {
+      return values.size();
+    }
+
+    @Override
     protected ProjectionResult<T> visit(ResultVisitor<T> visitor) {
-      return visitor.visitMultiple(values);
+      return visitor.visitMultiple(this);
     }
 
     @Override
@@ -258,14 +296,49 @@ public abstract class ProjectionResult<T> implements Iterable<T> {
   }
 
   private static final class NestedProjectionResult<T> extends ProjectionResult<T> {
+
+    private static <T> ProjectionResult<T> pair(ProjectionResult<T> first, ProjectionResult<T> second) {
+      return new NestedProjectionResult<>(TreePVector.singleton(first).plus(second), first.size() + second.size());
+    }
+
+    private final int size;
     private final PVector<ProjectionResult<T>> results;
 
-    private NestedProjectionResult(PVector<ProjectionResult<T>> results) {
+    private NestedProjectionResult(PVector<ProjectionResult<T>> results, int size) {
       this.results = results;
+      this.size = size;
+    }
+
+    private NestedProjectionResult<T> prepend(ProjectionResult<T> other) {
+      return new NestedProjectionResult<>(results.plus(0, other), size() + other.size());
     }
 
     public ProjectionResult<T> add(ProjectionResult<T> result) {
-      return new NestedProjectionResult<>(results.plus(result));
+      return result.visit(new ResultVisitor<T>() {
+        @Override
+        public ProjectionResult<T> visitEmpty() {
+          return NestedProjectionResult.this;
+        }
+
+        @Override
+        public ProjectionResult<T> visitSingleton(SingletonProjectionResult<T> other) {
+          return new NestedProjectionResult<>(
+              results.with(
+                  results.size() - 1,
+                  results.get(results.size() - 1).add(other)),
+              size + 1);
+        }
+
+        @Override
+        public ProjectionResult<T> visitMultiple(MultipleProjectionResult<T> other) {
+          return new NestedProjectionResult<>(results.plus(other), size() + other.size());
+        }
+
+        @Override
+        public ProjectionResult<T> visitNested(NestedProjectionResult<T> other) {
+          return new NestedProjectionResult<>(results.plus(other), size() + other.size());
+        }
+      });
     }
 
     @Override
@@ -292,20 +365,20 @@ public abstract class ProjectionResult<T> implements Iterable<T> {
     }
 
     @Override
+    public int size() {
+      return size;
+    }
+
+    @Override
     protected ProjectionResult<T> visit(ResultVisitor<T> visitor) {
-      return visitor.visitNested(results);
+      return visitor.visitNested(this);
     }
 
     @Override
     public Iterator<T> iterator() {
       final Iterator<ProjectionResult<T>> iterator = results.iterator();
 
-      if (!iterator.hasNext()) {
-        return Collections.emptyListIterator();
-      }
-
       return new Iterator<T>() {
-
         private Iterator<T> current = iterator.next().iterator();
 
         @Override

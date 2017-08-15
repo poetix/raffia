@@ -83,7 +83,7 @@ final class PathParser {
     }
 
     if (expression.contains(":")) {
-      throw new UnsupportedOperationException("Ranges not supported yet");
+      return parseRangeExpression(expression);
     }
 
     if (expression.startsWith("'") && expression.endsWith("'")) {
@@ -104,6 +104,27 @@ final class PathParser {
     }
 
     return toArrayIndices(indices);
+  }
+
+  private static PathSegment parseRangeExpression(String expression) {
+    if (expression.equals(":")) {
+      throw new IllegalArgumentException("\":\" is not a legal range expression");
+    }
+
+    if (expression.startsWith(":")) {
+      return PathSegments.ofArraySlice(PathSegments.LOWER_UNBOUNDED, Integer.parseInt(expression.substring(1)));
+    }
+
+    if (expression.endsWith(":")) {
+      return PathSegments.ofArraySlice(Integer.parseInt(expression.substring(0, expression.length() - 1)), PathSegments.UPPER_UNBOUNDED);
+    }
+
+    String[] bounds = expression.split(":");
+    if (bounds.length != 2) {
+      throw new IllegalArgumentException("\"" + expression + "\" is not a legal range expression");
+    }
+
+    return PathSegments.ofArraySlice(Integer.parseInt(bounds[0]), Integer.parseInt(bounds[1]));
   }
 
   private static PathSegment toKeys(String[] indices) {

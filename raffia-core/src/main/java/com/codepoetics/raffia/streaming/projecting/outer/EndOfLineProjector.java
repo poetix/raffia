@@ -1,12 +1,13 @@
 package com.codepoetics.raffia.streaming.projecting.outer;
 
 import com.codepoetics.raffia.streaming.FilteringWriter;
+import com.codepoetics.raffia.streaming.projecting.StreamingProjector;
 import com.codepoetics.raffia.streaming.rewriting.StreamingRewriter;
 import com.codepoetics.raffia.writers.BasketWriter;
 
 import java.math.BigDecimal;
 
-public final class EndOfLineProjector<T extends BasketWriter<T>> extends StreamingRewriter<T> {
+public final class EndOfLineProjector<T extends BasketWriter<T>> extends StreamingProjector<T> {
 
   EndOfLineProjector(T target) {
     super(target);
