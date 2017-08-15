@@ -1,11 +1,9 @@
 package com.codepoetics.raffia.streaming.rewriting.outer;
 
-import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.operations.Updater;
-import com.codepoetics.raffia.writers.BasketWriter;
 import com.codepoetics.raffia.paths.Path;
-import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.streaming.FilteringWriter;
+import com.codepoetics.raffia.writers.BasketWriter;
 
 public final class IndexSeekingOuterRewriter<T extends BasketWriter<T>> extends UnmatchedOuterRewriter<T> {
 

@@ -1,6 +1,5 @@
 package com.codepoetics.raffia.predicates;
 
-import com.codepoetics.raffia.mappers.Mapper;
 import com.codepoetics.raffia.operations.ValuePredicate;
 
 import java.math.BigDecimal;

@@ -1,7 +1,7 @@
 package com.codepoetics.raffia.paths.segments;
 
-import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.baskets.ArrayContents;
+import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.operations.ProjectionResult;
 import com.codepoetics.raffia.operations.Projector;
 import com.codepoetics.raffia.operations.Updater;

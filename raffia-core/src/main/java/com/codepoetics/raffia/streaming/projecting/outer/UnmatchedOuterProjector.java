@@ -1,7 +1,7 @@
 package com.codepoetics.raffia.streaming.projecting.outer;
 
-import com.codepoetics.raffia.writers.BasketWriter;
 import com.codepoetics.raffia.streaming.FilteringWriter;
+import com.codepoetics.raffia.writers.BasketWriter;
 
 import java.math.BigDecimal;
 

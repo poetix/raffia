@@ -1,25 +1,18 @@
 package com.codepoetics.raffia;
 
 import com.codepoetics.raffia.baskets.Basket;
+import com.codepoetics.raffia.mappers.Mapper;
 import com.codepoetics.raffia.operations.BasketPredicate;
 import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.operations.ValuePredicate;
 import com.codepoetics.raffia.predicates.BasketPredicates;
-import com.codepoetics.raffia.predicates.StringPredicates;
-import com.codepoetics.raffia.writers.BasketWeavingWriter;
-import com.codepoetics.raffia.mappers.Mapper;
-import com.codepoetics.raffia.baskets.Visitor;
+import com.codepoetics.raffia.operations.Setters;
 import com.codepoetics.raffia.streaming.FilteringWriter;
-import com.codepoetics.raffia.projections.Projections;
-import com.codepoetics.raffia.setters.Setters;
-import com.codepoetics.raffia.updaters.Updaters;
+import com.codepoetics.raffia.writers.BasketWeavingWriter;
 import com.codepoetics.raffia.writers.Writers;
 import org.junit.Test;
 
 import static com.codepoetics.raffia.lenses.Lens.lens;
-import static com.codepoetics.raffia.projections.Projections.asArray;
-import static com.codepoetics.raffia.projections.Projections.asString;
-import static com.codepoetics.raffia.projections.Projections.atKey;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
@@ -262,7 +255,7 @@ public class FilteringWriterRewritingTest {
 
   @Test
   public void urlRewritingTest() {
-    Updater urlRewriter = Updaters.ofString(new Mapper<String, String>() {
+    Updater urlRewriter = com.codepoetics.raffia.operations.Updaters.ofString(new Mapper<String, String>() {
       @Override
       public String map(String input) {
         return input.replace("test.com", "realsite.com");

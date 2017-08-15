@@ -3,7 +3,6 @@ package com.codepoetics.raffia.predicates;
 import com.codepoetics.raffia.baskets.ArrayContents;
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.baskets.PropertySet;
-import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.operations.BasketPredicate;
 import com.codepoetics.raffia.operations.ValuePredicate;
 

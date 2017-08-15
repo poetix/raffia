@@ -1,8 +1,8 @@
 package com.codepoetics.raffia.streaming.rewriting.inner;
 
-import com.codepoetics.raffia.writers.BasketWriter;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.streaming.rewriting.StreamingRewriter;
+import com.codepoetics.raffia.writers.BasketWriter;
 
 import java.math.BigDecimal;
 

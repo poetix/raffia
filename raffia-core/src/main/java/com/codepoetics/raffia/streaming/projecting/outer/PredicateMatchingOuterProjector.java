@@ -2,12 +2,9 @@ package com.codepoetics.raffia.streaming.projecting.outer;
 
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.operations.Projector;
-import com.codepoetics.raffia.writers.BasketWriter;
-import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.streaming.projecting.inner.InnerProjector;
-
-import java.util.List;
+import com.codepoetics.raffia.writers.BasketWriter;
 
 final class PredicateMatchingOuterProjector<T extends BasketWriter<T>> extends UnmatchedOuterProjector<T> {
 

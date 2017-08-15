@@ -1,19 +1,12 @@
 package com.codepoetics.raffia.paths.segments;
 
-import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.baskets.ArrayContents;
+import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.baskets.ObjectEntry;
 import com.codepoetics.raffia.baskets.PropertySet;
 import com.codepoetics.raffia.operations.*;
 import com.codepoetics.raffia.paths.Path;
 import com.codepoetics.raffia.paths.PathSegmentMatchResult;
-import com.codepoetics.raffia.projections.Projections;
-import com.codepoetics.raffia.visitors.Visitors;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 final class MatchingItemPathSegment extends BasePathSegment {
 

@@ -1,23 +1,14 @@
 package com.codepoetics.raffia;
 
-import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.mappers.Mapper;
-import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.operations.BasketPredicate;
-import com.codepoetics.raffia.operations.Projector;
-import com.codepoetics.raffia.projections.Projections;
-import com.codepoetics.raffia.visitors.Visitors;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import static com.codepoetics.raffia.StoreExample.*;
 import static com.codepoetics.raffia.lenses.Lens.lens;
-import static com.codepoetics.raffia.predicates.NumberPredicates.isLessThan;
 import static com.codepoetics.raffia.predicates.BasketPredicates.hasKey;
-import static com.codepoetics.raffia.projections.Projections.asNumber;
-import static com.codepoetics.raffia.projections.Projections.asString;
+import static com.codepoetics.raffia.predicates.NumberPredicates.isLessThan;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 

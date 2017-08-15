@@ -1,18 +1,17 @@
 package com.codepoetics.raffia.lenses;
 
+import com.codepoetics.raffia.baskets.ArrayContents;
 import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.baskets.Visitor;
+import com.codepoetics.raffia.baskets.PropertySet;
 import com.codepoetics.raffia.mappers.Mapper;
 import com.codepoetics.raffia.operations.*;
 import com.codepoetics.raffia.paths.Path;
 import com.codepoetics.raffia.paths.PathSegment;
 import com.codepoetics.raffia.paths.Paths;
 import com.codepoetics.raffia.paths.segments.PathSegments;
-import com.codepoetics.raffia.predicates.NumberPredicates;
 import com.codepoetics.raffia.predicates.BasketPredicates;
+import com.codepoetics.raffia.predicates.NumberPredicates;
 import com.codepoetics.raffia.predicates.StringPredicates;
-import com.codepoetics.raffia.projections.Projections;
-import com.codepoetics.raffia.visitors.Visitors;
 import org.pcollections.PVector;
 import org.pcollections.TreePVector;
 
@@ -95,8 +94,16 @@ public class Lens implements Projector<Basket> {
     return project(basket).getSingle();
   }
 
+  public <T> T getOne(Mapper<Basket, T> mapper, Basket basket) {
+    return project(basket).map(mapper).getSingle();
+  }
+
   public List<Basket> getAll(Basket basket) {
     return project(basket).toList();
+  }
+
+  public <T> List<T> getAll(Mapper<Basket, T> mapper, Basket basket) {
+    return project(basket).map(mapper).toList();
   }
 
   public BasketPredicate matching(String value) {
@@ -167,10 +174,6 @@ public class Lens implements Projector<Basket> {
     }
   };
 
-  public List<String> getAllStrings(Basket basket) {
-    return project(basket).map(asString).toList();
-  }
-
   private final Mapper<Basket, BigDecimal> asNumber = new Mapper<Basket, BigDecimal>() {
     @Override
     public BigDecimal map(Basket input) {
@@ -178,7 +181,64 @@ public class Lens implements Projector<Basket> {
     }
   };
 
+  private final Mapper<Basket, Boolean> asBoolean = new Mapper<Basket, Boolean>() {
+    @Override
+    public Boolean map(Basket input) {
+      return input.asBoolean();
+    }
+  };
+
+  private final Mapper<Basket, ArrayContents> asArray = new Mapper<Basket, ArrayContents>() {
+    @Override
+    public ArrayContents map(Basket input) {
+      return input.asArray();
+    }
+  };
+
+  private final Mapper<Basket, PropertySet> asObject = new Mapper<Basket, PropertySet>() {
+    @Override
+    public PropertySet map(Basket input) {
+      return input.asObject();
+    }
+  };
+
+  public List<String> getAllStrings(Basket basket) {
+    return getAll(asString, basket);
+  }
+
   public List<BigDecimal> getAllNumbers(Basket basket) {
-    return project(basket).map(asNumber).toList();
+    return getAll(asNumber, basket);
+  }
+
+  public List<Boolean> getAllBooleans(Basket basket) {
+    return getAll(asBoolean, basket);
+  }
+
+  public List<ArrayContents> getAllArrays(Basket basket) {
+    return getAll(asArray, basket);
+  }
+
+  public List<PropertySet> getAllObjects(Basket basket) {
+    return getAll(asObject, basket);
+  }
+
+  public String getOneString(Basket basket) {
+    return getOne(asString, basket);
+  }
+
+  public BigDecimal getOneNumber(Basket basket) {
+    return getOne(asNumber, basket);
+  }
+
+  public Boolean getOneBoolean(Basket basket) {
+    return getOne(asBoolean, basket);
+  }
+
+  public ArrayContents getOneArray(Basket basket) {
+    return getOne(asArray, basket);
+  }
+
+  public PropertySet getOneObject(Basket basket) {
+    return getOne(asObject, basket);
   }
 }

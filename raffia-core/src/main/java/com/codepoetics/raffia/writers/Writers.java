@@ -1,7 +1,7 @@
 package com.codepoetics.raffia.writers;
 
-import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.baskets.ArrayContents;
+import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.baskets.ObjectEntry;
 import com.codepoetics.raffia.baskets.PropertySet;
 import org.pcollections.PVector;

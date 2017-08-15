@@ -1,7 +1,6 @@
 package com.codepoetics.raffia;
 
 import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.builders.BasketBuilder;
 import com.codepoetics.raffia.builders.BasketWeaver;
 
 import java.math.BigDecimal;

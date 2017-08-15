@@ -1,13 +1,9 @@
-package com.codepoetics.raffia.setters;
+package com.codepoetics.raffia.operations;
 
-import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.baskets.ArrayContents;
+import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.baskets.ObjectEntry;
 import com.codepoetics.raffia.baskets.PropertySet;
-import com.codepoetics.raffia.operations.Updater;
-import com.codepoetics.raffia.operations.Updaters;
-import com.codepoetics.raffia.visitors.Visitors;
 
 import java.math.BigDecimal;
 import java.util.Collection;

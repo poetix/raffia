@@ -2,13 +2,10 @@ package com.codepoetics.raffia.streaming.projecting.outer;
 
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.operations.Projector;
-import com.codepoetics.raffia.writers.BasketWriter;
 import com.codepoetics.raffia.paths.Path;
-import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.streaming.projecting.StreamingProjector;
-
-import java.util.List;
+import com.codepoetics.raffia.writers.BasketWriter;
 
 public abstract class OuterProjector<T extends BasketWriter<T>> extends StreamingProjector<T> {
 

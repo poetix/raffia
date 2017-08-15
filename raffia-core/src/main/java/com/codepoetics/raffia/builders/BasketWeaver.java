@@ -1,21 +1,35 @@
 package com.codepoetics.raffia.builders;
 
 import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.injections.Injections;
 import com.codepoetics.raffia.mappers.Mapper;
 import com.codepoetics.raffia.mappers.Mappers;
-import com.codepoetics.raffia.visitors.Visitors;
 import com.codepoetics.raffia.writers.BasketWeavingWriter;
 import com.codepoetics.raffia.writers.BasketWriter;
 import com.codepoetics.raffia.writers.Writers;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 public final class BasketWeaver implements BasketWriter<BasketWeaver> {
+
+  private static final Mapper<Boolean, Basket> fromBoolean = new Mapper<Boolean, Basket>() {
+    @Override
+    public Basket map(Boolean input) {
+      return Basket.ofBoolean(input);
+    }
+  };
+  private static final Mapper<BigDecimal, Basket> fromNumber = new Mapper<BigDecimal, Basket>() {
+    @Override
+    public Basket map(BigDecimal input) {
+      return Basket.ofNumber(input);
+    }
+  };
+  private static final Mapper<String, Basket> fromString = new Mapper<String, Basket>() {
+    @Override
+    public Basket map(String input) {
+      return Basket.ofString(input);
+    }
+  };
 
   public static BasketWeaver create() {
     return weavingWith(Writers.weaving());
@@ -104,15 +118,15 @@ public final class BasketWeaver implements BasketWriter<BasketWeaver> {
   }
 
   public BasketWeaver array(String firstItem, String...subsequentItems) {
-    return array(firstItem, subsequentItems, Injections.fromString);
+    return array(firstItem, subsequentItems, fromString);
   }
 
   public BasketWeaver array(BigDecimal firstItem, BigDecimal...subsequentItems) {
-    return array(firstItem, subsequentItems, Injections.fromNumber);
+    return array(firstItem, subsequentItems, fromNumber);
   }
 
   public BasketWeaver array(boolean firstItem, Boolean...subsequentItems) {
-    return array(firstItem, subsequentItems, Injections.fromBoolean);
+    return array(firstItem, subsequentItems, fromBoolean);
   }
 
   private <T> BasketWeaver array(T first, T[] subsequent, Mapper<T, Basket> mapper) {

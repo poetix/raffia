@@ -1,11 +1,9 @@
 package com.codepoetics.raffia.streaming.rewriting.outer;
 
-import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.operations.Updater;
-import com.codepoetics.raffia.writers.BasketWriter;
-import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.streaming.rewriting.inner.InnerRewriter;
+import com.codepoetics.raffia.writers.BasketWriter;
 
 final class PredicateMatchingOuterRewriter<T extends BasketWriter<T>> extends UnmatchedOuterRewriter<T> {
 

@@ -4,11 +4,8 @@ import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.writers.BasketWeavingWriter;
 import com.codepoetics.raffia.mappers.Mapper;
-import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.predicates.NumberPredicates;
-import com.codepoetics.raffia.projections.Projections;
-import com.codepoetics.raffia.updaters.Updaters;
 import com.codepoetics.raffia.writers.PassThroughWriter;
 import org.junit.Test;
 
@@ -64,14 +61,14 @@ public class RoundtripTest {
 
   @Test
   public void rewritePathMatchedStrings() throws IOException {
-    Updater toUppercase = Updaters.ofString(new Mapper<String, String>() {
+    Updater toUppercase = com.codepoetics.raffia.operations.Updaters.ofString(new Mapper<String, String>() {
       @Override
       public String map(String input) {
         return input.toUpperCase();
       }
     });
 
-    Updater uppercaseTitle = Updaters.updating("title", toUppercase);
+    Updater uppercaseTitle = com.codepoetics.raffia.operations.Updaters.updating("title", toUppercase);
 
     StringWriter stringWriter = new StringWriter();
 

@@ -1,29 +1,21 @@
 package com.codepoetics.raffia;
 
 import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.mappers.Mapper;
 import com.codepoetics.raffia.baskets.PropertySet;
-import com.codepoetics.raffia.baskets.Visitor;
+import com.codepoetics.raffia.mappers.Mapper;
 import com.codepoetics.raffia.operations.BasketPredicate;
 import com.codepoetics.raffia.operations.Updater;
-import com.codepoetics.raffia.projections.Projections;
-import com.codepoetics.raffia.setters.Setters;
-import com.codepoetics.raffia.updaters.Updaters;
+import com.codepoetics.raffia.operations.Setters;
 import org.junit.Test;
 
-import java.math.BigDecimal;
-
 import static com.codepoetics.raffia.StoreExample.store;
-import static com.codepoetics.raffia.injections.Injections.fromString;
 import static com.codepoetics.raffia.lenses.Lens.lens;
-import static com.codepoetics.raffia.projections.Projections.asNumber;
-import static com.codepoetics.raffia.projections.Projections.asString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 public class Updating {
 
-  private static final Updater capitaliseString = Updaters.ofString(new Mapper<String, String>() {
+  private static final Updater capitaliseString = com.codepoetics.raffia.operations.Updaters.ofString(new Mapper<String, String>() {
     @Override
     public String map(String input) {
       return input.toUpperCase();
@@ -38,7 +30,7 @@ public class Updating {
     }
   };
 
-  private static final Updater addDescription = Updaters.ofObject(new Mapper<PropertySet, PropertySet>() {
+  private static final Updater addDescription = com.codepoetics.raffia.operations.Updaters.ofObject(new Mapper<PropertySet, PropertySet>() {
     @Override
     public PropertySet map(PropertySet input) {
       return input.with("description",

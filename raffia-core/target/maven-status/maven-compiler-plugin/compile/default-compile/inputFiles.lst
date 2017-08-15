@@ -10,7 +10,6 @@
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/paths/segments/StructProjector.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/streaming/rewriting/outer/EndOfLineRewriter.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/builders/BasketBuilder.java
-/Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/setters/Setters.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/streaming/rewriting/outer/MatchedOuterRewriter.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/visitors/ObjectVisitor.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/baskets/PropertySet.java
@@ -41,7 +40,6 @@
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/streaming/projecting/StreamingProjector.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/streaming/rewriting/inner/IndexSeekingInnerRewriter.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/baskets/BooleanBasket.java
-/Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/projections/Projections.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/streaming/rewriting/inner/WeavingRewriter.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/paths/segments/PathSegments.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/lenses/Lens.java
@@ -65,6 +63,7 @@
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/streaming/projecting/inner/MatchedInnerProjector.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/writers/PassThroughWriter.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/paths/PathSegment.java
+/Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/operations/Setters.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/streaming/projecting/outer/PredicateMatchingOuterProjector.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/baskets/ObjectEntry.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/operations/ProjectionResult.java
@@ -78,5 +77,3 @@
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/writers/BasketWeavingWriter.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/Raffia.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/operations/Projector.java
-/Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/updaters/Updaters.java
-/Users/dominicfox/src/java/raffia/raffia-core/src/main/java/com/codepoetics/raffia/injections/Injections.java

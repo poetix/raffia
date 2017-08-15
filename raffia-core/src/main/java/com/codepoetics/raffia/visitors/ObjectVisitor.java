@@ -1,10 +1,6 @@
 package com.codepoetics.raffia.visitors;
 
-import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.baskets.Visitor;
-import com.codepoetics.raffia.baskets.ArrayContents;
-import com.codepoetics.raffia.baskets.ObjectEntry;
-import com.codepoetics.raffia.baskets.PropertySet;
+import com.codepoetics.raffia.baskets.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

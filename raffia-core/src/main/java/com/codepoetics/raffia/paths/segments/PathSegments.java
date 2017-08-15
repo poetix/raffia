@@ -2,7 +2,6 @@ package com.codepoetics.raffia.paths.segments;
 
 import com.codepoetics.raffia.operations.BasketPredicate;
 import com.codepoetics.raffia.paths.PathSegment;
-import com.codepoetics.raffia.baskets.Visitor;
 
 import java.util.ArrayList;
 import java.util.Collection;

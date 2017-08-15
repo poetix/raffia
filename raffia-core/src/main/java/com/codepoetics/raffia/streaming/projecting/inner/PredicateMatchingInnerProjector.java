@@ -3,14 +3,12 @@ package com.codepoetics.raffia.streaming.projecting.inner;
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.operations.ProjectionResult;
 import com.codepoetics.raffia.operations.Projector;
-import com.codepoetics.raffia.writers.BasketWriter;
-import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.streaming.projecting.StreamingProjector;
 import com.codepoetics.raffia.visitors.Visitors;
+import com.codepoetics.raffia.writers.BasketWriter;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 final class PredicateMatchingInnerProjector<T extends BasketWriter<T>> extends InnerProjector<T> {
 

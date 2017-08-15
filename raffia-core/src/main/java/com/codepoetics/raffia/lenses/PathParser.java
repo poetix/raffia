@@ -1,6 +1,5 @@
 package com.codepoetics.raffia.lenses;
 
-import com.codepoetics.raffia.baskets.Visitor;
 import com.codepoetics.raffia.operations.BasketPredicate;
 import com.codepoetics.raffia.paths.PathSegment;
 import com.codepoetics.raffia.paths.segments.PathSegments;

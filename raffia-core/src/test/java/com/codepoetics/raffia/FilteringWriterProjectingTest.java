@@ -4,17 +4,11 @@ import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.operations.BasketPredicate;
 import com.codepoetics.raffia.operations.ValuePredicate;
 import com.codepoetics.raffia.predicates.BasketPredicates;
-import com.codepoetics.raffia.writers.BasketWeavingWriter;
-import com.codepoetics.raffia.mappers.Mapper;
-import com.codepoetics.raffia.baskets.Visitor;
-import com.codepoetics.raffia.projections.Projections;
-import com.codepoetics.raffia.setters.Setters;
 import com.codepoetics.raffia.streaming.FilteringWriter;
-import com.codepoetics.raffia.writers.Writers;
+import com.codepoetics.raffia.writers.BasketWeavingWriter;
 import org.junit.Test;
 
 import static com.codepoetics.raffia.lenses.Lens.lens;
-import static com.codepoetics.raffia.projections.Projections.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 
