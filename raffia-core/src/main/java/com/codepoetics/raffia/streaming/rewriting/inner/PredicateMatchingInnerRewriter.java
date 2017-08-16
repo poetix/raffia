@@ -18,23 +18,18 @@ final class PredicateMatchingInnerRewriter<T extends BasketWriter<T>> extends In
   }
 
   @Override
-  public FilteringWriter<T> advance(T newTarget) {
-    return new PredicateMatchingInnerRewriter<>(newTarget, parent, itemUpdater);
-  }
-
-  @Override
   public FilteringWriter<T> beginObject() {
-    return InnerRewriter.matchedObject(getTarget(), this, itemUpdater);
+    return InnerRewriter.matchedObject(target, this, itemUpdater);
   }
 
   @Override
   public FilteringWriter<T> beginArray() {
-    return InnerRewriter.matchedArray(getTarget(), this, itemUpdater);
+    return InnerRewriter.matchedArray(target, this, itemUpdater);
   }
 
   @Override
   public FilteringWriter<T> key(String key) {
-    return advance(getTarget().key(key));
+    return advance(target.key(key));
   }
 
   @Override

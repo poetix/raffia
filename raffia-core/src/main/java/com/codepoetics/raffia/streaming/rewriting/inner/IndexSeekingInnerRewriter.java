@@ -39,11 +39,11 @@ abstract class IndexSeekingInnerRewriter<T extends BasketWriter<T>> extends Inne
   public FilteringWriter<T> beginObject() {
     switch (indexMatches()) {
       case UNMATCHED:
-        return passThrough(getTarget().beginObject());
+        return passThrough(target.beginObject());
       case MATCHED_BOUND:
-        return startObject(getTarget(), path.tail(), this, updater);
+        return startObject(target, path.tail(), this, updater);
       case MATCHED_UNBOUND:
-        return startObject(getTarget(), path, this, updater);
+        return startObject(target, path, this, updater);
       default:
         throw new IllegalStateException();
     }
@@ -53,11 +53,11 @@ abstract class IndexSeekingInnerRewriter<T extends BasketWriter<T>> extends Inne
   public FilteringWriter<T> beginArray() {
     switch (indexMatches()) {
       case UNMATCHED:
-        return passThrough(getTarget().beginArray());
+        return passThrough(target.beginArray());
       case MATCHED_BOUND:
-        return startArray(getTarget(), path.tail(), this, updater);
+        return startArray(target, path.tail(), this, updater);
       case MATCHED_UNBOUND:
-        return startArray(getTarget(), path, this, updater);
+        return startArray(target, path, this, updater);
       default:
         throw new IllegalStateException();
     }
@@ -79,40 +79,40 @@ abstract class IndexSeekingInnerRewriter<T extends BasketWriter<T>> extends Inne
   }
 
   private FilteringWriter<T> update(Basket value) {
-    return advance(updater.update(value).visit(Visitors.writingTo(getTarget())));
+    return advance(updater.update(value).visit(Visitors.writingTo(target)));
   }
 
   @Override
   public FilteringWriter<T> add(String value) {
     return isBoundLeaf()
       ? update(Basket.ofString(value))
-      : advance(getTarget().add(value));
+      : advance(target.add(value));
   }
 
   @Override
   public FilteringWriter<T> add(BigDecimal value) {
     return isBoundLeaf()
         ? update(Basket.ofNumber(value))
-        : advance(getTarget().add(value));
+        : advance(target.add(value));
   }
 
   @Override
   public FilteringWriter<T> add(boolean value) {
     return isBoundLeaf()
         ? update(Basket.ofBoolean(value))
-        : advance(getTarget().add(value));
+        : advance(target.add(value));
   }
 
   @Override
   public FilteringWriter<T> addNull() {
     return isBoundLeaf()
         ? update(Basket.ofNull())
-        : advance(getTarget().addNull());
+        : advance(target.addNull());
   }
 
   private static final class ObjectKeySeekingInnerRewriter<T extends BasketWriter<T>> extends IndexSeekingInnerRewriter<T> {
 
-    private final String key;
+    private String key;
 
     ObjectKeySeekingInnerRewriter(T target, Path path, StreamingRewriter<T> parent, Updater updater, String key) {
       super(target, path, parent, updater);
@@ -121,7 +121,9 @@ abstract class IndexSeekingInnerRewriter<T extends BasketWriter<T>> extends Inne
 
     @Override
     public FilteringWriter<T> advance(T newTarget) {
-      return new ObjectKeySeekingInnerRewriter<>(newTarget, path, parent, updater, null);
+      this.target = newTarget;
+      this.key = null;
+      return this;
     }
 
     @Override
@@ -134,14 +136,16 @@ abstract class IndexSeekingInnerRewriter<T extends BasketWriter<T>> extends Inne
       if (key != null) {
         throw new IllegalStateException("key() called twice");
       }
-      return new ObjectKeySeekingInnerRewriter<>(getTarget().key(newKey), path, parent, updater, newKey);
+      target = target.key(newKey);
+      key = newKey;
+      return this;
     }
 
   }
 
   private static final class ArrayIndexSeekingInnerRewriter<T extends BasketWriter<T>> extends IndexSeekingInnerRewriter<T> {
 
-    private final int index;
+    private int index;
 
     ArrayIndexSeekingInnerRewriter(T target, Path path, StreamingRewriter<T> parent, Updater updater, int index) {
       super(target, path, parent, updater);
@@ -150,7 +154,9 @@ abstract class IndexSeekingInnerRewriter<T extends BasketWriter<T>> extends Inne
 
     @Override
     public FilteringWriter<T> advance(T newTarget) {
-      return new ArrayIndexSeekingInnerRewriter<>(newTarget, path, parent, updater, index + 1);
+      this.target = newTarget;
+      this.index += 1;
+      return this;
     }
 
     @Override

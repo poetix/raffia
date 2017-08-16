@@ -5,6 +5,7 @@ import com.codepoetics.raffia.mappers.Mapper;
 import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.operations.Updaters;
 import com.codepoetics.raffia.streaming.FilteringWriter;
+import com.codepoetics.raffia.streaming.StreamingWriters;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -78,7 +79,7 @@ public class PerformanceTest {
   }
 
   @PerfTest(
-      invocations = 100000,
+      invocations = 1000000,
       threads = 8,
       rampUp = 10000
   )
@@ -108,7 +109,7 @@ public class PerformanceTest {
   }
 
   @PerfTest(
-      invocations = 100000,
+      invocations = 1000000,
       threads = 8,
       rampUp = 10000
   )
@@ -121,13 +122,13 @@ public class PerformanceTest {
     StringWriter stringWriter = new StringWriter();
     JsonWriter jsonWriter = JsonWriter.writingTo(FACTORY, stringWriter);
 
-    FilteringWriter<JsonWriter> rewritingWriter = FilteringWriter.rewriting(
+    FilteringWriter<JsonWriter> rewritingWriter = StreamingWriters.rewriting(
         VALUE_LENS,
         jsonWriter,
         TO_UPPERCASE
     );
 
-    FilteringWriter<FilteringWriter<JsonWriter>> filteringWriter = FilteringWriter.filtering(
+    FilteringWriter<FilteringWriter<JsonWriter>> filteringWriter = StreamingWriters.filteringArray(
         READ_IS_TRUE,
         rewritingWriter);
 

@@ -2,11 +2,9 @@ package com.codepoetics.raffia.paths.segments;
 
 import com.codepoetics.raffia.baskets.ArrayContents;
 import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.operations.BasketPredicate;
 import com.codepoetics.raffia.operations.ProjectionResult;
 import com.codepoetics.raffia.operations.Projector;
 import com.codepoetics.raffia.operations.Updater;
-import com.codepoetics.raffia.paths.Path;
 import com.codepoetics.raffia.paths.PathSegmentMatchResult;
 
 import java.util.Collection;

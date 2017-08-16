@@ -1,45 +1,52 @@
-package com.codepoetics.raffia.streaming.projecting.inner;
+package com.codepoetics.raffia.streaming.projecting;
 
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.operations.ProjectionResult;
 import com.codepoetics.raffia.operations.Projector;
 import com.codepoetics.raffia.streaming.FilteringWriter;
-import com.codepoetics.raffia.streaming.projecting.StreamingProjector;
 import com.codepoetics.raffia.visitors.Visitors;
 import com.codepoetics.raffia.writers.BasketWriter;
 
 import java.math.BigDecimal;
 
-final class PredicateMatchingInnerProjector<T extends BasketWriter<T>> extends InnerProjector<T> {
+public final class PredicateMatchingProjector<T extends BasketWriter<T>> extends StreamingProjector<T> {
 
   private final Projector<Basket> projector;
 
-  PredicateMatchingInnerProjector(T target, StreamingProjector<T> parent, Projector<Basket> projector) {
+  public PredicateMatchingProjector(T target, FilteringWriter<T> parent, Projector<Basket> projector) {
     super(target, parent);
     this.projector =  projector;
   }
 
   @Override
-  public FilteringWriter<T> advance(T newTarget) {
-    return new PredicateMatchingInnerProjector<>(newTarget, parent, projector);
-  }
-
-  @Override
   public FilteringWriter<T> beginObject() {
-    return InnerProjector.matchedObject(getTarget(), this, projector);
+    return WeavingProjector.weavingObject(target, this, projector);
   }
 
   @Override
   public FilteringWriter<T> beginArray() {
-    return InnerProjector.matchedArray(getTarget(), this, projector);
+    return WeavingProjector.weavingArray(target, this, projector);
+  }
+
+  @Override
+  public FilteringWriter<T> end() {
+    if (parent == null) {
+      throw new IllegalStateException("end() called when not writing array or object");
+    }
+
+    return parent.advance(target);
+  }
+
+  @Override
+  public FilteringWriter<T> key(String key) {
+    throw new IllegalStateException("key() called when not writing array or object");
   }
 
   private FilteringWriter<T> projected(ProjectionResult<Basket> projection) {
-    T newTarget = getTarget();
     for (Basket basket : projection) {
-      newTarget = basket.visit(Visitors.writingTo(newTarget));
+      target = basket.visit(Visitors.writingTo(target));
     }
-    return advance(newTarget);
+    return this;
   }
 
   @Override

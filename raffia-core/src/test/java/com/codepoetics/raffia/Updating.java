@@ -4,8 +4,8 @@ import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.baskets.PropertySet;
 import com.codepoetics.raffia.mappers.Mapper;
 import com.codepoetics.raffia.operations.BasketPredicate;
-import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.operations.Setters;
+import com.codepoetics.raffia.operations.Updater;
 import org.junit.Test;
 
 import static com.codepoetics.raffia.StoreExample.store;

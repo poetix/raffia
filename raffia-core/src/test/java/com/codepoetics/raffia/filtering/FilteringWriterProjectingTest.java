@@ -5,6 +5,7 @@ import com.codepoetics.raffia.operations.BasketPredicate;
 import com.codepoetics.raffia.operations.ValuePredicate;
 import com.codepoetics.raffia.predicates.BasketPredicates;
 import com.codepoetics.raffia.streaming.FilteringWriter;
+import com.codepoetics.raffia.streaming.StreamingWriters;
 import com.codepoetics.raffia.writers.BasketWeavingWriter;
 import org.junit.Test;
 
@@ -16,7 +17,7 @@ public class FilteringWriterProjectingTest {
 
   @Test
   public void projectSingleValue() {
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.projecting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
         lens("$"));
 
     Basket result = writer.add("Value").complete().weave();
@@ -26,7 +27,7 @@ public class FilteringWriterProjectingTest {
 
   @Test
   public void projectMatchedKey() {
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.projecting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
         lens("$.xyzzy.foo"));
 
     Basket result = writer.beginObject()
@@ -45,7 +46,7 @@ public class FilteringWriterProjectingTest {
 
   @Test
   public void projectAllKeys() {
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.projecting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
         lens("$.*"));
 
     Basket result = writer.beginObject()
@@ -59,7 +60,7 @@ public class FilteringWriterProjectingTest {
 
   @Test
   public void projectAllNestedKeys() {
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.projecting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
         lens("$.*.*"));
 
     Basket result = writer.beginObject()
@@ -76,7 +77,7 @@ public class FilteringWriterProjectingTest {
 
   @Test
   public void projectSecondItem() {
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.projecting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
         lens("$[1]"));
 
     Basket result = writer.beginArray()
@@ -91,7 +92,7 @@ public class FilteringWriterProjectingTest {
 
   @Test
   public void projectSecondAndThirdItems() {
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.projecting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
         lens("$[1, 2]"));
 
     Basket result = writer.beginArray()
@@ -106,7 +107,7 @@ public class FilteringWriterProjectingTest {
 
   @Test
   public void projectAllItems() {
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.projecting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
         lens("$[*]"));
 
     Basket result = writer.beginArray()
@@ -128,7 +129,7 @@ public class FilteringWriterProjectingTest {
       }
     });
 
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.projecting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
         lens("$[?]", shouldBeRewritten));
 
     Basket result = writer.beginArray()
@@ -143,7 +144,7 @@ public class FilteringWriterProjectingTest {
 
   @Test
   public void projectDeepScannedStrings() {
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.projecting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
         lens("$..nested.bar"));
 
     Basket result = writer.beginObject()
@@ -177,7 +178,7 @@ public class FilteringWriterProjectingTest {
   public void projectDeepScannedMatchingStrings() {
     BasketPredicate isFlaggedForRewrite = lens("@.project").isTrue();
 
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.projecting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
         lens("$..nested[?].value", isFlaggedForRewrite));
 
     Basket result = writer.beginObject()
@@ -217,7 +218,7 @@ public class FilteringWriterProjectingTest {
   public void projectMatchingObjects() {
     BasketPredicate isFlaggedForRewrite = lens("@.match").isTrue();
 
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.projecting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
         lens("$[?]..value", isFlaggedForRewrite));
 
     Basket result = writer.beginArray()

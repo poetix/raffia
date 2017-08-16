@@ -13,12 +13,12 @@ final class PredicateMatchingOuterRewriter<T extends BasketWriter<T>> extends Un
 
   @Override
   public FilteringWriter<T> beginObject() {
-    return InnerRewriter.predicateMatching(getTarget().beginObject(), this, updater);
+    return InnerRewriter.predicateMatching(target.beginObject(), this, updater);
   }
 
   @Override
   public FilteringWriter<T> beginArray() {
-    return InnerRewriter.predicateMatching(getTarget().beginArray(), this, updater);
+    return InnerRewriter.predicateMatching(target.beginArray(), this, updater);
   }
 
 }

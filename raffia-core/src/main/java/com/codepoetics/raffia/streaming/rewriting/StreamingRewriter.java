@@ -9,10 +9,12 @@ import com.codepoetics.raffia.streaming.rewriting.outer.OuterRewriter;
 import com.codepoetics.raffia.visitors.Visitors;
 import com.codepoetics.raffia.writers.BasketWriter;
 
-public abstract class StreamingRewriter<T extends BasketWriter<T>> extends FilteringWriter<T> {
+public abstract class StreamingRewriter<T extends BasketWriter<T>> implements FilteringWriter<T> {
+
+  protected T target;
 
   protected StreamingRewriter(T target) {
-    super(target);
+    this.target = target;
   }
 
   public static <T extends BasketWriter<T>> FilteringWriter<T> start(T target, Path path, Updater updater) {
@@ -48,14 +50,18 @@ public abstract class StreamingRewriter<T extends BasketWriter<T>> extends Filte
   }
 
   @Override
-  public T complete() {
-    return getTarget();
+  public FilteringWriter<T> advance(T newTarget) {
+    target = newTarget;
+    return this;
   }
 
-  public abstract FilteringWriter<T> advance(T newTarget);
+  @Override
+  public T complete() {
+    return target;
+  }
 
   protected FilteringWriter<T> updated(Basket basket) {
-    return advance(basket.visit(Visitors.writingTo(getTarget())));
+    return advance(basket.visit(Visitors.writingTo(target)));
   }
 
 }

@@ -14,22 +14,22 @@ abstract class UnmatchedOuterRewriter<T extends BasketWriter<T>> extends OuterRe
 
   @Override
   public FilteringWriter<T> add(String value) {
-    return advance(getTarget().add(value));
+    return advance(target.add(value));
   }
 
   @Override
   public FilteringWriter<T> add(BigDecimal value) {
-    return advance(getTarget().add(value));
+    return advance(target.add(value));
   }
 
   @Override
   public FilteringWriter<T> add(boolean value) {
-    return advance(getTarget().add(value));
+    return advance(target.add(value));
   }
 
   @Override
   public FilteringWriter<T> addNull() {
-    return advance(getTarget().addNull());
+    return advance(target.addNull());
   }
 
 }

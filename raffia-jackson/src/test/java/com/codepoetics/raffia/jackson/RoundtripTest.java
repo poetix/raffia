@@ -1,11 +1,12 @@
 package com.codepoetics.raffia.jackson;
 
 import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.operations.Updater;
-import com.codepoetics.raffia.writers.BasketWeavingWriter;
 import com.codepoetics.raffia.mappers.Mapper;
-import com.codepoetics.raffia.streaming.FilteringWriter;
+import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.predicates.NumberPredicates;
+import com.codepoetics.raffia.streaming.FilteringWriter;
+import com.codepoetics.raffia.streaming.StreamingWriters;
+import com.codepoetics.raffia.writers.BasketWeavingWriter;
 import com.codepoetics.raffia.writers.PassThroughWriter;
 import org.junit.Test;
 
@@ -72,7 +73,7 @@ public class RoundtripTest {
 
     StringWriter stringWriter = new StringWriter();
 
-    FilteringWriter<JsonWriter> transformer = FilteringWriter.rewriting(
+    FilteringWriter<JsonWriter> transformer = StreamingWriters.rewriting(
         lens("$..book[?]", lens("@.author").matching("Nigel Rees")),
         JsonWriter.writingTo(stringWriter),
         uppercaseTitle
@@ -88,7 +89,7 @@ public class RoundtripTest {
 
   @Test
   public void projectAuthorsOfCheapBooks() throws IOException {
-    FilteringWriter<BasketWeavingWriter> filter = FilteringWriter.projecting(
+    FilteringWriter<BasketWeavingWriter> filter = StreamingWriters.projectingArray(
         lens("$.store.book[?].author", lens("@.price").matchingNumber(NumberPredicates.isLessThan("10")))
     );
 

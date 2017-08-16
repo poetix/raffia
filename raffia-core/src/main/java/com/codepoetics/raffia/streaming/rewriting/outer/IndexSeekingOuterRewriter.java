@@ -17,12 +17,12 @@ public final class IndexSeekingOuterRewriter<T extends BasketWriter<T>> extends 
 
   @Override
   public FilteringWriter<T> beginObject() {
-    return startObject(getTarget(), path, this, updater);
+    return startObject(target, path, this, updater);
   }
 
   @Override
   public FilteringWriter<T> beginArray() {
-    return startArray(getTarget(), path, this, updater);
+    return startArray(target, path, this, updater);
   }
 
 

@@ -4,57 +4,71 @@ import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.operations.Projector;
 import com.codepoetics.raffia.paths.Path;
 import com.codepoetics.raffia.streaming.FilteringWriter;
-import com.codepoetics.raffia.streaming.projecting.inner.InnerProjector;
-import com.codepoetics.raffia.streaming.projecting.outer.OuterProjector;
 import com.codepoetics.raffia.writers.BasketWriter;
 
-public abstract class StreamingProjector<T extends BasketWriter<T>> extends FilteringWriter<T> {
+public abstract class StreamingProjector<T extends BasketWriter<T>> implements FilteringWriter<T> {
 
   public static <T extends BasketWriter<T>> FilteringWriter<T> start(T target, Path path) {
-    return OuterProjector.create(target.beginArray(), path);
+    if (path.isEmpty()) {
+      return matched(target);
+    }
+
+    return new StructStartSeekingProjector<>(target, path);
   }
 
-  private Projector<Basket> makeConditionalProjector(Path path) {
+  private static <T extends BasketWriter<T>> FilteringWriter<T> matched(T target) {
+    return new MatchedProjector<>(target, null);
+  }
+
+  private static Projector<Basket> makeConditionalProjector(Path path) {
     return path.head().createItemProjector(path.tail());
   }
 
-  protected FilteringWriter<T> startArray(T target, Path path, StreamingProjector<T> parent) {
+  public static <T extends BasketWriter<T>> FilteringWriter<T> startArray(T target, Path path, FilteringWriter<T> parent) {
     if (path.isEmpty()) {
-      return InnerProjector.matchedArray(target, parent);
+      return new MatchedProjector<T>(target, parent);
     }
 
     if (path.head().isConditional()) {
-      return InnerProjector.predicateMatching(target, parent, makeConditionalProjector(path));
+      return new PredicateMatchingProjector<>(target, parent, makeConditionalProjector(path));
     }
 
-    return InnerProjector.arrayIndexSeeking(target, path, parent);
+    return IndexSeekingProjector.seekingArrayIndex(target, path, parent);
   }
 
-  protected FilteringWriter<T> startObject(T target, Path path, StreamingProjector<T> parent) {
+  public static <T extends BasketWriter<T>> FilteringWriter<T> startObject(T target, Path path, FilteringWriter<T> parent) {
     if (path.isEmpty()) {
-      return InnerProjector.matchedObject(target, parent);
+      return new MatchedProjector<>(target, parent);
     }
 
     if (path.head().isConditional()) {
-      return InnerProjector.predicateMatching(target, parent, makeConditionalProjector(path));
+      return new PredicateMatchingProjector<>(target, parent, makeConditionalProjector(path));
     }
 
-    return InnerProjector.objectKeySeeking(target, path, parent);
+    return IndexSeekingProjector.seekingObjectKey(target, path, parent);
   }
 
-  public StreamingProjector(T target) {
-    super(target);
+  protected T target;
+  protected FilteringWriter<T> parent;
+
+  public StreamingProjector(T target, FilteringWriter<T> parent) {
+    this.target = target;
+    this.parent = parent;
   }
 
   @Override
-  public T complete() {
-    return getTarget().end();
+  public FilteringWriter<T> advance(T newTarget) {
+    target = newTarget;
+    return this;
   }
 
-  public abstract FilteringWriter<T> advance(T newTarget);
+  public FilteringWriter<T> ignore() {
+    return advance(target);
+  }
 
-  protected FilteringWriter<T> ignore() {
-    return advance(getTarget());
+  @Override
+  public final T complete() {
+    return target;
   }
 
 }

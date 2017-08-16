@@ -16,12 +16,12 @@ final class MatchedOuterRewriter<T extends BasketWriter<T>> extends OuterRewrite
 
   @Override
   public FilteringWriter<T> beginObject() {
-    return InnerRewriter.matchedObject(getTarget(), this, updater);
+    return InnerRewriter.matchedObject(target, this, updater);
   }
 
   @Override
   public FilteringWriter<T> beginArray() {
-    return InnerRewriter.matchedArray(getTarget(), this, updater);
+    return InnerRewriter.matchedArray(target, this, updater);
   }
 
   @Override

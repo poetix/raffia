@@ -40,11 +40,6 @@ public abstract class OuterRewriter<T extends BasketWriter<T>> extends Streaming
   }
 
   @Override
-  public FilteringWriter<T> advance(T newTarget) {
-    return new EndOfLineRewriter<>(newTarget);
-  }
-
-  @Override
   public FilteringWriter<T> key(String key) {
     throw new IllegalStateException("key() called when not writing object");
   }

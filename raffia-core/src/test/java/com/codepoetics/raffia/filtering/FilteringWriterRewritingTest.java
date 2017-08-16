@@ -3,11 +3,12 @@ package com.codepoetics.raffia.filtering;
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.mappers.Mapper;
 import com.codepoetics.raffia.operations.BasketPredicate;
+import com.codepoetics.raffia.operations.Setters;
 import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.operations.ValuePredicate;
 import com.codepoetics.raffia.predicates.BasketPredicates;
-import com.codepoetics.raffia.operations.Setters;
 import com.codepoetics.raffia.streaming.FilteringWriter;
+import com.codepoetics.raffia.streaming.StreamingWriters;
 import com.codepoetics.raffia.writers.BasketWeavingWriter;
 import com.codepoetics.raffia.writers.Writers;
 import org.junit.Test;
@@ -21,7 +22,7 @@ public class FilteringWriterRewritingTest {
 
   @Test
   public void rewriteSingleValue() {
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.rewriting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.rewriting(
         lens("$"),
         Writers.weaving(),
         Setters.toString("Rewritten"));
@@ -33,7 +34,7 @@ public class FilteringWriterRewritingTest {
 
   @Test
   public void rewriteMatchedKey() {
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.rewriting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.rewriting(
         lens("$.foo"),
         Writers.weaving(),
         Setters.toString("Rewritten"));
@@ -50,7 +51,7 @@ public class FilteringWriterRewritingTest {
 
   @Test
   public void rewriteAllKeys() {
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.rewriting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.rewriting(
         lens("$.*"),
         Writers.weaving(),
         Setters.toString("Rewritten"));
@@ -67,7 +68,7 @@ public class FilteringWriterRewritingTest {
 
   @Test
   public void rewriteAllNestedKeys() {
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.rewriting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.rewriting(
         lens("$.*.*"),
         Writers.weaving(),
         Setters.toString("Rewritten"));
@@ -86,7 +87,7 @@ public class FilteringWriterRewritingTest {
 
   @Test
   public void rewriteSecondItem() {
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.rewriting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.rewriting(
         lens("$[1]"),
         Writers.weaving(),
         Setters.toString("Rewritten"));
@@ -103,7 +104,7 @@ public class FilteringWriterRewritingTest {
 
   @Test
   public void rewriteAllItems() {
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.rewriting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.rewriting(
         lens("$[*]"),
         Writers.weaving(),
         Setters.toString("Rewritten"));
@@ -127,7 +128,7 @@ public class FilteringWriterRewritingTest {
       }
     });
 
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.rewriting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.rewriting(
         lens("$[?]", shouldBeRewritten),
         Writers.weaving(),
         Setters.toString("Rewritten"));
@@ -146,7 +147,7 @@ public class FilteringWriterRewritingTest {
   public void rewriteDeepScannedStrings() {
     BasketPredicate isFlaggedForRewrite = BasketPredicates.hasKey("rewrite", BasketPredicates.isTrue);
 
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.rewriting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.rewriting(
         lens("$..nested.value"),
         Writers.weaving(),
         Setters.toString("Rewritten")
@@ -183,7 +184,7 @@ public class FilteringWriterRewritingTest {
   public void rewriteDeepScannedMatchingStrings() {
     BasketPredicate isFlaggedForRewrite = BasketPredicates.hasKey("rewrite", BasketPredicates.isTrue);
 
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.rewriting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.rewriting(
         lens("$..nested[?].value", isFlaggedForRewrite),
         Writers.weaving(),
         Setters.toString("Rewritten")
@@ -227,7 +228,7 @@ public class FilteringWriterRewritingTest {
   public void rewriteMatchingObjects() {
     BasketPredicate isFlaggedForRewrite = lens("@.rewrite").isTrue();
 
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.rewriting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.rewriting(
         lens("$[?]..value", isFlaggedForRewrite),
         Writers.weaving(),
         Setters.toString("Rewritten"));
@@ -262,7 +263,7 @@ public class FilteringWriterRewritingTest {
       }
     });
 
-    FilteringWriter<BasketWeavingWriter> writer = FilteringWriter.rewriting(
+    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.rewriting(
         lens("$..links[*].url"),
         Writers.weaving(),
         urlRewriter

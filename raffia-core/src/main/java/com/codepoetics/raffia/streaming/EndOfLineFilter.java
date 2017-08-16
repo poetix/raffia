@@ -1,22 +1,10 @@
-package com.codepoetics.raffia.streaming.projecting.outer;
+package com.codepoetics.raffia.streaming;
 
-import com.codepoetics.raffia.streaming.FilteringWriter;
-import com.codepoetics.raffia.streaming.projecting.StreamingProjector;
-import com.codepoetics.raffia.streaming.rewriting.StreamingRewriter;
 import com.codepoetics.raffia.writers.BasketWriter;
 
 import java.math.BigDecimal;
 
-public final class EndOfLineProjector<T extends BasketWriter<T>> extends StreamingProjector<T> {
-
-  EndOfLineProjector(T target) {
-    super(target);
-  }
-
-  @Override
-  public FilteringWriter<T> advance(T newTarget) {
-    throw new IllegalStateException("advance() called after basket complete");
-  }
+public abstract class EndOfLineFilter<T extends BasketWriter<T>> implements FilteringWriter<T> {
 
   @Override
   public FilteringWriter<T> beginObject() {
@@ -56,5 +44,10 @@ public final class EndOfLineProjector<T extends BasketWriter<T>> extends Streami
   @Override
   public FilteringWriter<T> addNull() {
     throw new IllegalStateException("addNull() called after basket complete");
+  }
+
+  @Override
+  public FilteringWriter<T> advance(T newTarget) {
+    throw new IllegalStateException("advance() called after basket complete");
   }
 }

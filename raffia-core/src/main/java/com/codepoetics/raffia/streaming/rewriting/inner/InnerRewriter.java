@@ -37,12 +37,12 @@ public abstract class InnerRewriter<T extends BasketWriter<T>> extends Streaming
 
   @Override
   public FilteringWriter<T> end() {
-    return parent.advance(getTarget().end());
+    return parent.advance(target.end());
   }
 
   @Override
   public FilteringWriter<T> key(String key) {
-    return advance(getTarget().key(key));
+    return advance(target.key(key));
   }
 
 }
