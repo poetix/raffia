@@ -9,11 +9,11 @@ import com.codepoetics.raffia.writers.BasketWriter;
 
 import java.math.BigDecimal;
 
-public final class PredicateMatchingProjector<T extends BasketWriter<T>> extends StreamingProjector<T> {
+final class PredicateMatchingProjector<T extends BasketWriter<T>> extends StreamingProjector<T> {
 
   private final Projector<Basket> projector;
 
-  public PredicateMatchingProjector(T target, FilteringWriter<T> parent, Projector<Basket> projector) {
+  PredicateMatchingProjector(T target, FilteringWriter<T> parent, Projector<Basket> projector) {
     super(target, parent);
     this.projector =  projector;
   }

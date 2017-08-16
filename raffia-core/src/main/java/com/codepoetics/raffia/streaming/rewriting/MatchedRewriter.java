@@ -1,27 +1,41 @@
-package com.codepoetics.raffia.streaming.rewriting.outer;
+package com.codepoetics.raffia.streaming.rewriting;
 
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.streaming.FilteringWriter;
-import com.codepoetics.raffia.streaming.rewriting.inner.InnerRewriter;
 import com.codepoetics.raffia.writers.BasketWriter;
 
 import java.math.BigDecimal;
 
-final class MatchedOuterRewriter<T extends BasketWriter<T>> extends OuterRewriter<T> {
+final class MatchedRewriter<T extends BasketWriter<T>> extends StreamingRewriter<T> {
 
-  MatchedOuterRewriter(T target, Updater updater) {
-    super(target, updater);
+  MatchedRewriter(T target, FilteringWriter<T> parent, Updater updater) {
+    super(target, parent, updater);
   }
 
   @Override
   public FilteringWriter<T> beginObject() {
-    return InnerRewriter.matchedObject(target, this, updater);
+    return WeavingRewriter.weavingObject(target.beginObject(), this, updater);
   }
 
   @Override
   public FilteringWriter<T> beginArray() {
-    return InnerRewriter.matchedArray(target, this, updater);
+    return WeavingRewriter.weavingObject(target.beginArray(), this, updater);
+  }
+
+  @Override
+  public FilteringWriter<T> end() {
+    if (parent == null) {
+      throw new IllegalStateException("end() called when not writing object or array");
+    }
+
+    return parent.advance(target.end());
+  }
+
+  @Override
+  public FilteringWriter<T> key(String key) {
+    target = target.key(key);
+    return this;
   }
 
   @Override

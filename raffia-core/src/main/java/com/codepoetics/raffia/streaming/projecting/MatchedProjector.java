@@ -5,11 +5,11 @@ import com.codepoetics.raffia.writers.BasketWriter;
 
 import java.math.BigDecimal;
 
-public final class MatchedProjector<T extends BasketWriter<T>> extends StreamingProjector<T> {
+final class MatchedProjector<T extends BasketWriter<T>> extends StreamingProjector<T> {
 
   private int depth = 0;
 
-  public MatchedProjector(T target, FilteringWriter<T> parent) {
+  MatchedProjector(T target, FilteringWriter<T> parent) {
     super(target, parent);
     this.parent = parent;
   }

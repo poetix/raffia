@@ -1,27 +1,27 @@
 package com.codepoetics.raffia.jackson;
 
+import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.lenses.Lens;
-import com.codepoetics.raffia.mappers.Mapper;
 import com.codepoetics.raffia.operations.Updater;
-import com.codepoetics.raffia.operations.Updaters;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.streaming.StreamingWriters;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.databene.contiperf.PerfTest;
 import org.databene.contiperf.junit.ContiPerfRule;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 
 import static com.codepoetics.raffia.lenses.Lens.lens;
+import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 
 @Ignore
@@ -31,110 +31,192 @@ public class PerformanceTest {
 
   private static final JsonFactory FACTORY = MAPPER.getFactory();
 
-  private static final Lens VALUE_LENS = lens("$[*].value");
+  private static final Lens VALUE_LENS = lens(
+      "$.components[*].parts[*].qty");
 
-  private static final Updater TO_UPPERCASE = Updaters.ofString(new Mapper<String, String>() {
+  private static final Basket ONE = Basket.ofNumber(BigDecimal.ONE);
+
+  private static final Updater REPLACE_NULL_WITH_ZERO = new Updater() {
     @Override
-    public String map(String input) {
-      return input.toUpperCase();
+    public Basket update(Basket basket) {
+      return basket.isNull() ? ONE : basket;
     }
-  });
-
-  private static final Lens READ_IS_TRUE = lens("$[?]", lens("@.read").isTrue());
-
-  private static final TypeReference<List<Item>> LIST_OF_ITEMS = new TypeReference<List<Item>>() {
   };
 
   @Rule
   public ContiPerfRule i = new ContiPerfRule();
 
+  private static final Random random = new Random();
+  private static String document;
 
-  public static final class Item {
-    @JsonProperty
-    private boolean read;
+  @BeforeClass
+  public static void createDocument() throws JsonProcessingException {
+    document = jacksonWriteModel();
+    System.out.println(document);
+  }
 
-    @JsonProperty
-    private String value;
+  private static String jacksonWriteModel() throws JsonProcessingException {
+    return MAPPER.writeValueAsString(jacksonCreateModel());
+  }
 
-    public boolean isRead() {
-      return read;
+  private static Model jacksonCreateModel() {
+    Model model = new Model();
+    model.setId(UUID.randomUUID().toString());
+    model.setComponents(new HashMap<String, Component>());
+
+    for (int i = 0; i < 10; i++) {
+      model.components.put(UUID.randomUUID().toString(), jacksonCreateComponent());
+      model.components.put(UUID.randomUUID().toString(), jacksonCreateComponent());
     }
 
-    public void setRead(boolean read) {
-      this.read = read;
+    return model;
+  }
+
+  private static Component jacksonCreateComponent() {
+    Component component = new Component();
+    component.setId(UUID.randomUUID().toString());
+
+    List<Part> componentParts = new ArrayList<>();
+    for (int i = 0; i < 100; i++) {
+      componentParts.add(jacksonCreatePart());
+    }
+    component.setParts(componentParts);
+    return component;
+  }
+
+  private static Part jacksonCreatePart() {
+    Part part = new Part();
+    part.setId(UUID.randomUUID().toString());
+    int qty = random.nextInt(10);
+    part.setQty(qty == 0 ? null : qty);
+    return part;
+  }
+
+  public static final class Part {
+    private String id;
+    private Integer qty;
+
+    public String getId() {
+      return id;
     }
 
-    public String getValue() {
-      return value;
+    public void setId(String id) {
+      this.id = id;
     }
 
-    public void setValue(String value) {
-      this.value = value;
+    public Integer getQty() {
+      return qty;
+    }
+
+    public void setQty(Integer qty) {
+      this.qty = qty;
+    }
+  }
+
+  public static final class Component {
+    private String id;
+    private List<Part> parts;
+
+    public String getId() {
+      return id;
+    }
+
+    public void setId(String id) {
+      this.id = id;
+    }
+
+    public List<Part> getParts() {
+      return parts;
+    }
+
+    public void setParts(List<Part> parts) {
+      this.parts = parts;
+    }
+  }
+
+  public static final class Model {
+
+    private String id;
+    private String description;
+    private Map<String, Component> components;
+
+    public String getId() {
+      return id;
+    }
+
+    public void setId(String id) {
+      this.id = id;
+    }
+
+    public String getDescription() {
+      return description;
+    }
+
+    public void setDescription(String description) {
+      this.description = description;
+    }
+
+    public Map<String, Component> getComponents() {
+      return components;
+    }
+
+    public void setComponents(Map<String, Component> components) {
+      this.components = components;
     }
   }
 
   @Test
   public void resultsAreTheSame() throws IOException {
     assertEquals(jacksonMap(), raffiaMap());
+
+    System.out.println(raffiaMap());
   }
 
   @PerfTest(
-      invocations = 1000000,
+      invocations = 10000,
       threads = 8,
-      rampUp = 10000
+      rampUp = 1000
   )
   @Test
   public void jacksonMapAndWrite() throws IOException {
-    jacksonMap();
+    assertFalse(jacksonMap().isEmpty());
   }
 
   private String jacksonMap() throws IOException {
-    StringWriter stringWriter = new StringWriter();
-    JsonGenerator generator = FACTORY.createGenerator(stringWriter);
+    Model model = MAPPER.readValue(document, Model.class);
 
-    generator.writeStartArray();
-    List<Item> items = MAPPER.readValue(getClass().getResourceAsStream("/items.json"), LIST_OF_ITEMS);
-
-    for (Item item : items) {
-      if (item.isRead()) {
-        item.setValue(item.getValue().toUpperCase());
-        MAPPER.writeValue(generator, item);
+    for (Component component : model.getComponents().values()) {
+      for (Part part : component.getParts()) {
+        if (part.getQty() == null) {
+          part.setQty(1);
+        }
       }
     }
 
-    generator.writeEndArray();
-    generator.flush();
-
-    return stringWriter.toString();
+    return MAPPER.writeValueAsString(model);
   }
 
   @PerfTest(
-      invocations = 1000000,
+      invocations = 10000,
       threads = 8,
-      rampUp = 10000
+      rampUp = 1000
   )
   @Test
   public void raffiaMapAndWrite() throws IOException {
-    raffiaMap();
+    assertFalse(raffiaMap().isEmpty());
   }
 
   private String raffiaMap() throws IOException {
     StringWriter stringWriter = new StringWriter();
     JsonWriter jsonWriter = JsonWriter.writingTo(FACTORY, stringWriter);
 
-    FilteringWriter<JsonWriter> rewritingWriter = StreamingWriters.rewriting(
+    FilteringWriter<JsonWriter> nullReplacer = StreamingWriters.rewriting(
         VALUE_LENS,
         jsonWriter,
-        TO_UPPERCASE
+        REPLACE_NULL_WITH_ZERO
     );
 
-    FilteringWriter<FilteringWriter<JsonWriter>> filteringWriter = StreamingWriters.filteringArray(
-        READ_IS_TRUE,
-        rewritingWriter);
-
-    JsonReader.readWith(getClass().getResourceAsStream("/items.json"), filteringWriter)
-        .complete()
-        .complete();
+    JsonReader.readWith(document, nullReplacer).complete();
 
     return stringWriter.toString();
   }

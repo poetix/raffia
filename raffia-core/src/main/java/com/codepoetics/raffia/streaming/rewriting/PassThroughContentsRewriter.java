@@ -1,23 +1,16 @@
-package com.codepoetics.raffia.streaming.rewriting.inner;
+package com.codepoetics.raffia.streaming.rewriting;
 
 import com.codepoetics.raffia.streaming.FilteringWriter;
-import com.codepoetics.raffia.streaming.rewriting.StreamingRewriter;
 import com.codepoetics.raffia.writers.BasketWriter;
 
 import java.math.BigDecimal;
 
-final class PassThroughContentsRewriter<T extends BasketWriter<T>> extends InnerRewriter<T> {
+final class PassThroughContentsRewriter<T extends BasketWriter<T>> extends StreamingRewriter<T> {
 
   private int depth = 0;
 
   PassThroughContentsRewriter(T target, StreamingRewriter<T> parent) {
-    super(target, parent);
-  }
-
-  private FilteringWriter<T> enter(T newTarget) {
-    target = newTarget;
-    depth ++;
-    return this;
+    super(target, parent, null);
   }
 
   @Override
@@ -28,12 +21,16 @@ final class PassThroughContentsRewriter<T extends BasketWriter<T>> extends Inner
 
   @Override
   public FilteringWriter<T> beginObject() {
-    return enter(target.beginObject());
+    target = target.beginObject();
+    depth ++;
+    return this;
   }
 
   @Override
   public FilteringWriter<T> beginArray() {
-    return enter(target.beginArray());
+    target = target.beginArray();
+    depth ++;
+    return this;
   }
 
   @Override

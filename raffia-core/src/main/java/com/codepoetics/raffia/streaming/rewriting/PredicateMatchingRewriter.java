@@ -1,30 +1,31 @@
-package com.codepoetics.raffia.streaming.rewriting.inner;
+package com.codepoetics.raffia.streaming.rewriting;
 
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.operations.Updater;
 import com.codepoetics.raffia.streaming.FilteringWriter;
-import com.codepoetics.raffia.streaming.rewriting.StreamingRewriter;
 import com.codepoetics.raffia.writers.BasketWriter;
 
 import java.math.BigDecimal;
 
-final class PredicateMatchingInnerRewriter<T extends BasketWriter<T>> extends InnerRewriter<T> {
+final class PredicateMatchingRewriter<T extends BasketWriter<T>> extends StreamingRewriter<T> {
 
-  private final Updater itemUpdater;
-
-  PredicateMatchingInnerRewriter(T target, StreamingRewriter<T> parent, Updater itemUpdater) {
-    super(target, parent);
-    this.itemUpdater = itemUpdater;
+  PredicateMatchingRewriter(T target, FilteringWriter<T> parent, Updater itemUpdater) {
+    super(target, parent, itemUpdater);
   }
 
   @Override
   public FilteringWriter<T> beginObject() {
-    return InnerRewriter.matchedObject(target, this, itemUpdater);
+    return WeavingRewriter.weavingObject(target, this, updater);
   }
 
   @Override
   public FilteringWriter<T> beginArray() {
-    return InnerRewriter.matchedArray(target, this, itemUpdater);
+    return WeavingRewriter.weavingArray(target, this, updater);
+  }
+
+  @Override
+  public FilteringWriter<T> end() {
+    return parent.advance(target.end());
   }
 
   @Override
@@ -34,7 +35,7 @@ final class PredicateMatchingInnerRewriter<T extends BasketWriter<T>> extends In
 
   @Override
   public FilteringWriter<T> add(String value) {
-    return updated(itemUpdater.update(Basket.ofString(value)));
+    return updated(Basket.ofString(value));
   }
 
   @Override

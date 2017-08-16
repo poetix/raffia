@@ -9,19 +9,19 @@ import com.codepoetics.raffia.writers.BasketWriter;
 
 import java.math.BigDecimal;
 
-public abstract class IndexSeekingProjector<T extends BasketWriter<T>> extends StreamingProjector<T> {
+abstract class IndexSeekingProjector<T extends BasketWriter<T>> extends StreamingProjector<T> {
 
-  public static <T extends BasketWriter<T>> FilteringWriter<T> seekingArrayIndex(T target, Path path, FilteringWriter<T> parent) {
+  static <T extends BasketWriter<T>> FilteringWriter<T> seekingArrayIndex(T target, Path path, FilteringWriter<T> parent) {
     return new ArrayIndexSeekingInnerProjector<>(target, path, parent, 0);
   }
 
-  public static <T extends BasketWriter<T>> FilteringWriter<T> seekingObjectKey(T target, Path path, FilteringWriter<T> parent) {
+  static <T extends BasketWriter<T>> FilteringWriter<T> seekingObjectKey(T target, Path path, FilteringWriter<T> parent) {
     return new ObjectKeySeekingInnerProjector<>(target, path, parent, null);
   }
 
   protected final Path path;
 
-  protected IndexSeekingProjector(T target, Path path, FilteringWriter<T> parent) {
+  IndexSeekingProjector(T target, Path path, FilteringWriter<T> parent) {
     super(target, parent);
     this.parent = parent;
     this.path = path;

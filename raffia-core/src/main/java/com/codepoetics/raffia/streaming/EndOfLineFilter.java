@@ -4,7 +4,13 @@ import com.codepoetics.raffia.writers.BasketWriter;
 
 import java.math.BigDecimal;
 
-public abstract class EndOfLineFilter<T extends BasketWriter<T>> implements FilteringWriter<T> {
+public final class EndOfLineFilter<T extends BasketWriter<T>> implements FilteringWriter<T> {
+
+  private final T target;
+
+  public EndOfLineFilter(T target) {
+    this.target = target;
+  }
 
   @Override
   public FilteringWriter<T> beginObject() {
@@ -49,5 +55,10 @@ public abstract class EndOfLineFilter<T extends BasketWriter<T>> implements Filt
   @Override
   public FilteringWriter<T> advance(T newTarget) {
     throw new IllegalStateException("advance() called after basket complete");
+  }
+
+  @Override
+  public T complete() {
+    return target;
   }
 }

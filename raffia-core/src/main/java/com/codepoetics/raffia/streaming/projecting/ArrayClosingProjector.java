@@ -5,7 +5,7 @@ import com.codepoetics.raffia.writers.BasketWriter;
 
 import java.math.BigDecimal;
 
-public final class ArrayClosingProjector<T extends BasketWriter<T>> implements FilteringWriter<T> {
+final class ArrayClosingProjector<T extends BasketWriter<T>> implements FilteringWriter<T> {
 
   public static <T extends BasketWriter<T>> FilteringWriter<T> closing(FilteringWriter<T> inner) {
     return new ArrayClosingProjector<>(inner);

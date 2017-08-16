@@ -8,6 +8,10 @@ import com.codepoetics.raffia.writers.BasketWriter;
 
 public abstract class StreamingProjector<T extends BasketWriter<T>> implements FilteringWriter<T> {
 
+  public static <T extends BasketWriter<T>> FilteringWriter<T> startArray(T target, Path path) {
+    return ArrayClosingProjector.closing(start(target.beginArray(), path));
+  }
+
   public static <T extends BasketWriter<T>> FilteringWriter<T> start(T target, Path path) {
     if (path.isEmpty()) {
       return matched(target);
@@ -24,7 +28,7 @@ public abstract class StreamingProjector<T extends BasketWriter<T>> implements F
     return path.head().createItemProjector(path.tail());
   }
 
-  public static <T extends BasketWriter<T>> FilteringWriter<T> startArray(T target, Path path, FilteringWriter<T> parent) {
+  static <T extends BasketWriter<T>> FilteringWriter<T> startArray(T target, Path path, FilteringWriter<T> parent) {
     if (path.isEmpty()) {
       return new MatchedProjector<T>(target, parent);
     }
@@ -36,7 +40,7 @@ public abstract class StreamingProjector<T extends BasketWriter<T>> implements F
     return IndexSeekingProjector.seekingArrayIndex(target, path, parent);
   }
 
-  public static <T extends BasketWriter<T>> FilteringWriter<T> startObject(T target, Path path, FilteringWriter<T> parent) {
+  static <T extends BasketWriter<T>> FilteringWriter<T> startObject(T target, Path path, FilteringWriter<T> parent) {
     if (path.isEmpty()) {
       return new MatchedProjector<>(target, parent);
     }
@@ -51,7 +55,7 @@ public abstract class StreamingProjector<T extends BasketWriter<T>> implements F
   protected T target;
   protected FilteringWriter<T> parent;
 
-  public StreamingProjector(T target, FilteringWriter<T> parent) {
+  StreamingProjector(T target, FilteringWriter<T> parent) {
     this.target = target;
     this.parent = parent;
   }
@@ -62,7 +66,7 @@ public abstract class StreamingProjector<T extends BasketWriter<T>> implements F
     return this;
   }
 
-  public FilteringWriter<T> ignore() {
+  FilteringWriter<T> ignore() {
     return advance(target);
   }
 

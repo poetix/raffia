@@ -1,4 +1,4 @@
-package com.codepoetics.raffia.streaming.rewriting.inner;
+package com.codepoetics.raffia.streaming.rewriting;
 
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.operations.Updater;
@@ -6,29 +6,26 @@ import com.codepoetics.raffia.paths.Path;
 import com.codepoetics.raffia.paths.PathSegment;
 import com.codepoetics.raffia.paths.PathSegmentMatchResult;
 import com.codepoetics.raffia.streaming.FilteringWriter;
-import com.codepoetics.raffia.streaming.rewriting.StreamingRewriter;
 import com.codepoetics.raffia.visitors.Visitors;
 import com.codepoetics.raffia.writers.BasketWriter;
 
 import java.math.BigDecimal;
 
-abstract class IndexSeekingInnerRewriter<T extends BasketWriter<T>> extends InnerRewriter<T> {
+abstract class IndexSeekingRewriter<T extends BasketWriter<T>> extends StreamingRewriter<T> {
 
-  static <T extends BasketWriter<T>> StreamingRewriter<T> seekingArrayIndex(T target, Path path, StreamingRewriter<T> parent, Updater updater) {
-    return new ArrayIndexSeekingInnerRewriter<>(target, path, parent, updater, 0);
+  static <T extends BasketWriter<T>> StreamingRewriter<T> seekingArrayIndex(T target, Path path, FilteringWriter<T> parent, Updater updater) {
+    return new ArrayIndexSeekingRewriter<>(target, path, parent, updater, 0);
   }
 
-  static <T extends BasketWriter<T>> StreamingRewriter<T> seekingObjectKey(T target, Path path, StreamingRewriter<T> parent, Updater updater) {
-    return new ObjectKeySeekingInnerRewriter<>(target, path, parent, updater, null);
+  static <T extends BasketWriter<T>> StreamingRewriter<T> seekingObjectKey(T target, Path path, FilteringWriter<T> parent, Updater updater) {
+    return new ObjectKeySeekingRewriter<>(target, path, parent, updater, null);
   }
 
   protected final Path path;
-  protected final Updater updater;
 
-  protected IndexSeekingInnerRewriter(T target, Path path, StreamingRewriter<T> parent, Updater updater) {
-    super(target, parent);
+  IndexSeekingRewriter(T target, Path path, FilteringWriter<T> parent, Updater updater) {
+    super(target, parent, updater);
     this.path = path;
-    this.updater = updater;
   }
 
   private FilteringWriter<T> passThrough(T newTarget) {
@@ -61,6 +58,11 @@ abstract class IndexSeekingInnerRewriter<T extends BasketWriter<T>> extends Inne
       default:
         throw new IllegalStateException();
     }
+  }
+
+  @Override
+  public FilteringWriter<T> end() {
+    return parent.advance(target.end());
   }
 
   private PathSegmentMatchResult indexMatches() {
@@ -110,11 +112,11 @@ abstract class IndexSeekingInnerRewriter<T extends BasketWriter<T>> extends Inne
         : advance(target.addNull());
   }
 
-  private static final class ObjectKeySeekingInnerRewriter<T extends BasketWriter<T>> extends IndexSeekingInnerRewriter<T> {
+  private static final class ObjectKeySeekingRewriter<T extends BasketWriter<T>> extends IndexSeekingRewriter<T> {
 
     private String key;
 
-    ObjectKeySeekingInnerRewriter(T target, Path path, StreamingRewriter<T> parent, Updater updater, String key) {
+    ObjectKeySeekingRewriter(T target, Path path, FilteringWriter<T> parent, Updater updater, String key) {
       super(target, path, parent, updater);
       this.key = key;
     }
@@ -143,11 +145,11 @@ abstract class IndexSeekingInnerRewriter<T extends BasketWriter<T>> extends Inne
 
   }
 
-  private static final class ArrayIndexSeekingInnerRewriter<T extends BasketWriter<T>> extends IndexSeekingInnerRewriter<T> {
+  private static final class ArrayIndexSeekingRewriter<T extends BasketWriter<T>> extends IndexSeekingRewriter<T> {
 
     private int index;
 
-    ArrayIndexSeekingInnerRewriter(T target, Path path, StreamingRewriter<T> parent, Updater updater, int index) {
+    ArrayIndexSeekingRewriter(T target, Path path, FilteringWriter<T> parent, Updater updater, int index) {
       super(target, path, parent, updater);
       this.index = index;
     }

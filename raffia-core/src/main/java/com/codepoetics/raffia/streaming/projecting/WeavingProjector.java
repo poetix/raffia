@@ -12,7 +12,6 @@ import com.codepoetics.raffia.writers.Writers;
 
 class WeavingProjector<T extends BasketWriter<T>> extends WeavingFilter<T> {
 
-
   static <T extends BasketWriter<T>> WeavingFilter<T> weavingObject(T target, FilteringWriter<T> parent, Projector<Basket> projector) {
     return weaving(target, parent, projector, Writers.weaving().beginObject());
   }
