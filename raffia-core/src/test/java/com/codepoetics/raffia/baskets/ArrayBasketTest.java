@@ -1,6 +1,5 @@
 package com.codepoetics.raffia.baskets;
 
-import com.codepoetics.raffia.visitors.Visitors;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -45,17 +44,6 @@ public class ArrayBasketTest {
     assertEquals(contents, unit.asArray());
 
     assertEquals(contents, unit.<ArrayContents>getValue());
-  }
-
-  @Test
-  public void reportsToVisitorAsObject() {
-    Visitor<String> visitor = mock(Visitor.class);
-
-    when(visitor.visitArray(any(ArrayContents.class))).thenReturn("result");
-
-    assertEquals("result", unit.visit(visitor));
-
-    verify(visitor).visitArray(contents);
   }
 
   @Test
@@ -106,8 +94,8 @@ public class ArrayBasketTest {
 
   @Test
   public void equalityAndHashcode() {
-    assertEquals(unit, unit.visit(Visitors.copy));
-    assertEquals(unit.hashCode(), unit.visit(Visitors.copy).hashCode());
+    assertEquals(unit, Basket.ofArray(contents));
+    assertEquals(unit.hashCode(), Basket.ofArray(contents).hashCode());
   }
 
   @Test

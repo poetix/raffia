@@ -2,10 +2,10 @@ package com.codepoetics.raffia;
 
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.baskets.PropertySet;
-import com.codepoetics.raffia.mappers.Mapper;
-import com.codepoetics.raffia.operations.BasketPredicate;
+import com.codepoetics.raffia.java.api.Mapper;
+import com.codepoetics.raffia.java.api.BasketPredicate;
 import com.codepoetics.raffia.operations.Setters;
-import com.codepoetics.raffia.operations.Updater;
+import com.codepoetics.raffia.java.api.Updater;
 import org.junit.Test;
 
 import static com.codepoetics.raffia.StoreExample.store;
@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.*;
 
 public class Updating {
 
-  private static final Updater capitaliseString = com.codepoetics.raffia.operations.Updaters.ofString(new Mapper<String, String>() {
+  private static final Updater capitaliseString = com.codepoetics.raffia.operations.Updaters.INSTANCE.ofString(new Mapper<String, String>() {
     @Override
     public String map(String input) {
       return input.toUpperCase();
@@ -30,7 +30,7 @@ public class Updating {
     }
   };
 
-  private static final Updater addDescription = com.codepoetics.raffia.operations.Updaters.ofObject(new Mapper<PropertySet, PropertySet>() {
+  private static final Updater addDescription = com.codepoetics.raffia.operations.Updaters.INSTANCE.ofObject(new Mapper<PropertySet, PropertySet>() {
     @Override
     public PropertySet map(PropertySet input) {
       return input.with("description",
@@ -76,7 +76,7 @@ public class Updating {
     BasketPredicate authorIsNigel = lens("$..author").matching("Nigel Rees");
 
     Basket updated = lens("$..book[?].title", authorIsNigel)
-        .update(Setters.toString("Hallucinogenic Adventures vol. 13"), store);
+        .update(Setters.INSTANCE.toString("Hallucinogenic Adventures vol. 13"), store);
 
     assertThat(
         lens("$..book").toMatching(authorIsNigel).to("title").getOne(updated).asString(),

@@ -1,9 +1,9 @@
 package com.codepoetics.raffia.projecting;
 
 import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.mappers.Mapper;
-import com.codepoetics.raffia.operations.BasketPredicate;
-import com.codepoetics.raffia.operations.Projector;
+import com.codepoetics.raffia.java.api.Mapper;
+import com.codepoetics.raffia.java.api.BasketPredicate;
+import com.codepoetics.raffia.java.api.Projector;
 import com.codepoetics.raffia.operations.Projectors;
 import org.junit.Test;
 
@@ -182,7 +182,7 @@ public class JsonPathExamples {
     Projector<Basket> arbitrarilyCheapBooks = Projectors.feedback(
         lens("$..expensive"), priceIsLessThan);
 
-    assertThat(arbitrarilyCheapBooks.project(store).toList(), contains(REES, MELVILLE));
+    assertThat(arbitrarilyCheapBooks.project(store).asList(), contains(REES, MELVILLE));
   }
 
 }

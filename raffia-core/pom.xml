@@ -11,6 +11,10 @@
 
     <artifactId>raffia-core</artifactId>
 
+    <properties>
+        <kotlin.version>1.1.4-2</kotlin.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.pcollections</groupId>
@@ -36,6 +40,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 
 </project>

@@ -1,12 +1,10 @@
 package com.codepoetics.raffia.baskets;
 
-import com.codepoetics.raffia.visitors.Visitors;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
 
 public class NullBasketTest {
 
@@ -25,25 +23,14 @@ public class NullBasketTest {
   }
 
   @Test
-  public void reportsToVisitorAsNull() {
-    Visitor<String> visitor = mock(Visitor.class);
-
-    when(visitor.visitNull()).thenReturn("result");
-
-    assertEquals("result", unit.visit(visitor));
-
-    verify(visitor).visitNull();
-  }
-
-  @Test
   public void emptiness() {
     assertTrue(unit.isEmpty());
   }
 
   @Test
   public void equalityAndHashcode() {
-    assertEquals(unit, unit.visit(Visitors.copy));
-    assertEquals(unit.hashCode(), unit.visit(Visitors.copy).hashCode());
+    assertEquals(unit, Basket.ofNull());
+    assertEquals(unit.hashCode(), Basket.ofNull().hashCode());
   }
 
   @Test

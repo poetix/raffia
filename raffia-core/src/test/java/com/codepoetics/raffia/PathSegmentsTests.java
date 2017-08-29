@@ -10,22 +10,22 @@ public class PathSegmentsTests {
 
   @Test
   public void singleKeyRepresentation() {
-    assertThat(PathSegments.ofObjectKey("foo").representation(), equalTo(".foo"));
+    assertThat(PathSegments.INSTANCE.ofObjectKey("foo").representation(), equalTo(".foo"));
   }
 
   @Test
   public void multiKeyRepresentation() {
-    assertThat(PathSegments.ofObjectKeys("foo", "bar").representation(), equalTo("['foo', 'bar']"));
+    assertThat(PathSegments.INSTANCE.ofObjectKeys("foo", "bar").representation(), equalTo("['foo', 'bar']"));
   }
 
   @Test
   public void singleIndexRepresentation() {
-    assertThat(PathSegments.ofArrayIndex(1).representation(), equalTo("[1]"));
+    assertThat(PathSegments.INSTANCE.ofArrayIndex(1).representation(), equalTo("[1]"));
   }
 
   @Test
   public void multiIndexRepresentation() {
-    assertThat(PathSegments.ofArrayIndices(1, 2).representation(), equalTo("[1, 2]"));
+    assertThat(PathSegments.INSTANCE.ofArrayIndices(1, 2).representation(), equalTo("[1, 2]"));
   }
 
 }

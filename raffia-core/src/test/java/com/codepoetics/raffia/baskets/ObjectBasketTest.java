@@ -1,7 +1,6 @@
 package com.codepoetics.raffia.baskets;
 
-import com.codepoetics.raffia.mappers.Mapper;
-import com.codepoetics.raffia.visitors.Visitors;
+import com.codepoetics.raffia.java.api.Mapper;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -14,7 +13,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
 
 public class ObjectBasketTest {
 
@@ -49,17 +47,6 @@ public class ObjectBasketTest {
     assertEquals(properties, unit.asObject());
 
     assertEquals(properties, unit.<PropertySet>getValue());
-  }
-
-  @Test
-  public void reportsToVisitorAsObject() {
-    Visitor<String> visitor = mock(Visitor.class);
-
-    when(visitor.visitObject(any(PropertySet.class))).thenReturn("result");
-
-    assertEquals("result", unit.visit(visitor));
-
-    verify(visitor).visitObject(properties);;
   }
 
   @Test
@@ -142,8 +129,8 @@ public class ObjectBasketTest {
 
   @Test
   public void equalityAndHashcode() {
-    assertEquals(unit, unit.visit(Visitors.copy));
-    assertEquals(unit.hashCode(), unit.visit(Visitors.copy).hashCode());
+    assertEquals(unit, Basket.ofObject(properties));
+    assertEquals(unit.hashCode(), Basket.ofObject(properties).hashCode());
   }
 
   @Test

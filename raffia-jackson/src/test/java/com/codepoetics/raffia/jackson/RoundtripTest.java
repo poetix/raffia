@@ -1,8 +1,8 @@
 package com.codepoetics.raffia.jackson;
 
 import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.mappers.Mapper;
-import com.codepoetics.raffia.operations.Updater;
+import com.codepoetics.raffia.java.api.Mapper;
+import com.codepoetics.raffia.java.api.Updater;
 import com.codepoetics.raffia.predicates.NumberPredicates;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.streaming.StreamingWriters;
@@ -62,18 +62,18 @@ public class RoundtripTest {
 
   @Test
   public void rewritePathMatchedStrings() throws IOException {
-    Updater toUppercase = com.codepoetics.raffia.operations.Updaters.ofString(new Mapper<String, String>() {
+    Updater toUppercase = com.codepoetics.raffia.operations.Updaters.INSTANCE.ofString(new Mapper<String, String>() {
       @Override
       public String map(String input) {
         return input.toUpperCase();
       }
     });
 
-    Updater uppercaseTitle = com.codepoetics.raffia.operations.Updaters.updating("title", toUppercase);
+    Updater uppercaseTitle = com.codepoetics.raffia.operations.Updaters.INSTANCE.updating("title", toUppercase);
 
     StringWriter stringWriter = new StringWriter();
 
-    FilteringWriter<JsonWriter> transformer = StreamingWriters.rewriting(
+    FilteringWriter<JsonWriter> transformer = StreamingWriters.INSTANCE.rewriting(
         lens("$..book[?]", lens("@.author").matching("Nigel Rees")),
         JsonWriter.writingTo(stringWriter),
         uppercaseTitle
@@ -89,8 +89,8 @@ public class RoundtripTest {
 
   @Test
   public void projectAuthorsOfCheapBooks() throws IOException {
-    FilteringWriter<BasketWeavingWriter> filter = StreamingWriters.projectingArray(
-        lens("$.store.book[?].author", lens("@.price").matchingNumber(NumberPredicates.isLessThan("10")))
+    FilteringWriter<BasketWeavingWriter> filter = StreamingWriters.INSTANCE.projectingArray(
+        lens("$.store.book[?].author", lens("@.price").matchingNumber(NumberPredicates.INSTANCE.isLessThan("10")))
     );
 
     Basket result = JsonReader.readWith(getClass().getResourceAsStream("/store.json"), filter)

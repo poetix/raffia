@@ -12,11 +12,11 @@ import static org.junit.Assert.assertTrue;
 public class ProjectionResultsTest {
 
   private ProjectionResult<String> empty() {
-    return ProjectionResult.empty();
+    return ProjectionResult.Companion.empty();
   }
 
   private ProjectionResult<String> singleton(String value) {
-    return ProjectionResult.ofSingle(value);
+    return ProjectionResult.Companion.ofSingle(value);
   }
 
   private ProjectionResult<String> multiple(String first, String second) {

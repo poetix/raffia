@@ -1,7 +1,6 @@
 package com.codepoetics.raffia.baskets;
 
-import com.codepoetics.raffia.mappers.Mapper;
-import com.codepoetics.raffia.visitors.Visitors;
+import com.codepoetics.raffia.java.api.Mapper;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -9,8 +8,6 @@ import java.math.BigDecimal;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
 
 public class StringBasketTest {
 
@@ -40,17 +37,6 @@ public class StringBasketTest {
   }
 
   @Test
-  public void reportsToVisitorAsString() {
-    Visitor<String> visitor = mock(Visitor.class);
-
-    when(visitor.visitString(anyString())).thenReturn("result");
-
-    assertEquals("result", unit.visit(visitor));
-
-    verify(visitor).visitString("value");
-  }
-
-  @Test
   public void emptiness() {
     assertFalse(unit.isEmpty());
   }
@@ -77,8 +63,8 @@ public class StringBasketTest {
 
   @Test
   public void equalityAndHashcode() {
-    assertEquals(unit, unit.visit(Visitors.copy));
-    assertEquals(unit.hashCode(), unit.visit(Visitors.copy).hashCode());
+    assertEquals(unit, Basket.ofString("value"));
+    assertEquals(unit.hashCode(), Basket.ofString("value").hashCode());
   }
 
   @Test

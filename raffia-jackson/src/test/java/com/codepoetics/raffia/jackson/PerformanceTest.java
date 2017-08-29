@@ -2,7 +2,7 @@ package com.codepoetics.raffia.jackson;
 
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.lenses.Lens;
-import com.codepoetics.raffia.operations.Updater;
+import com.codepoetics.raffia.java.api.Updater;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.streaming.StreamingWriters;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -34,7 +34,7 @@ public class PerformanceTest {
   private static final Lens VALUE_LENS = lens(
       "$.components[*].parts[*].qty");
 
-  private static final Basket ONE = Basket.ofNumber(BigDecimal.ONE);
+  private static final Basket ONE = Basket.Companion.ofNumber(BigDecimal.ONE);
 
   private static final Updater REPLACE_NULL_WITH_ZERO = new Updater() {
     @Override
@@ -208,9 +208,9 @@ public class PerformanceTest {
 
   private String raffiaMap() throws IOException {
     StringWriter stringWriter = new StringWriter();
-    JsonWriter jsonWriter = JsonWriter.writingTo(FACTORY, stringWriter);
+    JsonWriter jsonWriter = JsonWriter.Companion.writingTo(FACTORY, stringWriter);
 
-    FilteringWriter<JsonWriter> nullReplacer = StreamingWriters.rewriting(
+    FilteringWriter<JsonWriter> nullReplacer = StreamingWriters.INSTANCE.rewriting(
         VALUE_LENS,
         jsonWriter,
         REPLACE_NULL_WITH_ZERO
