@@ -2,10 +2,10 @@ package com.codepoetics.raffia.predicates
 
 import com.codepoetics.raffia.baskets.ArrayContents
 import com.codepoetics.raffia.baskets.PropertySet
-import com.codepoetics.raffia.java.api.BasketPredicate
-import com.codepoetics.raffia.java.api.ValuePredicate
-import com.codepoetics.raffia.java.api.basketPredicate
-import com.codepoetics.raffia.java.api.valuePredicate
+import com.codepoetics.raffia.functions.BasketPredicate
+import com.codepoetics.raffia.functions.ValuePredicate
+import com.codepoetics.raffia.functions.basketPredicate
+import com.codepoetics.raffia.functions.valuePredicate
 
 import java.math.BigDecimal
 

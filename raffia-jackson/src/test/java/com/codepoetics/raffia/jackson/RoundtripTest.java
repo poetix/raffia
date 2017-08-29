@@ -1,8 +1,8 @@
 package com.codepoetics.raffia.jackson;
 
 import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.java.api.Mapper;
-import com.codepoetics.raffia.java.api.Updater;
+import com.codepoetics.raffia.functions.Mapper;
+import com.codepoetics.raffia.functions.Updater;
 import com.codepoetics.raffia.predicates.NumberPredicates;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.streaming.StreamingWriters;

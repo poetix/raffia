@@ -1,7 +1,7 @@
 package com.codepoetics.raffia.streaming
 
 import com.codepoetics.raffia.lenses.Lens
-import com.codepoetics.raffia.java.api.Updater
+import com.codepoetics.raffia.functions.Updater
 import com.codepoetics.raffia.streaming.projecting.StreamingProjector
 import com.codepoetics.raffia.streaming.rewriting.StreamingRewriter
 import com.codepoetics.raffia.writers.BasketWeavingWriter

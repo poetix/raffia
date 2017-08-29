@@ -1,6 +1,6 @@
 package com.codepoetics.raffia.baskets
 
-import com.codepoetics.raffia.java.api.Mapper
+import com.codepoetics.raffia.functions.Mapper
 import java.math.BigDecimal
 import java.util.*
 

@@ -3,6 +3,7 @@ package com.codepoetics.raffia.jackson;
 import com.codepoetics.raffia.Raffia;
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.writers.BasketWriter;
+import com.codepoetics.raffia.writers.Writers;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -17,15 +18,15 @@ public final class JsonReader {
   private static final JsonFactory FACTORY = new JsonFactory();
 
   public static Basket readBasket(String json) {
-    return readWith(json, Raffia.INSTANCE.weaver()).weave();
+    return readWith(json, Writers.weavingTransient()).weave();
   }
 
   public static Basket readBasket(InputStream inputStream) throws IOException {
-    return readWith(inputStream, Raffia.INSTANCE.weaver()).weave();
+    return readWith(inputStream, Writers.weavingTransient()).weave();
   }
 
   public static Basket readBasket(Reader reader) throws IOException {
-    return readWith(reader, Raffia.INSTANCE.weaver()).weave();
+    return readWith(reader, Writers.weavingTransient()).weave();
   }
 
   public static <T extends BasketWriter<T>> T readWith(String json, T writer) {

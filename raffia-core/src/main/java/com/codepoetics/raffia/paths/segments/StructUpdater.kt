@@ -3,7 +3,7 @@ package com.codepoetics.raffia.paths.segments
 import com.codepoetics.raffia.baskets.ArrayContents
 import com.codepoetics.raffia.baskets.Basket
 import com.codepoetics.raffia.baskets.PropertySet
-import com.codepoetics.raffia.java.api.Updater
+import com.codepoetics.raffia.functions.Updater
 
 internal abstract class StructUpdater : Updater {
     override fun update(basket: Basket): Basket {

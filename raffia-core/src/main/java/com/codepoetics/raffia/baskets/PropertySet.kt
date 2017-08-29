@@ -1,6 +1,6 @@
 package com.codepoetics.raffia.baskets
 
-import com.codepoetics.raffia.java.api.Mapper
+import com.codepoetics.raffia.functions.Mapper
 import org.pcollections.HashTreePMap
 import org.pcollections.PMap
 import org.pcollections.PVector

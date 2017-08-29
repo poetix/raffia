@@ -2,7 +2,7 @@ package com.codepoetics.raffia.streaming.projecting
 
 import com.codepoetics.raffia.baskets.Basket
 import com.codepoetics.raffia.operations.ProjectionResult
-import com.codepoetics.raffia.java.api.Projector
+import com.codepoetics.raffia.functions.Projector
 import com.codepoetics.raffia.streaming.FilteringWriter
 import com.codepoetics.raffia.writers.BasketWriter
 import com.codepoetics.raffia.writers.writeTo

@@ -1,6 +1,6 @@
 package com.codepoetics.raffia.paths.segments
 
-import com.codepoetics.raffia.java.api.BasketPredicate
+import com.codepoetics.raffia.functions.BasketPredicate
 import com.codepoetics.raffia.paths.PathSegment
 
 import java.util.ArrayList

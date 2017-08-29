@@ -2,7 +2,7 @@ package com.codepoetics.raffia.jackson;
 
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.lenses.Lens;
-import com.codepoetics.raffia.java.api.Updater;
+import com.codepoetics.raffia.functions.Updater;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.streaming.StreamingWriters;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -173,9 +173,9 @@ public class PerformanceTest {
   }
 
   @PerfTest(
-      invocations = 10000,
+      invocations = 100000,
       threads = 8,
-      rampUp = 1000
+      rampUp = 10000
   )
   @Test
   public void jacksonMapAndWrite() throws IOException {
@@ -197,9 +197,9 @@ public class PerformanceTest {
   }
 
   @PerfTest(
-      invocations = 10000,
+      invocations = 100000,
       threads = 8,
-      rampUp = 1000
+      rampUp = 10000
   )
   @Test
   public void raffiaMapAndWrite() throws IOException {

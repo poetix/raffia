@@ -1,7 +1,7 @@
 package com.codepoetics.raffia.streaming.projecting
 
 import com.codepoetics.raffia.baskets.Basket
-import com.codepoetics.raffia.java.api.Projector
+import com.codepoetics.raffia.functions.Projector
 import com.codepoetics.raffia.streaming.FilteringWriter
 import com.codepoetics.raffia.streaming.WeavingFilter
 import com.codepoetics.raffia.writers.BasketWeavingWriter
@@ -19,11 +19,11 @@ internal class WeavingProjector<T : BasketWriter<T>>(private val target: T, pare
     companion object {
 
         fun <T : BasketWriter<T>> weavingObject(target: T, parent: FilteringWriter<T>, projector: Projector<Basket>): WeavingFilter<T> {
-            return weaving(target, parent, projector, Writers.weaving().beginObject())
+            return weaving(target, parent, projector, Writers.weavingTransient().beginObject())
         }
 
         fun <T : BasketWriter<T>> weavingArray(target: T, parent: FilteringWriter<T>, projector: Projector<Basket>): WeavingFilter<T> {
-            return weaving(target, parent, projector, Writers.weaving().beginArray())
+            return weaving(target, parent, projector, Writers.weavingTransient().beginArray())
         }
 
         private fun <T : BasketWriter<T>> weaving(target: T, parent: FilteringWriter<T>, projector: Projector<Basket>, weaver: BasketWeavingWriter): WeavingFilter<T> {

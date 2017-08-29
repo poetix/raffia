@@ -1,7 +1,7 @@
 package com.codepoetics.raffia.streaming.rewriting
 
 import com.codepoetics.raffia.baskets.Basket
-import com.codepoetics.raffia.java.api.Updater
+import com.codepoetics.raffia.functions.Updater
 import com.codepoetics.raffia.streaming.FilteringWriter
 import com.codepoetics.raffia.streaming.WeavingFilter
 import com.codepoetics.raffia.writers.BasketWeavingWriter
@@ -19,13 +19,13 @@ internal class WeavingRewriter<T : BasketWriter<T>> private constructor(private 
                 target: T,
                 parent: FilteringWriter<T>,
                 updater: Updater): WeavingRewriter<T> =
-                weaving(target, parent, updater, Writers.weaving().beginObject())
+                weaving(target, parent, updater, Writers.weavingTransient().beginObject())
 
         fun <T : BasketWriter<T>> weavingArray(
                 target: T,
                 parent: FilteringWriter<T>,
                 updater: Updater): WeavingRewriter<T> =
-                weaving(target, parent, updater, Writers.weaving().beginArray())
+                weaving(target, parent, updater, Writers.weavingTransient().beginArray())
 
         private fun <T : BasketWriter<T>> weaving(
                 target: T,

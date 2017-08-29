@@ -1,4 +1,4 @@
-package com.codepoetics.raffia.java.api
+package com.codepoetics.raffia.functions
 
 interface Mapper<I, O> {
     fun map(input: I): O

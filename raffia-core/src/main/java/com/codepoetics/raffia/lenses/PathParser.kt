@@ -1,6 +1,6 @@
 package com.codepoetics.raffia.lenses
 
-import com.codepoetics.raffia.java.api.BasketPredicate
+import com.codepoetics.raffia.functions.BasketPredicate
 import com.codepoetics.raffia.paths.PathSegment
 import com.codepoetics.raffia.paths.segments.PathSegments
 import org.pcollections.PVector

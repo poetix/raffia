@@ -1,7 +1,7 @@
 package com.codepoetics.raffia.streaming.rewriting
 
 import com.codepoetics.raffia.baskets.Basket
-import com.codepoetics.raffia.java.api.Updater
+import com.codepoetics.raffia.functions.Updater
 import com.codepoetics.raffia.paths.Path
 import com.codepoetics.raffia.paths.PathSegment
 import com.codepoetics.raffia.paths.PathSegmentMatchResult

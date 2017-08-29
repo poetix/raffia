@@ -3,9 +3,9 @@ package com.codepoetics.raffia.paths.segments
 import com.codepoetics.raffia.baskets.ArrayContents
 import com.codepoetics.raffia.baskets.Basket
 import com.codepoetics.raffia.baskets.PropertySet
-import com.codepoetics.raffia.java.api.BasketPredicate
-import com.codepoetics.raffia.java.api.Projector
-import com.codepoetics.raffia.java.api.Updater
+import com.codepoetics.raffia.functions.BasketPredicate
+import com.codepoetics.raffia.functions.Projector
+import com.codepoetics.raffia.functions.Updater
 import com.codepoetics.raffia.operations.*
 import com.codepoetics.raffia.paths.Path
 import com.codepoetics.raffia.paths.PathSegmentMatchResult

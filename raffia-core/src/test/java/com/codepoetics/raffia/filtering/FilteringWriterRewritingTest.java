@@ -1,11 +1,11 @@
 package com.codepoetics.raffia.filtering;
 
 import com.codepoetics.raffia.baskets.Basket;
-import com.codepoetics.raffia.java.api.Mapper;
-import com.codepoetics.raffia.java.api.BasketPredicate;
+import com.codepoetics.raffia.functions.Mapper;
+import com.codepoetics.raffia.functions.BasketPredicate;
 import com.codepoetics.raffia.operations.Setters;
-import com.codepoetics.raffia.java.api.Updater;
-import com.codepoetics.raffia.java.api.ValuePredicate;
+import com.codepoetics.raffia.functions.Updater;
+import com.codepoetics.raffia.functions.ValuePredicate;
 import com.codepoetics.raffia.predicates.BasketPredicates;
 import com.codepoetics.raffia.streaming.FilteringWriter;
 import com.codepoetics.raffia.streaming.StreamingWriters;

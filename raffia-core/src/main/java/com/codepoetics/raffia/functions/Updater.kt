@@ -1,4 +1,4 @@
-package com.codepoetics.raffia.java.api
+package com.codepoetics.raffia.functions
 
 import com.codepoetics.raffia.baskets.Basket
 

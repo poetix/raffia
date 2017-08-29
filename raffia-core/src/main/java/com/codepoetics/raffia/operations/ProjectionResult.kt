@@ -1,7 +1,7 @@
 package com.codepoetics.raffia.operations
 
-import com.codepoetics.raffia.java.api.ValuePredicate
-import com.codepoetics.raffia.java.api.Mapper
+import com.codepoetics.raffia.functions.ValuePredicate
+import com.codepoetics.raffia.functions.Mapper
 import org.pcollections.PVector
 import org.pcollections.TreePVector
 
@@ -9,7 +9,7 @@ import java.util.*
 
 sealed class ProjectionResult<T> : Iterable<T> {
 
-    abstract fun add(result: ProjectionResult<T>): ProjectionResult<T>
+    abstract fun add(other: ProjectionResult<T>): ProjectionResult<T>
     abstract fun <O> map(mapper: Mapper<T, O>): ProjectionResult<O>
     abstract val single: T
 
@@ -64,7 +64,7 @@ sealed class ProjectionResult<T> : Iterable<T> {
 
         override fun iterator(): Iterator<Any> = Collections.emptyListIterator<Any>()
 
-        override fun add(result: ProjectionResult<Any>): ProjectionResult<Any> = result
+        override fun add(other: ProjectionResult<Any>): ProjectionResult<Any> = other
 
         override fun <O> map(mapper: Mapper<Any, O>): ProjectionResult<O> = empty()
 
@@ -135,12 +135,12 @@ sealed class ProjectionResult<T> : Iterable<T> {
         private fun PVector<ProjectionResult<T>>.appendToLast(other: ProjectionResult<T>): PVector<ProjectionResult<T>> =
             with(size - 1, this[size - 1].add(other))
 
-        override fun add(result: ProjectionResult<T>): ProjectionResult<T> =
-            when(result) {
+        override fun add(other: ProjectionResult<T>): ProjectionResult<T> =
+            when(other) {
                 is EmptyProjectionResult -> this
-                is SingletonProjectionResult -> NestedProjectionResult(results.appendToLast(result), size + 1)
-                is MultipleProjectionResult -> NestedProjectionResult(results.plus(result), size + result.size)
-                is NestedProjectionResult -> NestedProjectionResult(results.plus(result), size + result.size)
+                is SingletonProjectionResult -> NestedProjectionResult(results.appendToLast(other), size + 1)
+                is MultipleProjectionResult -> NestedProjectionResult(results.plus(other), size + other.size)
+                is NestedProjectionResult -> NestedProjectionResult(results.plus(other), size + other.size)
             }
 
         override fun <O> map(mapper: Mapper<T, O>): ProjectionResult<O> {

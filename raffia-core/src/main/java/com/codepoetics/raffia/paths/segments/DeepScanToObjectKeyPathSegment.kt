@@ -5,8 +5,8 @@ import com.codepoetics.raffia.baskets.Basket
 import com.codepoetics.raffia.baskets.ObjectEntry
 import com.codepoetics.raffia.baskets.PropertySet
 import com.codepoetics.raffia.operations.ProjectionResult
-import com.codepoetics.raffia.java.api.Projector
-import com.codepoetics.raffia.java.api.Updater
+import com.codepoetics.raffia.functions.Projector
+import com.codepoetics.raffia.functions.Updater
 import com.codepoetics.raffia.paths.PathSegmentMatchResult
 
 import java.util.ArrayList

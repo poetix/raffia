@@ -1,6 +1,6 @@
 package com.codepoetics.raffia.streaming.rewriting
 
-import com.codepoetics.raffia.java.api.Updater
+import com.codepoetics.raffia.functions.Updater
 import com.codepoetics.raffia.paths.Path
 import com.codepoetics.raffia.streaming.EndOfLineFilter
 import com.codepoetics.raffia.streaming.FilteringWriter
