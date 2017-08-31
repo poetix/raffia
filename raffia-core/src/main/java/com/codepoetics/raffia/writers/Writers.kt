@@ -49,7 +49,7 @@ private class PersistentValueWeaver(private val value: Basket?) : ScalarPromotin
     }
 
     override fun end(): BasketWeavingWriter {
-        throw IllegalStateException("end called without corresponding beginObject or beginArray")
+        throw IllegalStateException("exit called without corresponding beginObject or beginArray")
     }
 
     override fun key(key: String): BasketWeavingWriter {
@@ -82,7 +82,7 @@ private class TransientValueWeaver(var value: Basket?) : ScalarPromotingWeaver()
     }
 
     override fun end(): BasketWeavingWriter {
-        throw IllegalStateException("end called without corresponding beginObject or beginArray")
+        throw IllegalStateException("exit called without corresponding beginObject or beginArray")
     }
 
     override fun key(key: String): BasketWeavingWriter {

@@ -184,13 +184,16 @@ sealed class ProjectionResult<T> : Iterable<T> {
     companion object {
 
         @JvmStatic
-        fun <T> empty(): ProjectionResult<T> {
-            return EmptyProjectionResult as ProjectionResult<T>
-        }
+        fun <T> empty(): ProjectionResult<T> = EmptyProjectionResult as ProjectionResult<T>
 
         @JvmStatic
-        fun <T> ofSingle(value: T): ProjectionResult<T> {
-            return SingletonProjectionResult(value)
+        fun <T> ofSingle(value: T): ProjectionResult<T> = SingletonProjectionResult(value)
+
+        @JvmStatic
+        fun <T> ofMultiple(values: Collection<T>): ProjectionResult<T> = when(values.size) {
+            0 -> empty()
+            1 -> ofSingle(values.first())
+            else -> MultipleProjectionResult(TreePVector.from(values))
         }
     }
 }

@@ -3,8 +3,6 @@ package com.codepoetics.raffia.jackson;
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.lenses.Lens;
 import com.codepoetics.raffia.functions.Updater;
-import com.codepoetics.raffia.streaming.FilteringWriter;
-import com.codepoetics.raffia.streaming.StreamingWriters;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,6 +22,7 @@ import static com.codepoetics.raffia.lenses.Lens.lens;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 
+/*
 @Ignore
 public class PerformanceTest {
 
@@ -221,3 +220,4 @@ public class PerformanceTest {
     return stringWriter.toString();
   }
 }
+*/

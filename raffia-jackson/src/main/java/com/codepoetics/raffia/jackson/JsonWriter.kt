@@ -51,7 +51,7 @@ class JsonWriter private constructor(private val parent: JsonWriter?, private va
                     generator.writeEndObject()
                     return flushOnCompletion(parent!!)
                 }
-                else -> throw IllegalStateException("end called without matching startArray or startObject")
+                else -> throw IllegalStateException("exit called without matching startArray or startObject")
             }
         } catch (e: IOException) {
             throw RuntimeException(e)
