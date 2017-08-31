@@ -7,6 +7,8 @@ import com.codepoetics.raffia.operations.Setters;
 import com.codepoetics.raffia.functions.Updater;
 import com.codepoetics.raffia.functions.ValuePredicate;
 import com.codepoetics.raffia.predicates.BasketPredicates;
+import com.codepoetics.raffia.streaming.Filter;
+import com.codepoetics.raffia.streaming.PathAwareWriterKt;
 import com.codepoetics.raffia.writers.BasketWeavingWriter;
 import com.codepoetics.raffia.writers.Writers;
 import org.junit.Test;
@@ -16,33 +18,32 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 
-/*
 public class FilteringWriterRewritingTest {
 
   @Test
   public void rewriteSingleValue() {
-    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.INSTANCE.rewriting(
+    Filter<BasketWeavingWriter> writer = PathAwareWriterKt.updatingFilter(
         lens("$"),
-        Writers.INSTANCE.weaving(),
-        Setters.INSTANCE.toString("Rewritten"));
+        Setters.toString("Rewritten"),
+        Writers.weaving());
 
-    Basket result = writer.add("Unrewritten").complete().weave();
+    Basket result = writer.add("Unrewritten").getResult().weave();
 
     assertThat(result.asString(), equalTo("Rewritten"));
   }
 
   @Test
   public void rewriteMatchedKey() {
-    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.INSTANCE.rewriting(
+    Filter<BasketWeavingWriter> writer = PathAwareWriterKt.updatingFilter(
         lens("$.foo"),
-        Writers.INSTANCE.weaving(),
-        Setters.INSTANCE.toString("Rewritten"));
+        Setters.toString("Rewritten"),
+        Writers.weaving());
 
     Basket result = writer.beginObject()
           .key("foo").add("Unrewritten")
           .key("bar").add("Unrewritten")
         .end()
-        .complete().weave();
+        .getResult().weave();
 
     assertThat(result.getProperty("foo").asString(), equalTo("Rewritten"));
     assertThat(result.getProperty("bar").asString(), equalTo("Unrewritten"));
@@ -50,16 +51,16 @@ public class FilteringWriterRewritingTest {
 
   @Test
   public void rewriteAllKeys() {
-    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.INSTANCE.rewriting(
+    Filter<BasketWeavingWriter> writer = PathAwareWriterKt.updatingFilter(
         lens("$.*"),
-        Writers.INSTANCE.weaving(),
-        Setters.INSTANCE.toString("Rewritten"));
+        Setters.toString("Rewritten"),
+        Writers.weaving());
 
     Basket result = writer.beginObject()
         .key("foo").add("Unrewritten")
         .key("bar").add("Unrewritten")
         .end()
-        .complete().weave();
+        .getResult().weave();
 
     assertThat(result.getProperty("foo").asString(), equalTo("Rewritten"));
     assertThat(result.getProperty("bar").asString(), equalTo("Rewritten"));
@@ -67,10 +68,10 @@ public class FilteringWriterRewritingTest {
 
   @Test
   public void rewriteAllNestedKeys() {
-    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.INSTANCE.rewriting(
+    Filter<BasketWeavingWriter> writer = PathAwareWriterKt.updatingFilter(
         lens("$.*.*"),
-        Writers.INSTANCE.weaving(),
-        Setters.INSTANCE.toString("Rewritten"));
+        Setters.toString("Rewritten"),
+        Writers.weaving());
 
     Basket result = writer.beginObject()
         .key("foo").add("Unrewritten")
@@ -79,28 +80,29 @@ public class FilteringWriterRewritingTest {
         .key("bar").add("Unrewritten")
         .end()
         .end()
-        .complete().weave();
+        .getResult().weave();
 
     assertThat(lens("$..foo").getAllStrings(result), contains("Unrewritten", "Rewritten"));
   }
 
   @Test
   public void rewriteSecondItem() {
-    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.INSTANCE.rewriting(
+    Filter<BasketWeavingWriter> writer = PathAwareWriterKt.updatingFilter(
         lens("$[1]"),
-        Writers.INSTANCE.weaving(),
-        Setters.INSTANCE.toString("Rewritten"));
+        Setters.toString("Rewritten"),
+        Writers.weaving());
 
     Basket result = writer.beginArray()
         .add("Unrewritten")
         .add("Unrewritten")
         .add("Unrewritten")
         .end()
-        .complete().weave();
+        .getResult().weave();
 
     assertThat(result.asListOfString(), contains("Unrewritten", "Rewritten", "Unrewritten"));
   }
 
+  /*
   @Test
   public void rewriteAllItems() {
     FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.INSTANCE.rewriting(
@@ -290,6 +292,6 @@ public class FilteringWriterRewritingTest {
 
     assertThat(lens("$..url").getAllStrings(transformed), contains("http://realsite.com/", "http://realsite.com/about"));
   }
+  */
 
 }
-*/
