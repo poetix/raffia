@@ -3,6 +3,9 @@ package com.codepoetics.raffia.jackson;
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.lenses.Lens;
 import com.codepoetics.raffia.functions.Updater;
+import com.codepoetics.raffia.streaming.Filter;
+import com.codepoetics.raffia.streaming.Filters;
+import com.codepoetics.raffia.streaming.PathAwareWriterKt;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,7 +25,6 @@ import static com.codepoetics.raffia.lenses.Lens.lens;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 
-/*
 @Ignore
 public class PerformanceTest {
 
@@ -172,9 +174,9 @@ public class PerformanceTest {
   }
 
   @PerfTest(
-      invocations = 100000,
+      invocations = 500000,
       threads = 8,
-      rampUp = 10000
+      rampUp = 50000
   )
   @Test
   public void jacksonMapAndWrite() throws IOException {
@@ -196,28 +198,33 @@ public class PerformanceTest {
   }
 
   @PerfTest(
-      invocations = 100000,
+      invocations = 500000,
       threads = 8,
-      rampUp = 10000
+      rampUp = 50000
   )
   @Test
   public void raffiaMapAndWrite() throws IOException {
     assertFalse(raffiaMap().isEmpty());
   }
 
+  //@Test
+  public void profile() throws IOException {
+    for (int i=0; i < 100000; i++) {
+      raffiaMapAndWrite();
+    }
+  }
+
   private String raffiaMap() throws IOException {
     StringWriter stringWriter = new StringWriter();
-    JsonWriter jsonWriter = JsonWriter.Companion.writingTo(FACTORY, stringWriter);
+    JsonWriter jsonWriter = JsonWriter.writingTo(FACTORY, stringWriter);
 
-    FilteringWriter<JsonWriter> nullReplacer = StreamingWriters.INSTANCE.rewriting(
+    Filter<JsonWriter> writer = Filters.updating(
         VALUE_LENS,
-        jsonWriter,
-        REPLACE_NULL_WITH_ZERO
-    );
+        REPLACE_NULL_WITH_ZERO,
+        jsonWriter);
 
-    JsonReader.readWith(document, nullReplacer).complete();
+    JsonReader.readWith(document, writer);
 
     return stringWriter.toString();
   }
 }
-*/

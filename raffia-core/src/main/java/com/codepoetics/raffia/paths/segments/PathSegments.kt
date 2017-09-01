@@ -2,9 +2,7 @@ package com.codepoetics.raffia.paths.segments
 
 import com.codepoetics.raffia.functions.BasketPredicate
 import com.codepoetics.raffia.paths.PathSegment
-
-import java.util.ArrayList
-import java.util.Collections
+import java.util.*
 
 object PathSegments {
 

@@ -1,10 +1,9 @@
 package com.codepoetics.raffia.operations
 
-import com.codepoetics.raffia.functions.ValuePredicate
 import com.codepoetics.raffia.functions.Mapper
+import com.codepoetics.raffia.functions.ValuePredicate
 import org.pcollections.PVector
 import org.pcollections.TreePVector
-
 import java.util.*
 
 sealed class ProjectionResult<T> : Iterable<T> {

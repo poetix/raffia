@@ -1,36 +1,39 @@
 package com.codepoetics.raffia.filtering;
 
+
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.functions.BasketPredicate;
 import com.codepoetics.raffia.functions.ValuePredicate;
+import com.codepoetics.raffia.operations.ProjectionResult;
 import com.codepoetics.raffia.predicates.BasketPredicates;
+import com.codepoetics.raffia.streaming.Filter;
+import com.codepoetics.raffia.streaming.Filters;
 import com.codepoetics.raffia.writers.BasketWeavingWriter;
-import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.List;
 
 import static com.codepoetics.raffia.lenses.Lens.lens;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
 
-/*
 public class FilteringWriterProjectingTest {
 
   @Test
   public void projectSingleValue() {
-    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
-        lens("$"));
+    Filter<ProjectionResult<Basket>> writer = Filters.projecting(lens("$"));
 
-    Basket result = writer.add("Value").complete().weave();
+    ProjectionResult<Basket> result = writer.add("Value").getResult();
 
-    assertThat(result.asListOfString(), contains("Value"));
+    assertThat(result.getSingle().asString(), equalTo("Value"));
   }
 
   @Test
   public void projectMatchedKey() {
-    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
-        lens("$.xyzzy.foo"));
+    Filter<ProjectionResult<Basket>> writer = Filters.projecting(lens("$.xyzzy.foo"));
 
-    Basket result = writer.beginObject()
+    ProjectionResult<Basket> result = writer.beginObject()
         .key("quux").beginObject()
           .add("foo").add("not the foo value you want")
         .end()
@@ -39,85 +42,80 @@ public class FilteringWriterProjectingTest {
           .key("bar").add("bar value")
         .end()
         .end()
-        .complete().weave();
+        .getResult();
 
-    assertThat(result.asListOfString(), contains("foo value"));
+    assertThat(result.asList(), contains(Basket.ofString("foo value")));
   }
 
   @Test
   public void projectAllKeys() {
-    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
-        lens("$.*"));
+    Filter<ProjectionResult<Basket>> writer = Filters.projecting(lens("$.*"));
 
-    Basket result = writer.beginObject()
+    ProjectionResult<Basket> result = writer.beginObject()
         .key("foo").add("foo value")
         .key("bar").add("bar value")
         .end()
-        .complete().weave();
+        .getResult();
 
-    assertThat(result.asListOfString(), contains("foo value", "bar value"));
+    assertThat(result.asList(), contains(Basket.ofString("foo value"), Basket.ofString("bar value")));
   }
 
   @Test
   public void projectAllNestedKeys() {
-    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
-        lens("$.*.*"));
+    Filter<ProjectionResult<Basket>> writer = Filters.projecting(lens("$.*.*"));
 
-    Basket result = writer.beginObject()
+    ProjectionResult<Basket> result = writer.beginObject()
         .key("ignored").add("outer value")
         .key("nested").beginObject()
           .key("foo").add("nested foo value")
           .key("bar").add("nested bar value")
         .end()
         .end()
-        .complete().weave();
+        .getResult();
 
-    assertThat(result.asListOfString(), contains("nested foo value", "nested bar value"));
+    assertThat(result.asList(), contains(Basket.ofString("nested foo value"), Basket.ofString("nested bar value")));
   }
 
   @Test
   public void projectSecondItem() {
-    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
-        lens("$[1]"));
+    Filter<ProjectionResult<Basket>> writer = Filters.projecting(lens("$[1]"));
 
-    Basket result = writer.beginArray()
+    ProjectionResult<Basket> result = writer.beginArray()
         .add("first")
         .add("second")
         .add("third")
         .end()
-        .complete().weave();
+        .getResult();
 
-    assertThat(result.asListOfString(), contains("second"));
+    assertThat(result.getSingle().asString(), equalTo("second"));
   }
 
   @Test
   public void projectSecondAndThirdItems() {
-    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
-        lens("$[1, 2]"));
+    Filter<ProjectionResult<Basket>> writer = Filters.projecting(lens("$[1, 2]"));
 
-    Basket result = writer.beginArray()
+    ProjectionResult<Basket> result = writer.beginArray()
         .add("first")
         .add("second")
         .add("third")
         .end()
-        .complete().weave();
+        .getResult();
 
-    assertThat(result.asListOfString(), contains("second", "third"));
+    assertThat(result.asList(), contains(Basket.ofString("second"), Basket.ofString("third")));
   }
 
   @Test
   public void projectAllItems() {
-    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
-        lens("$[*]"));
+    Filter<ProjectionResult<Basket>> writer = Filters.projecting(lens("$[*]"));
 
-    Basket result = writer.beginArray()
+    ProjectionResult<Basket> result = writer.beginArray()
         .add("first")
         .add("second")
         .add("third")
         .end()
-        .complete().weave();
+        .getResult();
 
-    assertThat(result.asListOfString(), contains("first", "second", "third"));
+    assertThat(result.asList(), contains(Basket.ofString("first"), Basket.ofString("second"), Basket.ofString("third")));
   }
 
   @Test
@@ -129,25 +127,24 @@ public class FilteringWriterProjectingTest {
       }
     });
 
-    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
-        lens("$[?]", shouldBeRewritten));
+    Filter<ProjectionResult<Basket>> writer = Filters.projecting(lens("$[?]", shouldBeRewritten));
 
-    Basket result = writer.beginArray()
+    ProjectionResult<Basket> result = writer.beginArray()
         .add("a (project me)")
         .add("b")
         .add("c (project me)")
         .end()
-        .complete().weave();
+        .getResult();
 
-    assertThat(result.asListOfString(), contains("a (project me)", "c (project me)"));
+    assertThat(result.asList(), contains(Basket.ofString("a (project me)"), Basket.ofString("c (project me)")));
   }
 
   @Test
   public void projectDeepScannedStrings() {
-    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
+    Filter<ProjectionResult<Basket>> writer = Filters.projecting(
         lens("$..nested.bar"));
 
-    Basket result = writer.beginObject()
+    ProjectionResult<Basket> result = writer.beginObject()
         .key("nested").beginObject()
           .key("foo").add("foo 1")
           .key("bar").add("bar 1")
@@ -169,19 +166,19 @@ public class FilteringWriterProjectingTest {
           .end()
         .end()
       .end()
-      .complete().weave();
+      .getResult();
 
-    assertThat(result.asListOfString(), contains("bar 1", "bar 2", "bar 3"));
+    assertThat(result.asList(), contains(Basket.ofString("bar 1"), Basket.ofString("bar 2"), Basket.ofString("bar 3")));
   }
 
   @Test
   public void projectDeepScannedMatchingStrings() {
     BasketPredicate isFlaggedForRewrite = lens("@.project").isTrue();
 
-    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
+    Filter<ProjectionResult<Basket>> writer = Filters.projecting(
         lens("$..nested[?].value", isFlaggedForRewrite));
 
-    Basket result = writer.beginObject()
+    ProjectionResult<Basket> result = writer.beginObject()
         .key("nested").beginArray()
           .beginObject()
             .key("project").add(true)
@@ -209,19 +206,19 @@ public class FilteringWriterProjectingTest {
           .end()
         .end()
         .end()
-        .complete().weave();
+        .getResult();
 
-    assertThat(result.asListOfString(), contains("project me", "and me"));
+    assertThat(result.asList(), contains(Basket.ofString("project me"), Basket.ofString("and me")));
   }
 
   @Test
   public void projectMatchingObjects() {
     BasketPredicate isFlaggedForRewrite = lens("@.match").isTrue();
 
-    FilteringWriter<BasketWeavingWriter> writer = StreamingWriters.projectingArray(
+    Filter<ProjectionResult<Basket>> writer = Filters.projecting(
         lens("$[?]..value", isFlaggedForRewrite));
 
-    Basket result = writer.beginArray()
+    ProjectionResult<Basket> result = writer.beginArray()
         .beginObject()
           .key("match").add(true)
           .key("value").add("a")
@@ -237,10 +234,9 @@ public class FilteringWriterProjectingTest {
           .key("value").add("c")
         .end()
         .end()
-        .complete().weave();
+        .getResult();
 
-    assertThat(result.asListOfString(), contains("a", "b"));
+    assertThat(result.asList(), contains(Basket.ofString("a"), Basket.ofString("b")));
   }
 
 }
-*/

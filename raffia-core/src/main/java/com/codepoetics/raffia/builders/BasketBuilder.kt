@@ -3,9 +3,7 @@ package com.codepoetics.raffia.builders
 import com.codepoetics.raffia.baskets.Basket
 import com.codepoetics.raffia.writers.BasketWriter
 import com.codepoetics.raffia.writers.writeTo
-
 import java.math.BigDecimal
-import java.util.Collections
 
 class BasketBuilder<T : BasketWriter<T>> protected constructor(val writer: T) : BasketWriter<BasketBuilder<T>> {
 

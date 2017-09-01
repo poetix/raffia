@@ -2,8 +2,8 @@ package com.codepoetics.raffia.paths.segments
 
 import com.codepoetics.raffia.baskets.Basket
 import com.codepoetics.raffia.functions.Projector
-import com.codepoetics.raffia.operations.Projectors
 import com.codepoetics.raffia.functions.Updater
+import com.codepoetics.raffia.operations.Projectors
 import com.codepoetics.raffia.paths.Path
 import com.codepoetics.raffia.paths.PathSegment
 

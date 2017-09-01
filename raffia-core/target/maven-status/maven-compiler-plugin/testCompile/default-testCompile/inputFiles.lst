@@ -1,3 +1,4 @@
+/Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/streaming/PathAwareWriterTest.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/StoreExample.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/baskets/StringBasketTest.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/filtering/FilteringWriterRewritingTest.java
@@ -10,5 +11,4 @@
 /Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/PathSegmentsTests.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/baskets/ObjectBasketTest.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/filtering/FilteringWriterProjectingTest.java
-/Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/streaming/IndexMatcherTest.java
 /Users/dominicfox/src/java/raffia/raffia-core/src/test/java/com/codepoetics/raffia/Updating.java

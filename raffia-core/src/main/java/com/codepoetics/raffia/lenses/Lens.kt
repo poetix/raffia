@@ -3,12 +3,10 @@ package com.codepoetics.raffia.lenses
 import com.codepoetics.raffia.baskets.ArrayContents
 import com.codepoetics.raffia.baskets.Basket
 import com.codepoetics.raffia.baskets.PropertySet
-import com.codepoetics.raffia.functions.BasketPredicate
-import com.codepoetics.raffia.functions.Projector
-import com.codepoetics.raffia.functions.Updater
-import com.codepoetics.raffia.functions.ValuePredicate
-import com.codepoetics.raffia.functions.Mapper
-import com.codepoetics.raffia.operations.*
+import com.codepoetics.raffia.functions.*
+import com.codepoetics.raffia.operations.ProjectionResult
+import com.codepoetics.raffia.operations.Projectors
+import com.codepoetics.raffia.operations.Setters
 import com.codepoetics.raffia.paths.Path
 import com.codepoetics.raffia.paths.PathSegment
 import com.codepoetics.raffia.paths.Paths
@@ -18,9 +16,8 @@ import com.codepoetics.raffia.predicates.NumberPredicates
 import com.codepoetics.raffia.predicates.StringPredicates
 import org.pcollections.PVector
 import org.pcollections.TreePVector
-
 import java.math.BigDecimal
-import java.util.Arrays
+import java.util.*
 
 class Lens private constructor(private val segments: PVector<PathSegment>, val path: Path, private val projector: Projector<Basket>) : Projector<Basket> {
 

@@ -3,8 +3,8 @@ package com.codepoetics.raffia.paths.segments
 import com.codepoetics.raffia.baskets.ArrayContents
 import com.codepoetics.raffia.baskets.Basket
 import com.codepoetics.raffia.baskets.PropertySet
-import com.codepoetics.raffia.operations.ProjectionResult
 import com.codepoetics.raffia.functions.Projector
+import com.codepoetics.raffia.operations.ProjectionResult
 
 internal abstract class StructProjector<T> : Projector<T> {
 

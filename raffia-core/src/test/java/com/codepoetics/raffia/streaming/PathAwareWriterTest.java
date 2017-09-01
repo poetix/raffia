@@ -1,19 +1,12 @@
 package com.codepoetics.raffia.streaming;
 
-import com.codepoetics.raffia.lenses.Lens;
 import com.codepoetics.raffia.paths.Path;
-import com.codepoetics.raffia.paths.Paths;
 import com.codepoetics.raffia.predicates.BasketPredicates;
-import javafx.geometry.Pos;
 import kotlin.jvm.functions.Function1;
 import kotlin.jvm.functions.Function2;
-import kotlin.reflect.KFunction;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import static com.codepoetics.raffia.lenses.Lens.lens;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 
 public class PathAwareWriterTest {
@@ -37,9 +30,24 @@ public class PathAwareWriterTest {
     return new InterpretingWriter<>(stateMachine, state, id);
   }
 
+  private static final Function2<Position, Token, Position> positionStateMachine = new Function2<Position, Token, Position>() {
+    @Override
+    public Position invoke(Position position, Token token) {
+      return position.receive(token);
+    }
+  };
+
+  private static final Function2<PositionTrackingState, Token, PositionTrackingState> positionTrackingStateMachine = new Function2<PositionTrackingState, Token, PositionTrackingState>() {
+    @Override
+    public PositionTrackingState invoke(PositionTrackingState positionTrackingState, Token token) {
+      positionTrackingState.receive(token);
+      return positionTrackingState;
+    }
+  };
+
   @Test
   public void positionTracking() {
-    Filter<Position> writer = getWriter(PathAwareWriterKt.getPositionStateMachine(), Position.getEmpty());
+    Filter<Position> writer = getWriter(positionStateMachine, Position.getEmpty());
 
     assertPosition("", writer);
     assertPosition("[0]", writer.beginArray());
@@ -63,7 +71,7 @@ public class PathAwareWriterTest {
     Path emptyPath = lens("$").getPath();
 
     Filter<PositionTrackingState> writer = getWriter(
-        PathAwareWriterKt.getPositionTrackingStateMachine(),
+        positionTrackingStateMachine,
         PositionTrackingState.fromPath(emptyPath));
 
     assertState(PathBindingState.Complete.class, writer);
@@ -77,7 +85,7 @@ public class PathAwareWriterTest {
     Path conditionalPath = lens("$[?]", BasketPredicates.isFalse()).getPath();
 
     Filter<PositionTrackingState> writer = getWriter(
-        PathAwareWriterKt.getPositionTrackingStateMachine(),
+        positionTrackingStateMachine,
         PositionTrackingState.fromPath(conditionalPath));
 
     assertState(partial, writer);
@@ -91,7 +99,7 @@ public class PathAwareWriterTest {
     Path path = lens("$[1].bar").getPath();
 
     Filter<PositionTrackingState> writer = getWriter(
-        PathAwareWriterKt.getPositionTrackingStateMachine(),
+        positionTrackingStateMachine,
         PositionTrackingState.fromPath(path));
 
     assertState(partial, writer);
@@ -115,7 +123,7 @@ public class PathAwareWriterTest {
     Path path = lens("$.foo[?]", BasketPredicates.isArray()).getPath();
 
     Filter<PositionTrackingState> writer = getWriter(
-        PathAwareWriterKt.getPositionTrackingStateMachine(),
+        positionTrackingStateMachine,
         PositionTrackingState.fromPath(path));
 
     assertState(partial, writer);
@@ -129,7 +137,7 @@ public class PathAwareWriterTest {
     Path path = lens("$['foo', 'bar'][?]", BasketPredicates.isArray()).getPath();
 
     Filter<PositionTrackingState> writer = getWriter(
-        PathAwareWriterKt.getPositionTrackingStateMachine(),
+        positionTrackingStateMachine,
         PositionTrackingState.fromPath(path));
 
     assertState(partial, writer);

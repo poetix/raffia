@@ -2,10 +2,10 @@ package com.codepoetics.raffia;
 
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.baskets.PropertySet;
-import com.codepoetics.raffia.functions.Mapper;
 import com.codepoetics.raffia.functions.BasketPredicate;
-import com.codepoetics.raffia.operations.Setters;
+import com.codepoetics.raffia.functions.Mapper;
 import com.codepoetics.raffia.functions.Updater;
+import com.codepoetics.raffia.operations.Setters;
 import org.junit.Test;
 
 import static com.codepoetics.raffia.StoreExample.store;

@@ -5,8 +5,7 @@ import com.codepoetics.raffia.paths.PathSegment
 import com.codepoetics.raffia.paths.segments.PathSegments
 import org.pcollections.PVector
 import org.pcollections.TreePVector
-
-import java.util.ArrayList
+import java.util.*
 import java.util.regex.Pattern
 
 internal object PathParser {

@@ -6,7 +6,9 @@ import com.codepoetics.raffia.baskets.PropertySet
 import com.codepoetics.raffia.functions.BasketPredicate
 import com.codepoetics.raffia.functions.Projector
 import com.codepoetics.raffia.functions.Updater
-import com.codepoetics.raffia.operations.*
+import com.codepoetics.raffia.operations.ProjectionResult
+import com.codepoetics.raffia.operations.Projectors
+import com.codepoetics.raffia.operations.Updaters
 import com.codepoetics.raffia.paths.Path
 import com.codepoetics.raffia.paths.PathSegmentMatchResult
 
