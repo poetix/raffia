@@ -174,7 +174,7 @@ public class PerformanceTest {
   }
 
   @PerfTest(
-      invocations = 500000,
+      invocations = 100000,
       threads = 8,
       rampUp = 50000
   )
@@ -198,7 +198,7 @@ public class PerformanceTest {
   }
 
   @PerfTest(
-      invocations = 500000,
+      invocations = 100000,
       threads = 8,
       rampUp = 50000
   )

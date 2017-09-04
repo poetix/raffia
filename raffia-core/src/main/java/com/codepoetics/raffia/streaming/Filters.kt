@@ -11,7 +11,7 @@ object Filters {
 
     @JvmStatic
     fun <T : BasketWriter<T>> updating(lens: Lens, updater: Updater, writer: T): Filter<T> {
-        val interpreter: UpdatingInterpreter = updatingInterpreter(updater)
+        val interpreter: UpdatingInterpreter = UpdatingInterpreter(updater)
         val inputWritingStateMachine = inputWritingStateMachine<T>()
         val downstreamStateMachine = { state: UpdaterState<T>, token: UpdaterToken -> state.receive(inputWritingStateMachine, token) }
         val positionAwareSM = positionAwareStateMachine(interpreter, downstreamStateMachine)

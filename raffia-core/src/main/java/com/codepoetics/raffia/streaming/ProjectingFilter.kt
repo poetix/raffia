@@ -24,19 +24,19 @@ internal typealias ProjectingInterpreter = PathAwareInterpreter<ProjectorToken>
  * The interpreter which generates ProjectorTokens out of ordinary tokens, based on position and path-binding information
  */
 internal val projectingInterpreter: ProjectingInterpreter = { state, token ->
-    state.pathBindingState.let {
-        when (it) {
-            is PathBindingState.Complete ->
+    state.current.let {
+        when (it.type) {
+            PathBindingType.COMPLETE ->
                 if (state.atBindingPoint) {
                     if (token is Token.End) ProjectorToken.DoNothing
                     else ProjectorToken.StartProjecting(Projectors.id, token)
                 } else ProjectorToken.ContinueProjecting(token)
 
-            is PathBindingState.Conditional ->
+            PathBindingType.CONDITIONAL ->
                 if (state.atBindingPoint) {
                     if (token is Token.End) ProjectorToken.DoNothing
                     else ProjectorToken.StartProjecting(
-                            it.conditionalPath.head().createItemProjector(it.conditionalPath.tail()), token)
+                            it.remainingPath.head().createItemProjector(it.remainingPath.tail()), token)
                 } else ProjectorToken.ContinueProjecting(token)
 
             else -> ProjectorToken.DoNothing

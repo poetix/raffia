@@ -11,11 +11,6 @@ import static org.junit.Assert.assertEquals;
 
 public class PathAwareWriterTest {
 
-  private static final Class<? extends PathBindingState> partial = PathBindingState.Partial.class;
-  private static final Class<? extends PathBindingState> deviated = PathBindingState.Deviated.class;
-  private static final Class<? extends PathBindingState> complete = PathBindingState.Complete.class;
-  private static final Class<? extends PathBindingState> conditional = PathBindingState.Conditional.class;
-
   private static <T> Function1<T, T> id() {
     return new Function1<T, T>() {
       @Override
@@ -47,7 +42,7 @@ public class PathAwareWriterTest {
 
   @Test
   public void positionTracking() {
-    Filter<Position> writer = getWriter(positionStateMachine, Position.getEmpty());
+    Filter<Position> writer = getWriter(positionStateMachine, new Position());
 
     assertPosition("", writer);
     assertPosition("[0]", writer.beginArray());
@@ -74,10 +69,10 @@ public class PathAwareWriterTest {
         positionTrackingStateMachine,
         PositionTrackingState.fromPath(emptyPath));
 
-    assertState(PathBindingState.Complete.class, writer);
-    assertState(PathBindingState.Complete.class, writer.beginArray());
-    assertState(PathBindingState.Complete.class, writer.add("value"));
-    assertState(PathBindingState.Complete.class, writer.end());
+    assertState(PathBindingType.COMPLETE, writer);
+    assertState(PathBindingType.COMPLETE, writer.beginArray());
+    assertState(PathBindingType.COMPLETE, writer.add("value"));
+    assertState(PathBindingType.COMPLETE, writer.end());
   }
 
   @Test
@@ -88,10 +83,10 @@ public class PathAwareWriterTest {
         positionTrackingStateMachine,
         PositionTrackingState.fromPath(conditionalPath));
 
-    assertState(partial, writer);
-    assertState(conditional, writer.beginArray());
-    assertState(conditional, writer.add("value"));
-    assertState(conditional, writer.end());
+    assertState(PathBindingType.PARTIAL, writer);
+    assertState(PathBindingType.CONDITIONAL, writer.beginArray());
+    assertState(PathBindingType.CONDITIONAL, writer.add("value"));
+    assertState(PathBindingType.CONDITIONAL, writer.end());
   }
 
   @Test
@@ -102,20 +97,20 @@ public class PathAwareWriterTest {
         positionTrackingStateMachine,
         PositionTrackingState.fromPath(path));
 
-    assertState(partial, writer);
-    assertState(deviated, writer.beginArray());
-    assertState(deviated, writer.beginObject());
-    assertState(partial, writer.end());
-    assertState(deviated, writer.beginObject());
-    assertState(deviated, writer.key("foo"));
-    assertState(deviated, writer.add("value"));
-    assertState(complete, writer.key("bar"));
-    assertState(complete, writer.beginArray());
-    assertState(deviated, writer.end());
-    assertState(deviated, writer.key("baz"));
-    assertState(deviated, writer.add("value"));
-    assertState(deviated, writer.end());
-    assertState(deviated, writer.end());
+    assertState(PathBindingType.PARTIAL, writer);
+    assertState(PathBindingType.DEVIATED, writer.beginArray());
+    assertState(PathBindingType.DEVIATED, writer.beginObject());
+    assertState(PathBindingType.PARTIAL, writer.end());
+    assertState(PathBindingType.DEVIATED, writer.beginObject());
+    assertState(PathBindingType.DEVIATED, writer.key("foo"));
+    assertState(PathBindingType.DEVIATED, writer.add("value"));
+    assertState(PathBindingType.COMPLETE, writer.key("bar"));
+    assertState(PathBindingType.COMPLETE, writer.beginArray());
+    assertState(PathBindingType.DEVIATED, writer.end());
+    assertState(PathBindingType.DEVIATED, writer.key("baz"));
+    assertState(PathBindingType.DEVIATED, writer.add("value"));
+    assertState(PathBindingType.DEVIATED, writer.end());
+    assertState(PathBindingType.DEVIATED, writer.end());
   }
 
   @Test
@@ -126,10 +121,10 @@ public class PathAwareWriterTest {
         positionTrackingStateMachine,
         PositionTrackingState.fromPath(path));
 
-    assertState(partial, writer);
-    assertState(deviated, writer.beginObject());
-    assertState(partial, writer.key("foo"));
-    assertState(conditional, writer.beginArray());
+    assertState(PathBindingType.PARTIAL, writer);
+    assertState(PathBindingType.DEVIATED, writer.beginObject());
+    assertState(PathBindingType.PARTIAL, writer.key("foo"));
+    assertState(PathBindingType.CONDITIONAL, writer.beginArray());
   }
 
   @Test
@@ -140,24 +135,24 @@ public class PathAwareWriterTest {
         positionTrackingStateMachine,
         PositionTrackingState.fromPath(path));
 
-    assertState(partial, writer);
-    assertState(deviated, writer.beginObject());
-    assertState(partial, writer.key("foo"));
-    assertState(conditional, writer.beginArray());
-    assertState(conditional, writer.beginObject());
-    assertState(conditional, writer.end());
-    assertState(deviated, writer.end());
-    assertState(deviated, writer.key("baz"));
-    assertState(deviated, writer.add("value"));
-    assertState(partial, writer.key("bar"));
-    assertState(conditional, writer.beginObject());
+    assertState(PathBindingType.PARTIAL, writer);
+    assertState(PathBindingType.DEVIATED, writer.beginObject());
+    assertState(PathBindingType.PARTIAL, writer.key("foo"));
+    assertState(PathBindingType.CONDITIONAL, writer.beginArray());
+    assertState(PathBindingType.CONDITIONAL, writer.beginObject());
+    assertState(PathBindingType.CONDITIONAL, writer.end());
+    assertState(PathBindingType.DEVIATED, writer.end());
+    assertState(PathBindingType.DEVIATED, writer.key("baz"));
+    assertState(PathBindingType.DEVIATED, writer.add("value"));
+    assertState(PathBindingType.PARTIAL, writer.key("bar"));
+    assertState(PathBindingType.CONDITIONAL, writer.beginObject());
   }
 
-  private void assertState(Class<? extends PathBindingState> stateClass, Filter<PositionTrackingState> writer) {
-    if (!stateClass.isInstance(writer.getResult().getPathBindingState())) {
+  private void assertState(PathBindingType expectedType, Filter<PositionTrackingState> writer) {
+    if (writer.getResult().getCurrent().getType() != expectedType) {
       System.out.println(writer.getResult().getPosition());
     }
-    assertEquals(stateClass.getSimpleName(), writer.getResult().getPathBindingState().getClass().getSimpleName());
+    assertEquals(expectedType, writer.getResult().getCurrent().getType());
   }
 
 }

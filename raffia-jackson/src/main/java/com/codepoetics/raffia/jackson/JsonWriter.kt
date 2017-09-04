@@ -12,7 +12,7 @@ import java.io.StringWriter
 import java.io.Writer
 import java.math.BigDecimal
 
-class JsonWriter private constructor(private val parent: JsonWriter?, private val context: StructContext, private val generator: JsonGenerator) : BasketWriter<JsonWriter> {
+class JsonWriter private constructor(private val generator: JsonGenerator) : BasketWriter<JsonWriter> {
 
     private enum class StructContext {
         OBJECT,
@@ -20,105 +20,59 @@ class JsonWriter private constructor(private val parent: JsonWriter?, private va
         NONE
     }
 
-    override fun beginObject(): JsonWriter {
-        try {
-            generator.writeStartObject()
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
+    private val contextStack = mutableListOf<StructContext>(StructContext.NONE)
+    private var stackPtr = 0
 
-        return JsonWriter(this, StructContext.OBJECT, generator)
+    override fun beginObject(): JsonWriter = apply {
+        generator.writeStartObject()
+
+        stackPtr += 1
+        if (stackPtr == contextStack.size) contextStack.add(StructContext.OBJECT) else contextStack[stackPtr] = StructContext.OBJECT
     }
 
-    override fun beginArray(): JsonWriter {
-        try {
-            generator.writeStartArray()
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
+    override fun beginArray(): JsonWriter = apply {
+        generator.writeStartArray()
 
-        return JsonWriter(this, StructContext.ARRAY, generator)
+        stackPtr += 1
+        if (stackPtr == contextStack.size) contextStack.add(StructContext.ARRAY) else contextStack[stackPtr] = StructContext.ARRAY
     }
 
-    override fun end(): JsonWriter {
-        try {
-            when (context) {
-                JsonWriter.StructContext.ARRAY -> {
-                    generator.writeEndArray()
-                    return flushOnCompletion(parent!!)
-                }
-                JsonWriter.StructContext.OBJECT -> {
-                    generator.writeEndObject()
-                    return flushOnCompletion(parent!!)
-                }
-                else -> throw IllegalStateException("exit called without matching startArray or startObject")
+    private inline fun update(block: JsonWriter.() -> Unit) = apply {
+        block()
+        if (stackPtr == 0) generator.flush()
+    }
+
+    override fun end(): JsonWriter =
+        when (contextStack[stackPtr]) {
+            JsonWriter.StructContext.ARRAY -> update {
+                generator.writeEndArray()
+                stackPtr -= 1
             }
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
-
-    }
-
-    private fun flushOnCompletion(writer: JsonWriter): JsonWriter {
-        if (writer.context == StructContext.NONE) {
-            try {
-                generator.flush()
-            } catch (e: IOException) {
-                throw RuntimeException(e)
+            JsonWriter.StructContext.OBJECT -> update {
+                generator.writeEndObject()
+                stackPtr -= 1
             }
-
+            else -> throw IllegalStateException("exit called without matching startArray or startObject")
         }
-        return writer
+
+    override fun key(key: String): JsonWriter = apply {
+        generator.writeFieldName(key)
     }
 
-    override fun key(key: String): JsonWriter {
-        try {
-            generator.writeFieldName(key)
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
-
-        return this
+    override fun add(value: String): JsonWriter = update {
+        generator.writeString(value)
     }
 
-    override fun add(value: String): JsonWriter {
-        try {
-            generator.writeString(value)
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
-
-        return flushOnCompletion(this)
+    override fun add(value: BigDecimal): JsonWriter = update {
+        generator.writeNumber(value)
     }
 
-    override fun add(value: BigDecimal): JsonWriter {
-        try {
-            generator.writeNumber(value)
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
-
-        return flushOnCompletion(this)
+    override fun add(value: Boolean): JsonWriter = update {
+        generator.writeBoolean(value)
     }
 
-    override fun add(value: Boolean): JsonWriter {
-        try {
-            generator.writeBoolean(value)
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
-
-        return flushOnCompletion(this)
-    }
-
-    override fun addNull(): JsonWriter {
-        try {
-            generator.writeNull()
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
-
-        return flushOnCompletion(this)
+    override fun addNull(): JsonWriter = update {
+        generator.writeNull()
     }
 
     companion object {
@@ -181,7 +135,7 @@ class JsonWriter private constructor(private val parent: JsonWriter?, private va
 
         @JvmStatic
         fun writingTo(generator: JsonGenerator): JsonWriter {
-            return JsonWriter(null, StructContext.NONE, generator)
+            return JsonWriter(generator)
         }
     }
 }

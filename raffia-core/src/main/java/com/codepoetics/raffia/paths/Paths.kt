@@ -4,6 +4,8 @@ object Paths {
 
     private val EMPTY = EmptyPath()
 
+    fun empty(): Path = EMPTY
+
     fun create(segments: List<PathSegment>): Path {
         var result: Path = EMPTY
         for (i in segments.indices.reversed()) {

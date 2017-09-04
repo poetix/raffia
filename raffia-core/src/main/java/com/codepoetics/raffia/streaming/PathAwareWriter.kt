@@ -3,57 +3,79 @@ package com.codepoetics.raffia.streaming
 import com.codepoetics.raffia.paths.Path
 import com.codepoetics.raffia.paths.PathSegment
 import com.codepoetics.raffia.paths.PathSegmentMatchResult
+import com.codepoetics.raffia.paths.Paths
+
+enum class PositionType {
+    NONE,
+    ARRAY_INDEX,
+    OBJECT_KEY
+}
+
+data class Index(var key: String = "", var index: Int = 0, var type: PositionType = PositionType.NONE)
 
 /**
  * Represents the current position in the Basket's nested object structure
  */
-sealed class Position(val depth: Int) {
+class Position() {
 
     companion object {
-        @JvmStatic
-        val empty: Position = NoPosition
+        val none: Index = Index()
     }
 
-    object NoPosition : Position(-1) {
-        override fun exit(): Position = throw IllegalStateException("exit() called on empty position")
-        override fun key(key: String): Position = throw IllegalStateException("key() called on empty position")
-        override fun advance(): Position = this
-        override fun checkAgainst(pathSegment: PathSegment): PathSegmentMatchResult = PathSegmentMatchResult.UNMATCHED
+    val stack = ReusableStack<Index> { Index() }
+
+    val current: Index get() = stack.current ?: none
+
+    val depth: Int get() = stack.depth
+
+    private fun key(key: String): Position = apply {
+        current.key = key
     }
 
-    class ArrayIndex(val outer: Position, depth: Int, var index: Int) : Position(depth) {
-        override fun exit(): Position = outer
+    private inline fun withCurrent(block: Index.() -> Unit): Position = apply { current.block() }
 
-        override fun key(key: String): Position = throw IllegalStateException("key() called on array index position")
-        override fun advance(): Position = apply { this.index += 1 }
-        override fun checkAgainst(pathSegment: PathSegment): PathSegmentMatchResult = pathSegment.matchesIndex(index)
+    private fun advance(): Position = withCurrent {
+        when (type) {
+            PositionType.ARRAY_INDEX -> index += 1
+            PositionType.OBJECT_KEY -> key = ""
+            else -> Unit
+        }
     }
 
-    class ObjectKey(val outer: Position, depth: Int, var key: String?) : Position(depth) {
-        override fun exit(): Position = outer
-
-        override fun key(key: String): Position = apply { this.key = key }
-        override fun advance(): ObjectKey = apply { this.key = null }
-        override fun checkAgainst(pathSegment: PathSegment): PathSegmentMatchResult =
-                if (key == null) PathSegmentMatchResult.UNMATCHED
-                else pathSegment.matchesKey(key!!)
+    private fun enterArray(): Position = apply {
+        stack.push {
+            type = PositionType.ARRAY_INDEX
+            index = 0
+        }
     }
 
-    abstract protected fun key(key: String): Position
-    abstract protected fun advance(): Position
-
-    protected fun enterArray(): Position = ArrayIndex(this, depth + 1, 0)
-    protected fun enterObject(): Position = ObjectKey(this, depth + 1, null)
-
-    abstract protected fun exit(): Position
-
-    abstract internal fun checkAgainst(pathSegment: PathSegment): PathSegmentMatchResult
-
-    override fun toString(): String = when (this) {
-        is NoPosition -> ""
-        is ArrayIndex -> "${outer.toString()}[$index]"
-        is ObjectKey -> if (key == null) "${outer.toString()}.?" else "${outer.toString()}.$key"
+    private fun enterObject(): Position = apply {
+        stack.push {
+            type = PositionType.OBJECT_KEY
+            key = ""
+        }
     }
+
+    private fun exit(): Position = apply {
+        stack.pop()
+    }
+
+    fun checkAgainst(pathSegment: PathSegment): PathSegmentMatchResult =
+            current.let {
+                when (it.type) {
+                    PositionType.ARRAY_INDEX -> pathSegment.matchesIndex(it.index)
+                    PositionType.OBJECT_KEY -> if (it.key.isEmpty()) PathSegmentMatchResult.UNMATCHED else pathSegment.matchesKey(it.key)
+                    else -> PathSegmentMatchResult.UNMATCHED
+                }
+            }
+
+    override fun toString(): String = stack.contents.map {
+        when (it.type) {
+            PositionType.NONE -> ""
+            PositionType.ARRAY_INDEX -> "[${it.index}]"
+            PositionType.OBJECT_KEY -> if (it.key.isEmpty()) ".?" else ".${it.key}"
+        }
+    }.joinToString("")
 
     fun receive(token: Token): Position = when (token) {
         is Token.Key -> key(token.key)
@@ -64,62 +86,82 @@ sealed class Position(val depth: Int) {
     }
 }
 
+enum class PathBindingType {
+    PARTIAL,
+    DEVIATED,
+    COMPLETE,
+    CONDITIONAL
+}
+
 /**
  * Represents the state of path-binding, i.e. how much of a given path has been bound by the current Position
  */
-sealed class PathBindingState(val outer: PathBindingState?, val atDepth: Int) {
-
-    internal fun receive(position: Position): PathBindingState =
-            if (position is Position.NoPosition)
-                this
-            else if (position.depth <= atDepth)
-                outer!!.receive(position)
-            else if (this is PathBindingState.Partial)
-                comparePartial(remainingPath, position)
-            else this
-
-    private fun comparePartial(remainingPath: Path, position: Position): PathBindingState =
-            if (remainingPath.head().isConditional)
-                PathBindingState.Conditional(this, position.depth, remainingPath)
-            else when (position.checkAgainst(remainingPath.head())) {
-                PathSegmentMatchResult.UNMATCHED -> PathBindingState.Deviated(this, position.depth)
-                PathSegmentMatchResult.MATCHED_UNBOUND -> this
-                PathSegmentMatchResult.MATCHED_BOUND -> boundCase(remainingPath.tail(), position)
-            }
-
-    private fun boundCase(tail: Path, position: Position) =
-            if (tail.isEmpty)
-                PathBindingState.Complete(this, position.depth)
-            else PathBindingState.Partial(this, position.depth, tail)
-
-    companion object {
-        @JvmStatic
-        fun fromPath(path: Path): PathBindingState =
-                if (path.isEmpty) Complete(null, -1)
-                else Partial(null, -1, path)
-    }
-
-    class Conditional(outer: PathBindingState, atDepth: Int, val conditionalPath: Path) : PathBindingState(outer, atDepth)
-    class Complete(outer: PathBindingState?, atDepth: Int) : PathBindingState(outer, atDepth)
-    class Partial(outer: PathBindingState?, atDepth: Int, val remainingPath: Path) : PathBindingState(outer, atDepth)
-    class Deviated(outer: PathBindingState, atDepth: Int) : PathBindingState(outer, atDepth)
-
-}
+data class PathBindingState(var type: PathBindingType, var atDepth: Int, var remainingPath: Path)
 
 /**
  * Combined state from position tracking and path binding.
  */
-data class PositionTrackingState(var position: Position, var pathBindingState: PathBindingState) {
-    internal val atBindingPoint: Boolean get() = position.depth == pathBindingState.atDepth
+data class PositionTrackingState(var position: Position, val initial: PathBindingState) {
+
+    private val pathBindingStack = ReusableStack<PathBindingState>() { PathBindingState(PathBindingType.PARTIAL, 0, Paths.empty()) }
+
+    val current: PathBindingState get() = pathBindingStack.current ?: initial
+
+    internal val atBindingPoint: Boolean get() = position.depth == current.atDepth
 
     fun receive(token: Token): Unit {
         position = position.receive(token)
-        pathBindingState = pathBindingState.receive(position)
+        receive(position)
+    }
+
+    private fun receive(position: Position): Unit {
+        if (position.current.type == PositionType.NONE) return
+
+        while (position.depth <= current.atDepth) {
+            pathBindingStack.pop()
+        }
+
+        if (current.type == PathBindingType.PARTIAL) {
+            comparePartial(current.remainingPath, position)
+        }
+    }
+
+    private fun comparePartial(remainingPath: Path, position: Position): Unit {
+        if (remainingPath.head().isConditional) {
+            pathBindingStack.push {
+                type = PathBindingType.CONDITIONAL
+                atDepth = position.depth
+                this.remainingPath = remainingPath
+            }
+        } else when (position.checkAgainst(remainingPath.head())) {
+            PathSegmentMatchResult.UNMATCHED -> pathBindingStack.push {
+                type = PathBindingType.DEVIATED
+                atDepth = position.depth
+            }
+            PathSegmentMatchResult.MATCHED_UNBOUND -> Unit
+            PathSegmentMatchResult.MATCHED_BOUND -> boundCase(remainingPath.tail(), position)
+        }
+    }
+
+    private fun boundCase(tail: Path, position: Position) {
+        if (tail.isEmpty)
+            pathBindingStack.push {
+                type = PathBindingType.COMPLETE
+                atDepth = position.depth
+            }
+        else pathBindingStack.push {
+            type = PathBindingType.PARTIAL
+            atDepth = position.depth
+            remainingPath = tail
+        }
     }
 
     companion object {
         @JvmStatic
-        fun fromPath(path: Path): PositionTrackingState = PositionTrackingState(Position.empty, PathBindingState.fromPath(path))
+        fun fromPath(path: Path): PositionTrackingState = PositionTrackingState(Position(),
+                if (path.isEmpty) PathBindingState(PathBindingType.COMPLETE, -1, path)
+                else PathBindingState(PathBindingType.PARTIAL, -1, path))
+
     }
 }
 
