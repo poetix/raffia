@@ -2,37 +2,37 @@ package com.codepoetics.raffia;
 
 import com.codepoetics.raffia.baskets.Basket;
 import com.codepoetics.raffia.baskets.PropertySet;
-import com.codepoetics.raffia.functions.BasketPredicate;
-import com.codepoetics.raffia.functions.Mapper;
-import com.codepoetics.raffia.functions.Updater;
+import com.codepoetics.raffia.lenses.Strands;
 import com.codepoetics.raffia.operations.Setters;
+import com.codepoetics.raffia.operations.Updaters;
+import kotlin.jvm.functions.Function1;
 import org.junit.Test;
 
 import static com.codepoetics.raffia.StoreExample.store;
-import static com.codepoetics.raffia.lenses.Lens.lens;
+import static com.codepoetics.raffia.lenses.Strands.strand;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 public class Updating {
 
-  private static final Updater capitaliseString = com.codepoetics.raffia.operations.Updaters.INSTANCE.ofString(new Mapper<String, String>() {
+  private static final Function1<Basket, Basket> capitaliseString = Updaters.ofString(new Function1<String, String>() {
     @Override
-    public String map(String input) {
+    public String invoke(String input) {
       return input.toUpperCase();
     }
   });
 
-  private static final Updater priceToString = new Updater() {
+  private static final Function1<Basket, Basket> priceToString = new Function1<Basket, Basket>() {
     @Override
-    public Basket update(Basket basket) {
+    public Basket invoke(Basket basket) {
       System.out.println(basket);
       return Basket.ofString(basket.asNumber().toString());
     }
   };
 
-  private static final Updater addDescription = com.codepoetics.raffia.operations.Updaters.INSTANCE.ofObject(new Mapper<PropertySet, PropertySet>() {
+  private static final Function1<Basket, Basket> addDescription = Updaters.ofObject(new Function1<PropertySet, PropertySet>() {
     @Override
-    public PropertySet map(PropertySet input) {
+    public PropertySet invoke(PropertySet input) {
       return input.with("description",
           Basket.ofString(
               "\""
@@ -44,42 +44,42 @@ public class Updating {
 
   @Test
   public void capitaliseAuthorsOfAllBooks() {
-    Basket updated = lens("$..author").update(capitaliseString, store);
+    Basket updated = strand("$..author").update(store, capitaliseString);
 
     assertThat(
-        lens("$..author").getAllStrings(updated),
+        strand("$..author").getAllStrings(updated),
         contains("NIGEL REES", "EVELYN WAUGH", "HERMAN MELVILLE", "J. R. R. TOLKIEN"));
   }
 
   @Test
   public void convertPricesToStrings() {
-    Basket updated = lens("$..price").update(priceToString, store);
+    Basket updated = strand("$..price").update(store, priceToString);
 
     System.out.println(updated);
     assertThat(
-        lens("$..price").getAllStrings(updated),
+        strand("$..price").getAllStrings(updated),
         contains("8.95", "12.99", "8.99", "22.99", "19.95"));
   }
 
   @Test
   public void addDescriptionStringsToBooks() {
-    Basket updated = lens("$..book[*]").update(addDescription, store);
+    Basket updated = strand("$..book[*]").update(store, addDescription);
 
     assertThat(
-        lens().toAny("description").getAllStrings(updated),
+        strand("$..description").getAllStrings(updated),
         hasItem("\"Sayings of the Century\", by Nigel Rees")
     );
   }
 
   @Test
   public void rewritingAValue() {
-    BasketPredicate authorIsNigel = lens("$..author").matching("Nigel Rees");
+    Function1<Basket, Boolean> authorIsNigel = strand("$..author").matches("Nigel Rees");
 
-    Basket updated = lens("$..book[?].title", authorIsNigel)
-        .update(Setters.INSTANCE.toString("Hallucinogenic Adventures vol. 13"), store);
+    Basket updated = strand("$..book[?].title", authorIsNigel)
+        .update(store, Setters.toString("Hallucinogenic Adventures vol. 13"));
 
     assertThat(
-        lens("$..book").toMatching(authorIsNigel).to("title").getOne(updated).asString(),
+        strand("$..book[?].title", authorIsNigel).getString(updated),
         equalTo("Hallucinogenic Adventures vol. 13"));
   }
 

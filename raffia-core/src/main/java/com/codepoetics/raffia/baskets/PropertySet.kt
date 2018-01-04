@@ -1,6 +1,5 @@
 package com.codepoetics.raffia.baskets
 
-import com.codepoetics.raffia.functions.Mapper
 import org.pcollections.HashTreePMap
 import org.pcollections.PMap
 import org.pcollections.PVector
@@ -71,18 +70,16 @@ class PropertySet private constructor(private val keys: PVector<String>, private
         }
     }
 
-    fun mapValues(valueMapper: Mapper<Basket, Basket>): PropertySet =
-        PropertySet.of(map { entry -> ObjectEntry.of(entry.key, valueMapper.map(entry.value)) })
+    fun mapValues(valueMapper: (Basket) -> Basket): PropertySet =
+        PropertySet.of(map { entry -> ObjectEntry.of(entry.key, valueMapper(entry.value)) })
 
-    fun mapEntries(entryMapper: Mapper<ObjectEntry, List<ObjectEntry>>): PropertySet =
-            PropertySet.of(flatMap { entry -> entryMapper.map(entry) })
+    fun mapEntries(entryMapper: (ObjectEntry) -> Sequence<ObjectEntry>): PropertySet =
+            PropertySet.of(asSequence().flatMap(entryMapper))
 
     companion object {
 
         @JvmStatic
-        fun of(vararg entries: ObjectEntry): PropertySet {
-            return of(Arrays.asList(*entries))
-        }
+        fun of(vararg entries: ObjectEntry): PropertySet = of(Arrays.asList(*entries))
 
         @JvmStatic
         fun of(entries: Collection<ObjectEntry>): PropertySet {
@@ -94,8 +91,8 @@ class PropertySet private constructor(private val keys: PVector<String>, private
         }
 
         @JvmStatic
-        fun of(properties: Map<String, Basket>): PropertySet {
-            return PropertySet(TreePVector.from(properties.keys), HashTreePMap.from(properties))
-        }
+        fun of(properties: Map<String, Basket>): PropertySet = PropertySet(TreePVector.from(properties.keys), HashTreePMap.from(properties))
+
+        fun of(properties: Sequence<ObjectEntry>): PropertySet = of(properties.toList())
     }
 }

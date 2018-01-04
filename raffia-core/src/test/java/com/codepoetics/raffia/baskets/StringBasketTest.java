@@ -1,6 +1,6 @@
 package com.codepoetics.raffia.baskets;
 
-import com.codepoetics.raffia.functions.Mapper;
+import kotlin.jvm.functions.Function1;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -43,9 +43,9 @@ public class StringBasketTest {
 
   @Test
   public void mapValue() {
-    assertEquals(Basket.ofString("VALUE"), unit.mapString(new Mapper<String, String>() {
+    assertEquals(Basket.ofString("VALUE"), unit.mapString(new Function1<String, String>() {
       @Override
-      public String map(String input) {
+      public String invoke(String input) {
         return input.toUpperCase();
       }
     }));
@@ -53,9 +53,9 @@ public class StringBasketTest {
 
   @Test
   public void flatMapValue() {
-    assertEquals(Basket.ofNumber(new BigDecimal("5")), unit.flatMapString(new Mapper<String, Basket>() {
+    assertEquals(Basket.ofNumber(new BigDecimal("5")), unit.flatMapString(new Function1<String, Basket>() {
       @Override
-      public Basket map(String input) {
+      public Basket invoke(String input) {
         return Basket.ofNumber(BigDecimal.valueOf(input.length())) ;
       }
     }));

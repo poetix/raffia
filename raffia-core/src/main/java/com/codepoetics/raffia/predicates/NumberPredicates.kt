@@ -1,8 +1,5 @@
 package com.codepoetics.raffia.predicates
 
-import com.codepoetics.raffia.functions.ValuePredicate
-import com.codepoetics.raffia.functions.valuePredicate
-
 import java.math.BigDecimal
 
 object NumberPredicates {
@@ -20,7 +17,7 @@ object NumberPredicates {
     fun isEqualTo(other: String): ValuePredicate<BigDecimal> = isEqualTo(BigDecimal(other))
 
     @JvmStatic
-    fun isEqualTo(other: BigDecimal): ValuePredicate<BigDecimal> = valuePredicate { input -> input == other }
+    fun isEqualTo(other: BigDecimal): ValuePredicate<BigDecimal> = { input -> input == other }
 
     @JvmStatic
     fun isGreaterThan(other: Int): ValuePredicate<BigDecimal> = isGreaterThan(BigDecimal.valueOf(other.toLong()))
@@ -35,7 +32,7 @@ object NumberPredicates {
     fun isGreaterThan(other: String): ValuePredicate<BigDecimal> = isGreaterThan(BigDecimal(other))
 
     @JvmStatic
-    fun isGreaterThan(other: BigDecimal): ValuePredicate<BigDecimal> = valuePredicate { input -> input > other }
+    fun isGreaterThan(other: BigDecimal): ValuePredicate<BigDecimal> = { input -> input > other }
 
     @JvmStatic
     fun isLessThan(other: Int): ValuePredicate<BigDecimal> = isLessThan(BigDecimal.valueOf(other.toLong()))
@@ -50,7 +47,7 @@ object NumberPredicates {
     fun isLessThan(other: String): ValuePredicate<BigDecimal> = isLessThan(BigDecimal(other))
 
     @JvmStatic
-    fun isLessThan(other: BigDecimal): ValuePredicate<BigDecimal> = valuePredicate { input -> input < other }
+    fun isLessThan(other: BigDecimal): ValuePredicate<BigDecimal> = { input -> input < other }
 
     @JvmStatic
     fun isGreaterThanOrEqualTo(other: Int): ValuePredicate<BigDecimal> = isGreaterThanOrEqualTo(BigDecimal.valueOf(other.toLong()))
@@ -65,7 +62,7 @@ object NumberPredicates {
     fun isGreaterThanOrEqualTo(other: String): ValuePredicate<BigDecimal> = isGreaterThanOrEqualTo(BigDecimal(other))
 
     @JvmStatic
-    fun isGreaterThanOrEqualTo(other: BigDecimal): ValuePredicate<BigDecimal> = valuePredicate { input -> input >= other }
+    fun isGreaterThanOrEqualTo(other: BigDecimal): ValuePredicate<BigDecimal> = { input -> input >= other }
 
     @JvmStatic
     fun isLessThanOrEqualTo(other: Int): ValuePredicate<BigDecimal> = isLessThanOrEqualTo(BigDecimal.valueOf(other.toLong()))
@@ -80,5 +77,5 @@ object NumberPredicates {
     fun isLessThanOrEqualTo(other: String): ValuePredicate<BigDecimal> = isLessThanOrEqualTo(BigDecimal(other))
 
     @JvmStatic
-    fun isLessThanOrEqualTo(other: BigDecimal): ValuePredicate<BigDecimal> = valuePredicate { input -> input <= other }
+    fun isLessThanOrEqualTo(other: BigDecimal): ValuePredicate<BigDecimal> = { input -> input <= other }
 }

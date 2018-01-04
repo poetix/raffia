@@ -1,6 +1,7 @@
 package com.codepoetics.raffia.builders
 
 import com.codepoetics.raffia.baskets.Basket
+import com.codepoetics.raffia.baskets.Basket.Companion.ofString
 import com.codepoetics.raffia.writers.BasketWeavingWriter
 import com.codepoetics.raffia.writers.BasketWriter
 import com.codepoetics.raffia.writers.Writers
@@ -40,16 +41,19 @@ class BasketWeaver private constructor(private val writer: BasketWeavingWriter) 
     fun array(): BasketWeaver = with(writer.beginArray().end())
 
     fun array(firstItem: Basket, vararg subsequentItems: Basket): BasketWeaver =
-            array(firstItem, subsequentItems) { it }
+            with(subsequentItems.fold(
+                    writer.beginArray().add(firstItem),
+                    { state, item -> state.add(item) })
+            .end())
 
     fun array(firstItem: String, vararg subsequentItems: String): BasketWeaver =
-            array<String>(firstItem, subsequentItems) { Basket.ofString(it) }
+            array<String>(firstItem, subsequentItems, Basket.Companion::ofString)
 
     fun array(firstItem: BigDecimal, vararg subsequentItems: BigDecimal): BasketWeaver =
-            array<BigDecimal>(firstItem, subsequentItems) { Basket.ofNumber(it) }
+            array<BigDecimal>(firstItem, subsequentItems, Basket.Companion::ofNumber)
 
     fun array(firstItem: Boolean, vararg subsequentItems: Boolean): BasketWeaver =
-            array<Boolean>(firstItem, subsequentItems.toTypedArray()) { Basket.ofBoolean(it) }
+            array<Boolean>(firstItem, subsequentItems.toTypedArray(), Basket.Companion::ofBoolean)
 
     private fun <T> array(first: T, subsequent: Array<out T>, mapper: (T) -> Basket): BasketWeaver =
         with(subsequent.fold(

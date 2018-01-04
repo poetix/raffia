@@ -1,6 +1,8 @@
 package com.codepoetics.raffia.baskets;
 
-import com.codepoetics.raffia.functions.Mapper;
+import kotlin.jvm.functions.Function1;
+import kotlin.sequences.Sequence;
+import kotlin.sequences.SequencesKt;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -86,9 +88,9 @@ public class ObjectBasketTest {
         ObjectEntry.of("number", Basket.ofString("3.14")),
         ObjectEntry.of("boolean", Basket.ofString("true")),
         ObjectEntry.of("null", Basket.ofString("null"))
-    ), unit.mapValues(new Mapper<Basket, Basket>() {
+    ), unit.mapValues(new Function1<Basket, Basket>() {
       @Override
-      public Basket map(Basket input) {
+      public Basket invoke(Basket input) {
         return Basket.ofString(Objects.toString(input.getValue()));
       }
     }));
@@ -96,12 +98,12 @@ public class ObjectBasketTest {
 
   @Test
   public void mapEntries() {
-    assertEquals(unit.withoutProperty("null"), unit.mapEntries(new Mapper<ObjectEntry, List<ObjectEntry>>() {
+    assertEquals(unit.withoutProperty("null"), unit.mapEntries(new Function1<ObjectEntry, Sequence<ObjectEntry>>() {
       @Override
-      public List<ObjectEntry> map(ObjectEntry input) {
+      public Sequence<ObjectEntry> invoke(ObjectEntry input) {
         return input.getValue().isNull()
-            ? Collections.<ObjectEntry>emptyList()
-            : Collections.singletonList(input);
+            ? SequencesKt.<ObjectEntry>emptySequence()
+            : SequencesKt.sequenceOf(input);
       }
     }));
   }
@@ -109,9 +111,9 @@ public class ObjectBasketTest {
   @Test
   public void flatMap() {
     assertEquals(Basket.ofNumber(BigDecimal.valueOf(4)),
-        unit.flatMapObject(new Mapper<PropertySet, Basket>() {
+        unit.flatMapObject(new Function1<PropertySet, Basket>() {
       @Override
-      public Basket map(PropertySet input) {
+      public Basket invoke(PropertySet input) {
         return Basket.ofNumber(BigDecimal.valueOf(input.size()));
       }
     }));

@@ -1,6 +1,5 @@
 package com.codepoetics.raffia.baskets
 
-import com.codepoetics.raffia.functions.Mapper
 import org.pcollections.PVector
 import org.pcollections.TreePVector
 
@@ -22,11 +21,9 @@ class ArrayContents private constructor(private val contents: PVector<Basket>) :
 
     operator fun minus(index: Int): ArrayContents = ArrayContents(contents.minus(index))
 
-    fun toList(): List<Basket> = contents
+    fun map(mapper: (Basket) -> Basket): ArrayContents = ArrayContents.of(contents.map(mapper))
 
-    fun <T> map(mapper: Mapper<Basket, T>): List<T> = contents.map { item -> mapper.map(item) }
-
-    fun <T> flatMap(itemFlatMapper: Mapper<Basket, List<T>>): List<T> = contents.flatMap { item -> itemFlatMapper.map(item) }
+    fun flatMap(itemFlatMapper: (Basket) -> Sequence<Basket>): ArrayContents = ArrayContents.of(contents.asSequence().flatMap(itemFlatMapper))
 
     val isEmpty: Boolean
             get() = contents.isEmpty()
@@ -47,20 +44,18 @@ class ArrayContents private constructor(private val contents: PVector<Basket>) :
 
     companion object {
 
-        @JvmStatic
-        fun empty(): ArrayContents {
-            return ArrayContents(TreePVector.empty<Basket>())
-        }
+        val empty = ArrayContents(TreePVector.empty())
 
         @JvmStatic
-        fun of(vararg contents: Basket): ArrayContents {
-            return of(Arrays.asList(*contents))
-        }
+        fun empty(): ArrayContents = empty
 
         @JvmStatic
-        fun of(contents: Collection<Basket>): ArrayContents {
-            return ArrayContents(TreePVector.from(contents))
-        }
+        fun of(vararg contents: Basket): ArrayContents = of(Arrays.asList(*contents))
+
+        @JvmStatic
+        fun of(contents: Collection<Basket>): ArrayContents =ArrayContents(TreePVector.from(contents))
+
+        fun of(contents: Sequence<Basket>): ArrayContents = ArrayContents(contents.fold(TreePVector.empty<Basket>(), TreePVector<Basket>::plus))
     }
 
 }

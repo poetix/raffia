@@ -1,6 +1,5 @@
 package com.codepoetics.raffia.baskets
 
-import com.codepoetics.raffia.functions.Mapper
 import java.math.BigDecimal
 import java.util.*
 
@@ -97,29 +96,29 @@ sealed class Basket {
         throw UnsupportedOperationException("Cannot get $requested value from basket of type ${getType()}")
     }
 
-    fun mapString(mapper: Mapper<String, String>): Basket = ofString(mapper.map(asString()))
+    fun mapString(mapper: (String) -> String): Basket = ofString(mapper(asString()))
 
-    fun flatMapString(mapper: Mapper<String, Basket>): Basket = mapper.map(asString())
+    fun flatMapString(mapper: (String) -> Basket): Basket = mapper(asString())
 
-    fun mapNumber(mapper: Mapper<BigDecimal, BigDecimal>): Basket = ofNumber(mapper.map(asNumber()))
+    fun mapNumber(mapper:(BigDecimal) -> BigDecimal): Basket = ofNumber(mapper(asNumber()))
 
-    fun flatMapNumber(mapper: Mapper<BigDecimal, Basket>): Basket = mapper.map(asNumber())
+    fun flatMapNumber(mapper: (BigDecimal) -> Basket): Basket = mapper(asNumber())
 
-    fun mapBoolean(mapper: Mapper<Boolean, Boolean>): Basket = ofBoolean(mapper.map(asBoolean()))
+    fun mapBoolean(mapper: (Boolean) -> Boolean): Basket = ofBoolean(mapper(asBoolean()))
 
-    fun flatMapBoolean(mapper: Mapper<Boolean, Basket>): Basket = mapper.map(asBoolean())
+    fun flatMapBoolean(mapper: (Boolean) -> Basket): Basket = mapper(asBoolean())
 
-    fun mapObject(mapper: Mapper<PropertySet, PropertySet>): Basket = ofObject(mapper.map(asObject()))
+    fun mapObject(mapper: (PropertySet) -> PropertySet): Basket = ofObject(mapper(asObject()))
 
-    fun flatMapObject(mapper: Mapper<PropertySet, Basket>): Basket = mapper.map(asObject())
+    fun flatMapObject(mapper: (PropertySet) -> Basket): Basket = mapper(asObject())
 
-    fun mapArray(mapper: Mapper<ArrayContents, ArrayContents>): Basket = ofArray(mapper.map(asArray()))
+    fun mapArray(mapper: (ArrayContents) -> ArrayContents): Basket = ofArray(mapper(asArray()))
 
-    fun flatMapArray(mapper: Mapper<ArrayContents, Basket>): Basket = mapper.map(asArray())
+    fun flatMapArray(mapper: (ArrayContents) -> Basket): Basket = mapper(asArray())
 
-    fun asListOfString(): List<String> = asArray().map { input -> input.asString() }
+    fun asListOfString(): List<String> = asArray().map(Basket::asString).toList()
 
-    fun asListOfNumber(): List<BigDecimal> = asArray().map { input -> input.asNumber() }
+    fun asListOfNumber(): List<BigDecimal> = asArray().map(Basket::asNumber).toList()
 
     fun withProperty(key: String, value: Basket): Basket = ofObject(asObject().with(key, value))
 
@@ -133,19 +132,36 @@ sealed class Basket {
 
     fun getProperty(key: String): Basket? = asObject().get(key)
 
-    fun entries(): Iterable<ObjectEntry> = asObject()
+    fun entries(): List<ObjectEntry> = asObject().toList()
 
     fun getItem(index: Int): Basket = asArray().get(index)
 
-    fun items(): Iterable<Basket> = asArray()
+    fun items(): List<Basket> = asArray().toList()
 
-    fun mapItems(itemMapper: Mapper<Basket, Basket>): Basket = ofArray(asArray().map(itemMapper))
+    fun values(): List<Basket> = when(this) {
+        is Basket.ObjectBasket -> properties.map(ObjectEntry::value)
+        is Basket.ArrayBasket -> items()
+        is Basket.NullBasket -> emptyList()
+        else -> listOf(this)
+    }
 
-    fun flatMapItems(itemFlatMapper: Mapper<Basket, List<Basket>>): Basket = ofArray(asArray().flatMap(itemFlatMapper))
+    fun flatMapItems(itemFlatMapper: (Basket) -> Sequence<Basket>): Basket = ofArray(asArray().flatMap(itemFlatMapper))
 
-    fun mapValues(valueMapper: Mapper<Basket, Basket>): Basket = ofObject(asObject().mapValues(valueMapper))
+    fun mapValues(valueMapper: (Basket) -> Basket): Basket = ofObject(asObject().mapValues(valueMapper))
 
-    fun mapEntries(entryMapper: Mapper<ObjectEntry, List<ObjectEntry>>): Basket = ofObject(asObject().mapEntries(entryMapper))
+    fun mapEntries(entryMapper: (ObjectEntry) -> Sequence<ObjectEntry>): Basket = ofObject(asObject().mapEntries(entryMapper))
+
+    fun containsKey(key: String): Boolean = when(this) {
+        is Basket.ObjectBasket -> properties.containsKey(key)
+        else -> false
+    }
+
+     fun size(): Int = when(this) {
+         is Basket.ObjectBasket -> properties.size()
+         is Basket.ArrayBasket -> contents.size()
+         is Basket.NullBasket -> 0
+         else -> 1
+     }
 
     companion object {
 

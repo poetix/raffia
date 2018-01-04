@@ -7,11 +7,7 @@ import java.math.BigDecimal
 
 class BasketBuilder<T : BasketWriter<T>> protected constructor(val writer: T) : BasketWriter<BasketBuilder<T>> {
 
-    fun <T : BasketWriter<T>> writingTo(writer: T): BasketBuilder<T> {
-        return BasketBuilder(writer)
-    }
-
-    protected fun with(writer: T): BasketBuilder<T> {
+    private fun with(writer: T): BasketBuilder<T> {
         return BasketBuilder(writer)
     }
 

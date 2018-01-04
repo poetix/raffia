@@ -4,7 +4,6 @@ import com.codepoetics.raffia.baskets.ArrayContents
 import com.codepoetics.raffia.baskets.Basket
 import com.codepoetics.raffia.baskets.ObjectEntry
 import com.codepoetics.raffia.baskets.PropertySet
-import com.codepoetics.raffia.functions.Updater
 
 import java.math.BigDecimal
 
